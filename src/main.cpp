@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <filesystem>
 #include <string>
 #include <vector>
@@ -11,6 +12,15 @@
 #include "gradient.h"
 #include "mandelbrot.h"
 #include "pixel_color.h"
+
+struct MandelbrotParams {
+    int width;
+    int height;
+    int max_iterations;
+    double center_x;
+    double center_y;
+    double fractal_height;
+};
 
 void copy_mandelbrot_to_image(const std::vector<PixelColor>& image_data, sf::Image& image, const int image_width, const int image_height)
 {
@@ -36,34 +46,50 @@ void poll_events(sf::RenderWindow& window)
     }
 }
 
-void update_ui(sf::RenderWindow& window, sf::Clock& clock)
+void generate_mandelbrot(sf::Image& image, sf::Sprite& sprite, sf::Texture& texture, const Gradient& gradient, const int window_width, const int window_height, const MandelbrotParams& mandelbrot_params)
+{
+    std::vector<int> iterations_histogram(static_cast<std::size_t>(mandelbrot_params.max_iterations + 1));
+    std::vector<CalculationResult> results_per_point(static_cast<std::size_t>(mandelbrot_params.width * mandelbrot_params.height));
+    std::vector<PixelColor> image_data(static_cast<std::size_t>(mandelbrot_params.width * mandelbrot_params.height));
+
+    mandelbrot_calc(mandelbrot_params.width, mandelbrot_params.height, mandelbrot_params.max_iterations, mandelbrot_params.center_x, mandelbrot_params.center_y, mandelbrot_params.fractal_height, iterations_histogram, results_per_point);
+    mandelbrot_colorize(mandelbrot_params.max_iterations, gradient, image_data, iterations_histogram, results_per_point);
+
+    copy_mandelbrot_to_image(image_data, image, mandelbrot_params.width, mandelbrot_params.height);
+
+    texture.update(image);
+    sprite.setScale(static_cast<float>(window_width) / static_cast<float>(mandelbrot_params.width), static_cast<float>(window_height) / static_cast<float>(mandelbrot_params.height));
+}
+
+void render_ui(sf::RenderWindow& window, sf::Clock& clock, sf::Image& image, sf::Sprite& sprite, sf::Texture& texture, const Gradient& gradient, const int window_width, const int window_height, MandelbrotParams& mandelbrot_params)
 {
     ImGui::SFML::Update(window, clock.restart());
     ImGui::Begin("Mandelbrot");
     ImGui::Text("%.1f FPS (%.3f ms/frame)", 1.0 / ImGui::GetIO().DeltaTime, 1000.0 * ImGui::GetIO().DeltaTime);
+
+    if (ImGui::InputInt("max_iterations", &mandelbrot_params.max_iterations, 100, 1000))
+        mandelbrot_params.max_iterations = std::clamp(mandelbrot_params.max_iterations, 10, 10000);
+
+    if (ImGui::InputDouble("center_x", &mandelbrot_params.center_x, 0.1, 1.0))
+        mandelbrot_params.center_x = std::clamp(mandelbrot_params.center_x, -5.0, 5.0);
+
+    if (ImGui::InputDouble("center_y", &mandelbrot_params.center_y, 0.1, 1.0))
+        mandelbrot_params.center_y = std::clamp(mandelbrot_params.center_y, -5.0, 5.0);
+
+    if (ImGui::InputDouble("fractal_height", &mandelbrot_params.fractal_height, 0.1, 1.0))
+        mandelbrot_params.fractal_height = std::clamp(mandelbrot_params.fractal_height, 0.0, 5.0);
+
+    if (ImGui::Button("Render"))
+        generate_mandelbrot(image, sprite, texture, gradient, window_width, window_height, mandelbrot_params);
+
+    ImGui::SameLine();
+
+    if (ImGui::Button("Reset")) {
+        mandelbrot_params = MandelbrotParams{static_cast<int>(image.getSize().x), static_cast<int>(image.getSize().y), 100, -0.8, 0.0, 2.0};
+        generate_mandelbrot(image, sprite, texture, gradient, window_width, window_height, mandelbrot_params);
+    }
+
     ImGui::End();
-}
-
-void generate_mandelbrot(sf::Image& image, sf::Sprite& sprite, sf::Texture& texture, const Gradient& gradient, const int window_width, const int window_height)
-{
-    const int image_width = image.getSize().x;
-    const int image_height = image.getSize().y;
-    const int max_iterations = 100;
-    const double center_x = -0.8;
-    const double center_y = 0.0;
-    const double fractal_height = 2.0;
-
-    std::vector<int> iterations_histogram(static_cast<std::size_t>(max_iterations + 1));
-    std::vector<CalculationResult> results_per_point(static_cast<std::size_t>(image_width * image_height));
-    std::vector<PixelColor> image_data(static_cast<std::size_t>(image_width * image_height));
-
-    mandelbrot_calc(image_width, image_height, max_iterations, center_x, center_y, fractal_height, iterations_histogram, results_per_point);
-    mandelbrot_colorize(max_iterations, gradient, image_data, iterations_histogram, results_per_point);
-
-    copy_mandelbrot_to_image(image_data, image, image_width, image_height);
-
-    texture.update(image);
-    sprite.setScale(static_cast<float>(window_width) / static_cast<float>(image_width), static_cast<float>(window_height) / static_cast<float>(image_height));
 }
 
 void render_window(sf::RenderWindow& window, sf::Sprite& sprite)
@@ -98,14 +124,13 @@ int main()
     texture.loadFromImage(image);
     sf::Sprite sprite(texture);
 
+    MandelbrotParams mandelbrot_params{static_cast<int>(image.getSize().x), static_cast<int>(image.getSize().y), 100, -0.8, 0.0, 2.0};
+
     sf::Clock clock;
 
     while (window.isOpen()) {
         poll_events(window);
-        update_ui(window, clock);
-
-        generate_mandelbrot(image, sprite, texture, gradient, window_width, window_height);
-
+        render_ui(window, clock, image, sprite, texture, gradient, window_width, window_height, mandelbrot_params);
         render_window(window, sprite);
     }
 
