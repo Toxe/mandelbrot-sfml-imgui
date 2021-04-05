@@ -2,7 +2,10 @@ set(ALL_TARGETS
     mandelbrot
 )
 
-add_executable(mandelbrot main.cpp)
+add_executable(mandelbrot main.cpp
+                          mandelbrot.cpp mandelbrot.h
+                          gradient.cpp gradient.h
+                          pixel_color.h)
 
 foreach(target ${ALL_TARGETS})
     set_target_properties(${target} PROPERTIES CXX_EXTENSIONS OFF)
