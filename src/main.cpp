@@ -22,6 +22,58 @@ void copy_mandelbrot_to_image(const std::vector<PixelColor>& image_data, sf::Ima
     }
 }
 
+void poll_events(sf::RenderWindow& window)
+{
+    sf::Event event;
+
+    while (window.pollEvent(event)) {
+        ImGui::SFML::ProcessEvent(event);
+
+        if (event.type == sf::Event::Closed)
+            window.close();
+        else if (event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::Escape)
+            window.close();
+    }
+}
+
+void update_ui(sf::RenderWindow& window, sf::Clock& clock)
+{
+    ImGui::SFML::Update(window, clock.restart());
+    ImGui::Begin("Mandelbrot");
+    ImGui::Text("%.1f FPS (%.3f ms/frame)", 1.0 / ImGui::GetIO().DeltaTime, 1000.0 * ImGui::GetIO().DeltaTime);
+    ImGui::End();
+}
+
+void generate_mandelbrot(sf::Image& image, sf::Sprite& sprite, sf::Texture& texture, const Gradient& gradient, const int window_width, const int window_height)
+{
+    const int image_width = image.getSize().x;
+    const int image_height = image.getSize().y;
+    const int max_iterations = 100;
+    const double center_x = -0.8;
+    const double center_y = 0.0;
+    const double fractal_height = 2.0;
+
+    std::vector<int> iterations_histogram(static_cast<std::size_t>(max_iterations + 1));
+    std::vector<CalculationResult> results_per_point(static_cast<std::size_t>(image_width * image_height));
+    std::vector<PixelColor> image_data(static_cast<std::size_t>(image_width * image_height));
+
+    mandelbrot_calc(image_width, image_height, max_iterations, center_x, center_y, fractal_height, iterations_histogram, results_per_point);
+    mandelbrot_colorize(max_iterations, gradient, image_data, iterations_histogram, results_per_point);
+
+    copy_mandelbrot_to_image(image_data, image, image_width, image_height);
+
+    texture.update(image);
+    sprite.setScale(static_cast<float>(window_width) / static_cast<float>(image_width), static_cast<float>(window_height) / static_cast<float>(image_height));
+}
+
+void render_window(sf::RenderWindow& window, sf::Sprite& sprite)
+{
+    window.clear();
+    window.draw(sprite);
+    ImGui::SFML::Render(window);
+    window.display();
+}
+
 int main()
 {
     spdlog::set_level(spdlog::level::debug);
@@ -49,48 +101,12 @@ int main()
     sf::Clock clock;
 
     while (window.isOpen()) {
-        sf::Event event;
+        poll_events(window);
+        update_ui(window, clock);
 
-        while (window.pollEvent(event)) {
-            ImGui::SFML::ProcessEvent(event);
+        generate_mandelbrot(image, sprite, texture, gradient, window_width, window_height);
 
-            if (event.type == sf::Event::Closed)
-                window.close();
-            else if (event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::Escape)
-                window.close();
-        }
-
-        const int image_width = image.getSize().x;
-        const int image_height = image.getSize().y;
-        const int max_iterations = 100;
-        const double center_x = -0.8;
-        const double center_y = 0.0;
-        const double fractal_height = 2.0;
-
-        std::vector<int> iterations_histogram(static_cast<std::size_t>(max_iterations + 1));
-        std::vector<CalculationResult> results_per_point(static_cast<std::size_t>(image_width * image_height));
-        std::vector<PixelColor> image_data(static_cast<std::size_t>(image_width * image_height));
-
-        mandelbrot_calc(image_width, image_height, max_iterations, center_x, center_y, fractal_height, iterations_histogram, results_per_point);
-        mandelbrot_colorize(max_iterations, gradient, image_data, iterations_histogram, results_per_point);
-
-        copy_mandelbrot_to_image(image_data, image, image_width, image_height);
-
-        ImGui::SFML::Update(window, clock.restart());
-
-        const auto fps = 1.0 / ImGui::GetIO().DeltaTime;
-        const auto size = window.getSize();
-        const auto title = fmt::format("{} {}x{} FPS: {:.0f} {}", "Mandelbrot", size.x, size.y, fps, ImGui::GetIO().DeltaTime);
-        window.setTitle(title);
-
-        window.clear(sf::Color::Black);
-
-        texture.update(image);
-        sprite.setScale(static_cast<float>(window_width) / static_cast<float>(image_width), static_cast<float>(window_height) / static_cast<float>(image_height));
-        window.draw(sprite);
-
-        ImGui::SFML::Render(window);
-        window.display();
+        render_window(window, sprite);
     }
 
     ImGui::SFML::Shutdown();
