@@ -9,7 +9,14 @@
 
 int main()
 {
-    sf::RenderWindow window(sf::VideoMode(1024, 768), "Mandelbrot");
+    // init window at half desktop height and 4:3 aspect ratio
+    const auto desktop = sf::VideoMode::getDesktopMode();
+    const int height = desktop.height / 2;
+    const int width = 4 * height / 3;
+
+    spdlog::info("init window {}x{}", width, height);
+
+    sf::RenderWindow window(sf::VideoMode(width, height), "Mandelbrot");
     window.setVerticalSyncEnabled(true);
 
     ImGui::SFML::Init(window);
