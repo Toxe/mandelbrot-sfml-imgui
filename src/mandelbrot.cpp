@@ -90,29 +90,34 @@ std::vector<float> equalize_histogram(const std::vector<int>& iterations_histogr
 }
 
 void mandelbrot_colorize(const int max_iterations, const Gradient& gradient,
-                         std::vector<PixelColor>& image_data, const std::vector<int>& iterations_histogram, const std::vector<CalculationResult>& results_per_point) noexcept
+                         sf::Image& image, const std::vector<int>& iterations_histogram, const std::vector<CalculationResult>& results_per_point) noexcept
 {
     const auto equalized_iterations = equalize_histogram(iterations_histogram, max_iterations);
-    int pixel = 0;
+    const int image_width = image.getSize().x;
+    const int image_height = image.getSize().y;
 
-    for (auto& results : results_per_point) {
-        if (results.iter == max_iterations) {
-            // points inside the Mandelbrot Set are always painted black
-            image_data[static_cast<std::size_t>(pixel)] = PixelColor{0, 0, 0};
-        } else {
-            // The equalized iteration value (in the range of 0 .. max_iterations) represents the
-            // position of the pixel color in the color gradiant and needs to be mapped to 0.0 .. 1.0.
-            // To achieve smooth coloring we need to edge the equalized iteration towards the next
-            // iteration, determined by the distance between the two iterations.
-            const auto iter_curr = equalized_iterations[static_cast<std::size_t>(results.iter)];
-            const auto iter_next = equalized_iterations[static_cast<std::size_t>(results.iter + 1)];
+    auto point = results_per_point.cbegin();
 
-            const auto smoothed_iteration = std::lerp(iter_curr, iter_next, results.distance_to_next_iteration);
-            const auto pos_in_gradient = smoothed_iteration / static_cast<float>(max_iterations);
+    for (int y = 0; y < image_height; ++y) {
+        for (int x = 0; x < image_width; ++x) {
+            if (point->iter == max_iterations) {
+                // points inside the Mandelbrot Set are always painted black
+                image.setPixel(x, y, sf::Color::Black);
+            } else {
+                // The equalized iteration value (in the range of 0 .. max_iterations) represents the
+                // position of the pixel color in the color gradiant and needs to be mapped to 0.0 .. 1.0.
+                // To achieve smooth coloring we need to edge the equalized iteration towards the next
+                // iteration, determined by the distance between the two iterations.
+                const auto iter_curr = equalized_iterations[static_cast<std::size_t>(point->iter)];
+                const auto iter_next = equalized_iterations[static_cast<std::size_t>(point->iter + 1)];
 
-            image_data[static_cast<std::size_t>(pixel)] = color_from_gradient(gradient, pos_in_gradient);
+                const auto smoothed_iteration = std::lerp(iter_curr, iter_next, point->distance_to_next_iteration);
+                const auto pos_in_gradient = smoothed_iteration / static_cast<float>(max_iterations);
+
+                image.setPixel(x, y, color_from_gradient(gradient, pos_in_gradient));
+            }
+
+            ++point;
         }
-
-        ++pixel;
     }
 }

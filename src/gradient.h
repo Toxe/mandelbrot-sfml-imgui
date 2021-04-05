@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-#include "pixel_color.h"
+#include <SFML/Graphics/Color.hpp>
 
 bool equal_enough(float a, float b) noexcept;
 
@@ -19,4 +19,4 @@ struct Gradient {
 };
 
 Gradient load_gradient(const std::string& filename);
-PixelColor color_from_gradient(const Gradient& gradient, const float pos) noexcept;
+sf::Color color_from_gradient(const Gradient& gradient, const float pos) noexcept;

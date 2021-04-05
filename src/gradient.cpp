@@ -56,15 +56,15 @@ Gradient load_gradient(const std::string& filename)
     return gradient;
 }
 
-PixelColor color_from_gradient_range(const GradientColor& left, const GradientColor& right, const float pos) noexcept
+sf::Color color_from_gradient_range(const GradientColor& left, const GradientColor& right, const float pos) noexcept
 {
     const float relative_pos_between_colors = (pos - left.pos) / (right.pos - left.pos);
-    return PixelColor{static_cast<unsigned char>(255.0f * std::lerp(left.r, right.r, relative_pos_between_colors)),
-                      static_cast<unsigned char>(255.0f * std::lerp(left.g, right.g, relative_pos_between_colors)),
-                      static_cast<unsigned char>(255.0f * std::lerp(left.b, right.b, relative_pos_between_colors))};
+    return sf::Color{static_cast<sf::Uint8>(255.0f * std::lerp(left.r, right.r, relative_pos_between_colors)),
+                     static_cast<sf::Uint8>(255.0f * std::lerp(left.g, right.g, relative_pos_between_colors)),
+                     static_cast<sf::Uint8>(255.0f * std::lerp(left.b, right.b, relative_pos_between_colors))};
 }
 
-PixelColor color_from_gradient(const Gradient& gradient, const float pos) noexcept
+sf::Color color_from_gradient(const Gradient& gradient, const float pos) noexcept
 {
     const auto end = gradient.colors.cend();
 
@@ -74,5 +74,5 @@ PixelColor color_from_gradient(const Gradient& gradient, const float pos) noexce
     if (it != end)
         return color_from_gradient_range(*it, *(it + 1), pos);
     else
-        return PixelColor{0, 0, 0};
+        return sf::Color::Black;
 }

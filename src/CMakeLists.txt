@@ -4,8 +4,7 @@ set(ALL_TARGETS
 
 add_executable(mandelbrot main.cpp
                           mandelbrot.cpp mandelbrot.h
-                          gradient.cpp gradient.h
-                          pixel_color.h)
+                          gradient.cpp gradient.h)
 
 foreach(target ${ALL_TARGETS})
     set_target_properties(${target} PROPERTIES CXX_EXTENSIONS OFF)
