@@ -94,8 +94,8 @@ int main()
 
     // init window at half desktop height and 4:3 aspect ratio
     const auto desktop = sf::VideoMode::getDesktopMode();
-    const int window_height = desktop.height / 2;
-    const int window_width = 4 * window_height / 3;
+    const auto window_height = desktop.height / 2;
+    const auto window_width = 4 * window_height / 3;
 
     spdlog::info("init window {}x{}", window_width, window_height);
 
