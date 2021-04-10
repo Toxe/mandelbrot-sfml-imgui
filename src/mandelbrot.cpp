@@ -93,13 +93,13 @@ void mandelbrot_colorize(const int max_iterations, const Gradient& gradient,
                          sf::Image& image, const std::vector<int>& iterations_histogram, const std::vector<CalculationResult>& results_per_point) noexcept
 {
     const auto equalized_iterations = equalize_histogram(iterations_histogram, max_iterations);
-    const int image_width = image.getSize().x;
-    const int image_height = image.getSize().y;
+    const auto image_width = image.getSize().x;
+    const auto image_height = image.getSize().y;
 
     auto point = results_per_point.cbegin();
 
-    for (int y = 0; y < image_height; ++y) {
-        for (int x = 0; x < image_width; ++x) {
+    for (unsigned int y = 0; y < image_height; ++y) {
+        for (unsigned int x = 0; x < image_width; ++x) {
             if (point->iter == max_iterations) {
                 // points inside the Mandelbrot Set are always painted black
                 image.setPixel(x, y, sf::Color::Black);
