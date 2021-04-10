@@ -11,7 +11,15 @@ struct CalculationResult {
     float distance_to_next_iteration;
 };
 
-void mandelbrot_calc(const int image_width, const int image_height, const int max_iterations, const double center_x, const double center_y, const double height,
+struct ImageSize {
+    int width, height;
+};
+
+struct Section {
+    double center_x, center_y, height;
+};
+
+void mandelbrot_calc(const ImageSize& image, const Section& section, const int max_iterations,
                      std::vector<int>& iterations_histogram, std::vector<CalculationResult>& results_per_point) noexcept;
 void mandelbrot_colorize(const int max_iterations, const Gradient& gradient,
                          sf::Image& image, const std::vector<int>& iterations_histogram, const std::vector<CalculationResult>& results_per_point) noexcept;

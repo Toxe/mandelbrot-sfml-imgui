@@ -6,15 +6,15 @@
 
 #include "gradient.h"
 
-void mandelbrot_calc(const int image_width, const int image_height, const int max_iterations, const double center_x, const double center_y, const double height,
+void mandelbrot_calc(const ImageSize& image, const Section& section, const int max_iterations,
                      std::vector<int>& iterations_histogram, std::vector<CalculationResult>& results_per_point) noexcept
 {
-    const double width = height * (static_cast<double>(image_width) / static_cast<double>(image_height));
+    const double width = section.height * (static_cast<double>(image.width) / static_cast<double>(image.height));
 
-    const double x_left   = center_x - width / 2.0;
-    const double x_right  = center_x + width / 2.0;
-    const double y_top    = center_y + height / 2.0;
-    const double y_bottom = center_y - height / 2.0;
+    const double x_left   = section.center_x - width / 2.0;
+    const double x_right  = section.center_x + width / 2.0;
+    const double y_top    = section.center_y + section.height / 2.0;
+    const double y_bottom = section.center_y - section.height / 2.0;
 
     constexpr double bailout = 20.0;
     constexpr double bailout_squared = bailout * bailout;
@@ -27,11 +27,11 @@ void mandelbrot_calc(const int image_width, const int image_height, const int ma
 
     int pixel = 0;
 
-    for (int pixel_y = 0; pixel_y < image_height; ++pixel_y) {
-        const double y0 = std::lerp(y_top, y_bottom, static_cast<double>(pixel_y) / static_cast<double>(image_height));
+    for (int pixel_y = 0; pixel_y < image.height; ++pixel_y) {
+        const double y0 = std::lerp(y_top, y_bottom, static_cast<double>(pixel_y) / static_cast<double>(image.height));
 
-        for (int pixel_x = 0; pixel_x < image_width; ++pixel_x) {
-            const double x0 = std::lerp(x_left, x_right, static_cast<double>(pixel_x) / static_cast<double>(image_width));
+        for (int pixel_x = 0; pixel_x < image.width; ++pixel_x) {
+            const double x0 = std::lerp(x_left, x_right, static_cast<double>(pixel_x) / static_cast<double>(image.width));
 
             double x = 0.0;
             double y = 0.0;
