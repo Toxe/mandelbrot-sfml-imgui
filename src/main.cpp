@@ -98,7 +98,13 @@ int main()
     sf::RenderWindow window(sf::VideoMode(window_width, window_height), "Mandelbrot");
     window.setVerticalSyncEnabled(true);
 
-    ImGui::SFML::Init(window);
+    ImGui::SFML::Init(window, false);
+    ImGuiIO &io = ImGui::GetIO();
+    ImFontConfig font_cfg;
+    io.Fonts->Clear();
+    font_cfg.SizePixels = 25.0f;
+    io.Fonts->AddFontDefault(&font_cfg);
+    ImGui::SFML::UpdateFontTexture();
 
     sf::Image image;
     image.create(window_width, window_height);
