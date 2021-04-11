@@ -7,7 +7,8 @@
 #include "gradient.h"
 
 void mandelbrot_calc(const ImageSize& image, const Section& section, const int max_iterations,
-                     std::vector<int>& iterations_histogram, std::vector<CalculationResult>& results_per_point) noexcept
+                     std::vector<int>& iterations_histogram, std::vector<CalculationResult>& results_per_point,
+                     const int start_x, const int start_y, const int work_size) noexcept
 {
     const double width = section.height * (static_cast<double>(image.width) / static_cast<double>(image.height));
 
@@ -23,14 +24,10 @@ void mandelbrot_calc(const ImageSize& image, const Section& section, const int m
 
     double final_magnitude = 0.0;
 
-    std::fill(iterations_histogram.begin(), iterations_histogram.end(), 0);
-
-    int pixel = 0;
-
-    for (int pixel_y = 0; pixel_y < image.height; ++pixel_y) {
+    for (int pixel_y = start_y; pixel_y < (start_y + work_size); ++pixel_y) {
         const double y0 = std::lerp(y_top, y_bottom, static_cast<double>(pixel_y) / static_cast<double>(image.height));
 
-        for (int pixel_x = 0; pixel_x < image.width; ++pixel_x) {
+        for (int pixel_x = start_x; pixel_x < (start_x + work_size); ++pixel_x) {
             const double x0 = std::lerp(x_left, x_right, static_cast<double>(pixel_x) / static_cast<double>(image.width));
 
             double x = 0.0;
@@ -55,14 +52,14 @@ void mandelbrot_calc(const ImageSize& image, const Section& section, const int m
                 ++iter;
             }
 
+            const std::size_t pixel = static_cast<std::size_t>(pixel_y * image.width + pixel_x);
+
             if (iter < max_iterations) {
                 ++iterations_histogram[static_cast<std::size_t>(iter)]; // iter: 1 .. max_iterations-1, no need to count iterations_histogram[max_iterations]
-                results_per_point[static_cast<std::size_t>(pixel)] = CalculationResult{iter, 1.0f - std::min(1.0f, static_cast<float>((std::log(std::log(final_magnitude)) - log_log_bailout) / log_2))};
+                results_per_point[pixel] = CalculationResult{iter, 1.0f - std::min(1.0f, static_cast<float>((std::log(std::log(final_magnitude)) - log_log_bailout) / log_2))};
             } else {
-                results_per_point[static_cast<std::size_t>(pixel)] = CalculationResult{iter, 0.0};
+                results_per_point[pixel] = CalculationResult{iter, 0.0};
             }
-
-            ++pixel;
         }
     }
 }
