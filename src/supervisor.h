@@ -25,7 +25,7 @@ struct WorkResult {
     WorkUnit work;
 };
 
-std::future<void> task_master_start(sf::Image& image, sf::Texture& texture, const unsigned int num_threads, const int max_iterations, const Gradient& gradient);
-void task_master_stop();
-void task_master_image_request(const ImageRequest& request);
-bool task_master_working();
+std::future<void> supervisor_start(sf::Image& image, sf::Texture& texture, const unsigned int num_threads, const int max_iterations, const Gradient& gradient);
+void supervisor_stop();
+void supervisor_image_request(const ImageRequest& request);
+bool supervisor_working();

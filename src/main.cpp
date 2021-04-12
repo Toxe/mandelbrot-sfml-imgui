@@ -11,7 +11,7 @@
 #include <SFML/Graphics.hpp>
 
 #include "gradient.h"
-#include "task_master.h"
+#include "supervisor.h"
 
 const int max_iterations = 5000;
 
@@ -25,11 +25,11 @@ void poll_events(sf::RenderWindow& window)
         ImGui::SFML::ProcessEvent(event);
 
         if (event.type == sf::Event::Closed) {
-            task_master_stop();
+            supervisor_stop();
             window.close();
         }
         else if (event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::Escape) {
-            task_master_stop();
+            supervisor_stop();
             window.close();
         }
     }
@@ -53,16 +53,16 @@ void render_ui(sf::RenderWindow& window, sf::Clock& clock, sf::Image& image, Ima
     if (ImGui::InputDouble("fractal_height", &mandelbrot_params.section.height, 0.1, 1.0))
         mandelbrot_params.section.height = std::clamp(mandelbrot_params.section.height, 0.0, 5.0);
 
-    if (!task_master_working())
+    if (!supervisor_working())
         if (ImGui::Button("Render"))
-            task_master_image_request(mandelbrot_params);
+            supervisor_image_request(mandelbrot_params);
 
     ImGui::SameLine();
 
-    if (!task_master_working()) {
+    if (!supervisor_working()) {
         if (ImGui::Button("Reset")) {
             mandelbrot_params = ImageRequest{{static_cast<int>(image.getSize().x), static_cast<int>(image.getSize().y)}, {-0.8, 0.0, 2.0}, max_iterations};
-            task_master_image_request(mandelbrot_params);
+            supervisor_image_request(mandelbrot_params);
         }
     }
 
@@ -113,7 +113,7 @@ int main()
     sf::Sprite sprite(texture);
 
     ImageRequest mandelbrot_params{{static_cast<int>(image.getSize().x), static_cast<int>(image.getSize().y)}, {-0.8, 0.0, 2.0}, max_iterations};
-    auto task_master = task_master_start(image, texture, std::thread::hardware_concurrency(), mandelbrot_params.max_iterations, gradient);
+    auto supervisor = supervisor_start(image, texture, std::thread::hardware_concurrency(), mandelbrot_params.max_iterations, gradient);
 
     sf::Clock clock;
 
@@ -125,7 +125,7 @@ int main()
 
     ImGui::SFML::Shutdown();
 
-    task_master.wait();
+    supervisor.wait();
 
     return 0;
 }

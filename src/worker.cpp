@@ -1,4 +1,4 @@
-#include "task_worker.h"
+#include "worker.h"
 
 #include <thread>
 
@@ -6,7 +6,7 @@
 
 extern bool workers_running;
 
-void task_worker(const int id, std::mutex& mtx, std::condition_variable& cv, std::queue<WorkUnit>& work_queue, std::queue<WorkResult>& results_queue)
+void worker(const int id, std::mutex& mtx, std::condition_variable& cv, std::queue<WorkUnit>& work_queue, std::queue<WorkResult>& results_queue)
 {
     spdlog::debug("worker {}: started", id);
 
@@ -34,7 +34,7 @@ void task_worker(const int id, std::mutex& mtx, std::condition_variable& cv, std
             results_queue.push(WorkResult{work});
         }
 
-        // signal other workers or the task master
+        // signal other workers or the supervisor
         cv.notify_one();
     }
 

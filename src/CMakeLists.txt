@@ -5,8 +5,8 @@ set(ALL_TARGETS
 add_executable(mandelbrot main.cpp
                           mandelbrot.cpp mandelbrot.h
                           gradient.cpp gradient.h
-                          task_master.cpp task_master.h
-                          task_worker.cpp task_worker.h
+                          supervisor.cpp supervisor.h
+                          worker.cpp worker.h
 )
 
 foreach(target ${ALL_TARGETS})
