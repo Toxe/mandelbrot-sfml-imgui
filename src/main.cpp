@@ -13,6 +13,7 @@
 #include "gradient.h"
 #include "supervisor.h"
 
+const Section default_section_values = {-0.8, 0.0, 2.0};
 const int max_iterations = 5000;
 
 extern std::mutex paint_mtx;
@@ -37,31 +38,57 @@ void poll_events(sf::RenderWindow& window)
 
 void render_ui(sf::RenderWindow& window, sf::Clock& clock, sf::Image& image, ImageRequest& mandelbrot_params)
 {
-    ImGui::SFML::Update(window, clock.restart());
-    ImGui::Begin("Mandelbrot");
-    ImGui::Text("%.1f FPS (%.3f ms/frame)", 1.0 / ImGui::GetIO().DeltaTime, 1000.0 * ImGui::GetIO().DeltaTime);
+    static std::vector<float> fps(120);
+    static std::size_t values_offset = 0;
 
-    // if (ImGui::InputInt("max_iterations", &mandelbrot_params.max_iterations, 100, 1000))
-    //     mandelbrot_params.max_iterations = std::clamp(mandelbrot_params.max_iterations, 10, 10000);
+    const ImVec4 gray_text{0.6f, 0.6f, 0.6f, 1.0f};
+    const auto elapsed_time = clock.restart();
 
-    if (ImGui::InputDouble("center_x", &mandelbrot_params.section.center_x, 0.1, 1.0))
-        mandelbrot_params.section.center_x = std::clamp(mandelbrot_params.section.center_x, -5.0, 5.0);
+    ImGui::SFML::Update(window, elapsed_time);
+    ImGui::Begin("Mandelbrot", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
 
-    if (ImGui::InputDouble("center_y", &mandelbrot_params.section.center_y, 0.1, 1.0))
-        mandelbrot_params.section.center_y = std::clamp(mandelbrot_params.section.center_y, -5.0, 5.0);
+    const float elapsed_time_as_econds = elapsed_time.asSeconds();
+    const float current_fps = 1.0f / elapsed_time_as_econds;
+    const auto fps_label = fmt::format("{:.1f} FPS ({:.3f} ms/frame)", current_fps, 1000.0f * elapsed_time_as_econds);
+    fps[values_offset] = current_fps;
+    values_offset = (values_offset + 1) % fps.size();
+    ImGui::PlotLines("", fps.data(), static_cast<int>(fps.size()), static_cast<int>(values_offset), fps_label.c_str(), 0.0f, 1.5f * std::max(65.0f, *std::max_element(fps.begin(), fps.end())), ImVec2(0, 100.0f));
 
-    if (ImGui::InputDouble("fractal_height", &mandelbrot_params.section.height, 0.1, 1.0))
-        mandelbrot_params.section.height = std::clamp(mandelbrot_params.section.height, 0.0, 5.0);
+    ImGui::Text("image size: %dx%d", image.getSize().x, image.getSize().y);
 
-    if (!supervisor_working())
-        if (ImGui::Button("Render"))
+    ImGui::Separator();
+
+    ImGui::Text("status: %s", "idle");
+    ImGui::Text("render time: %.3fs", 0.0f);
+
+    ImGui::Separator();
+
+    ImGui::TextColored(gray_text, "Left/right click: zoom in/out");
+    ImGui::TextColored(gray_text, "Left drag: zoom in area");
+    ImGui::TextColored(gray_text, "Right drag: move around");
+    ImGui::TextColored(gray_text, "Space: show/hide UI");
+    ImGui::TextColored(gray_text, "   F1: fullscreen");
+    ImGui::TextColored(gray_text, "  ESC: quit");
+
+    ImGui::NewLine();
+
+    ImGui::InputDouble("center_x", &mandelbrot_params.section.center_x, 0.1, 1.0);
+    ImGui::InputDouble("center_y", &mandelbrot_params.section.center_y, 0.1, 1.0);
+    ImGui::InputDouble("fractal height", &mandelbrot_params.section.height, 0.1, 1.0);
+    ImGui::InputInt("iterations", &mandelbrot_params.max_iterations, 100, 1000);
+
+    if (ImGui::Button("Calculate")) {
+        if (!supervisor_working()) {
+            mandelbrot_params.max_iterations = max_iterations; // TODO: max_iterations
             supervisor_image_request(mandelbrot_params);
+        }
+    }
 
     ImGui::SameLine();
 
-    if (!supervisor_working()) {
-        if (ImGui::Button("Reset")) {
-            mandelbrot_params = ImageRequest{{static_cast<int>(image.getSize().x), static_cast<int>(image.getSize().y)}, {-0.8, 0.0, 2.0}, max_iterations};
+    if (ImGui::Button("Reset")) {
+        if (!supervisor_working()) {
+            mandelbrot_params = ImageRequest{{static_cast<int>(image.getSize().x), static_cast<int>(image.getSize().y)}, default_section_values, max_iterations};
             supervisor_image_request(mandelbrot_params);
         }
     }
@@ -112,7 +139,7 @@ int main()
     texture.loadFromImage(image);
     sf::Sprite sprite(texture);
 
-    ImageRequest mandelbrot_params{{static_cast<int>(image.getSize().x), static_cast<int>(image.getSize().y)}, {-0.8, 0.0, 2.0}, max_iterations};
+    ImageRequest mandelbrot_params{{static_cast<int>(image.getSize().x), static_cast<int>(image.getSize().y)}, default_section_values, max_iterations};
     auto supervisor = supervisor_start(image, texture, std::thread::hardware_concurrency(), mandelbrot_params.max_iterations, gradient);
 
     sf::Clock clock;
