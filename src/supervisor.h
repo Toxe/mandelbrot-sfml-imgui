@@ -9,7 +9,8 @@
 enum class Phase {
     Starting,
     Idle,
-    Request,
+    RequestSent,
+    RequestReceived,
     Waiting,
     Coloring,
     Shutdown,

@@ -131,7 +131,7 @@ void supervisor(sf::Image& image, sf::Texture& texture, const unsigned int num_t
             supervisor_set_phase(Phase::Shutdown);
             break;
         } else if (std::holds_alternative<SupervisorImageRequest>(msg)) {
-            supervisor_set_phase(Phase::Request);
+            supervisor_set_phase(Phase::RequestReceived);
             SupervisorImageRequest image_request{std::get<SupervisorImageRequest>(msg)};
             supervisor_clear_image(image_request.image_size, image, texture);
             supervisor_resize_combined_iterations_histogram_if_needed(image_request, combined_iterations_histogram);
@@ -187,6 +187,7 @@ void supervisor_calc_image(const SupervisorImageRequest& image_request)
     std::lock_guard<std::mutex> lock(mtx);
     supervisor_message_queue.push(image_request);
     cv_sv.notify_one();
+    supervisor_set_phase(Phase::RequestSent);
 }
 
 const char* supervisor_phase_name(const Phase phase)
@@ -196,8 +197,10 @@ const char* supervisor_phase_name(const Phase phase)
         return "starting";
     case Phase::Idle:
         return "idle";
-    case Phase::Request:
-        return "request";
+    case Phase::RequestSent:
+        return "request sent";
+    case Phase::RequestReceived:
+        return "request received";
     case Phase::Waiting:
         return "waiting";
     case Phase::Coloring:
