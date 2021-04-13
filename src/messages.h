@@ -8,6 +8,7 @@
 // ---- Supervisor messages -----------
 struct SupervisorImageRequest {
     int max_iterations;
+    int area_size;
     ImageSize image_size;
     FractalSection fractal_section;
 };

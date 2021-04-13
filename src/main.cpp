@@ -16,6 +16,7 @@
 
 const FractalSection default_fractal_section = {-0.8, 0.0, 2.0};
 const int default_max_iterations = 5000;
+const int default_area_size = 100;
 
 extern std::mutex paint_mtx;
 extern std::atomic<Phase> supervisor_phase;
@@ -78,6 +79,7 @@ void render_ui(sf::RenderWindow& window, sf::Clock& clock, sf::Image& image, Sup
     ImGui::InputDouble("center_y", &image_request.fractal_section.center_y, 0.1, 1.0);
     ImGui::InputDouble("fractal height", &image_request.fractal_section.height, 0.1, 1.0);
     ImGui::InputInt("iterations", &image_request.max_iterations, 100, 1000);
+    ImGui::InputInt("tile size", &image_request.area_size, 100, 500);
 
     if (phase == Phase::Idle) {
         if (ImGui::Button("Calculate"))
@@ -88,7 +90,7 @@ void render_ui(sf::RenderWindow& window, sf::Clock& clock, sf::Image& image, Sup
 
     if (phase == Phase::Idle) {
         if (ImGui::Button("Reset")) {
-            image_request = SupervisorImageRequest{default_max_iterations, {static_cast<int>(image.getSize().x), static_cast<int>(image.getSize().y)}, default_fractal_section};
+            image_request = SupervisorImageRequest{default_max_iterations, default_area_size, {static_cast<int>(image.getSize().x), static_cast<int>(image.getSize().y)}, default_fractal_section};
             supervisor_calc_image(image_request);
         }
     }
@@ -139,7 +141,7 @@ int main()
     texture.loadFromImage(image);
     sf::Sprite sprite(texture);
 
-    SupervisorImageRequest image_request{default_max_iterations, {static_cast<int>(image.getSize().x), static_cast<int>(image.getSize().y)}, default_fractal_section};
+    SupervisorImageRequest image_request{default_max_iterations, default_area_size, {static_cast<int>(image.getSize().x), static_cast<int>(image.getSize().y)}, default_fractal_section};
 
     auto supervisor = supervisor_start(image, texture, std::thread::hardware_concurrency(), gradient);
 

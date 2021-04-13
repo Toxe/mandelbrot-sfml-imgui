@@ -50,15 +50,13 @@ void supervisor_clear_image(const ImageSize& image_size, sf::Image& image, sf::T
 
 void supervisor_create_work(const SupervisorImageRequest& request, std::vector<int>& combined_iterations_histogram, std::vector<CalculationResult>& results_per_point)
 {
-    const int size = 100;
-
     std::lock_guard<std::mutex> lock(mtx);
 
-    for (int y = 0; y < request.image_size.height; y += size) {
-        const int height = std::min(request.image_size.height - y, size);
+    for (int y = 0; y < request.image_size.height; y += request.area_size) {
+        const int height = std::min(request.image_size.height - y, request.area_size);
 
-        for (int x = 0; x < request.image_size.width; x += size) {
-            const int width = std::min(request.image_size.width - x, size);
+        for (int x = 0; x < request.image_size.width; x += request.area_size) {
+            const int width = std::min(request.image_size.width - x, request.area_size);
             worker_message_queue.push(WorkerCalc{request.max_iterations, request.image_size, {x, y, width, height}, request.fractal_section, &results_per_point, &combined_iterations_histogram});
         }
     }
