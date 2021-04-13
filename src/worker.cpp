@@ -29,14 +29,14 @@ WorkerMessage worker_wait_for_message(std::mutex& mtx, std::condition_variable& 
     return msg;
 }
 
-void worker(const int id, std::mutex& mtx, std::condition_variable& cv, std::queue<WorkerMessage>& worker_message_queue, std::queue<SupervisorMessage>& supervisor_message_queue)
+void worker(const int id, std::mutex& mtx, std::condition_variable& cv_wk, std::condition_variable& cv_sv, std::queue<WorkerMessage>& worker_message_queue, std::queue<SupervisorMessage>& supervisor_message_queue)
 {
     spdlog::debug("worker {}: started", id);
 
     std::vector<int> iterations_histogram;
 
     while (true) {
-        const WorkerMessage msg = worker_wait_for_message(mtx, cv, worker_message_queue);
+        const WorkerMessage msg = worker_wait_for_message(mtx, cv_wk, worker_message_queue);
 
         if (std::holds_alternative<WorkerQuit>(msg)) {
             spdlog::debug("worker {}: received WorkerQuit", id);
@@ -53,8 +53,7 @@ void worker(const int id, std::mutex& mtx, std::condition_variable& cv, std::que
             }
         }
 
-        // signal other workers or the supervisor
-        cv.notify_one();
+        cv_sv.notify_one();
     }
 
     spdlog::debug("worker {}: stopping", id);

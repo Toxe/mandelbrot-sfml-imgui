@@ -14,7 +14,8 @@
 #include "worker.h"
 
 std::vector<std::thread> workers;
-std::condition_variable cv;
+std::condition_variable cv_sv;
+std::condition_variable cv_wk;
 std::mutex mtx;
 std::mutex paint_mtx;
 
@@ -103,7 +104,7 @@ void supervisor_reset_combined_iterations_histogram(std::vector<int>& combined_i
 SupervisorMessage supervisor_wait_for_message()
 {
     std::unique_lock<std::mutex> lock(mtx);
-    cv.wait(lock, [&] { return !supervisor_message_queue.empty(); });
+    cv_sv.wait(lock, [&] { return !supervisor_message_queue.empty(); });
 
     const SupervisorMessage msg = supervisor_message_queue.front();
     supervisor_message_queue.pop();
@@ -121,7 +122,7 @@ void supervisor(sf::Image& image, sf::Texture& texture, const unsigned int num_t
     std::vector<CalculationResult> results_per_point(static_cast<std::size_t>(image.getSize().x * image.getSize().y));
 
     for (unsigned int id = 0; id < num_threads; ++id)
-        workers.emplace_back(worker, id, std::ref(mtx), std::ref(cv), std::ref(worker_message_queue), std::ref(supervisor_message_queue));
+        workers.emplace_back(worker, id, std::ref(mtx), std::ref(cv_wk), std::ref(cv_sv), std::ref(worker_message_queue), std::ref(supervisor_message_queue));
 
     supervisor_set_phase(Phase::Idle);
 
@@ -151,7 +152,7 @@ void supervisor(sf::Image& image, sf::Texture& texture, const unsigned int num_t
             }
         }
 
-        cv.notify_one();
+        cv_wk.notify_one();
     }
 
     {
@@ -162,7 +163,7 @@ void supervisor(sf::Image& image, sf::Texture& texture, const unsigned int num_t
             worker_message_queue.push(WorkerQuit{});
     }
 
-    cv.notify_all();
+    cv_wk.notify_all();
 
     spdlog::debug("supervisor: waiting for workers to finish");
 
@@ -181,14 +182,14 @@ void supervisor_stop()
 {
     std::lock_guard<std::mutex> lock(mtx);
     supervisor_message_queue.push(SupervisorQuit{});
-    cv.notify_all();
+    cv_sv.notify_one();
 }
 
 void supervisor_calc_image(const SupervisorImageRequest& image_request)
 {
     std::lock_guard<std::mutex> lock(mtx);
     supervisor_message_queue.push(image_request);
-    cv.notify_all();
+    cv_sv.notify_one();
 }
 
 const char* supervisor_phase_name(const Phase phase)
