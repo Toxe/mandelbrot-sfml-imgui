@@ -79,14 +79,18 @@ void render_ui(sf::RenderWindow& window, sf::Clock& clock, sf::Image& image, Sup
     ImGui::InputDouble("fractal height", &image_request.fractal_section.height, 0.1, 1.0);
     ImGui::InputInt("iterations", &image_request.max_iterations, 100, 1000);
 
-    if (ImGui::Button("Calculate"))
-        supervisor_calc_image(image_request);
+    if (phase == Phase::Idle) {
+        if (ImGui::Button("Calculate"))
+            supervisor_calc_image(image_request);
+    }
 
     ImGui::SameLine();
 
-    if (ImGui::Button("Reset")) {
-        image_request = SupervisorImageRequest{default_max_iterations, {static_cast<int>(image.getSize().x), static_cast<int>(image.getSize().y)}, default_fractal_section};
-        supervisor_calc_image(image_request);
+    if (phase == Phase::Idle) {
+        if (ImGui::Button("Reset")) {
+            image_request = SupervisorImageRequest{default_max_iterations, {static_cast<int>(image.getSize().x), static_cast<int>(image.getSize().y)}, default_fractal_section};
+            supervisor_calc_image(image_request);
+        }
     }
 
     ImGui::End();
