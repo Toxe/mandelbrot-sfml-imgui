@@ -4,34 +4,41 @@
 
 #include <spdlog/spdlog.h>
 
-extern bool workers_running;
-
-void worker(const int id, std::mutex& mtx, std::condition_variable& cv, std::queue<WorkUnit>& work_queue, std::queue<WorkResult>& results_queue)
+void worker(const int id, std::mutex& mtx, std::condition_variable& cv, std::queue<WorkerMessage>& worker_message_queue, std::queue<SupervisorMessage>& supervisor_message_queue)
 {
     spdlog::debug("worker {}: started", id);
 
+    std::vector<int> iterations_histogram;
+
     while (true) {
-        WorkUnit work;
+        WorkerMessage msg;
 
         {
             std::unique_lock<std::mutex> lock(mtx);
-            cv.wait(lock, [&] { return !work_queue.empty() || !workers_running; });
+            cv.wait(lock, [&] { return !worker_message_queue.empty(); });
 
-            if (!workers_running)
-                break;
-
-            work = work_queue.front();
-            work_queue.pop();
-            // spdlog::debug("worker {}: received work row: {}, column: {} (queue size: {})", id, work.start_y, work.start_x, work_queue.size());
+            msg = worker_message_queue.front();
+            worker_message_queue.pop();
         }
 
-        std::vector<int> iterations_histogram(static_cast<std::size_t>(work.request.max_iterations + 1), 0);
-        mandelbrot_calc(work.request.image_size, work.request.section, work.request.max_iterations, iterations_histogram, *work.results_per_point, work.start_x, work.start_y, work.size);
+        if (std::holds_alternative<WorkerQuit>(msg)) {
+            spdlog::debug("worker {}: received WorkerQuit", id);
+            break;
+        } else if (std::holds_alternative<WorkerCalc>(msg)) {
+            WorkerCalc calc{std::get<WorkerCalc>(msg)};
 
-        {
-            std::lock_guard<std::mutex> lock(mtx);
-            std::transform(iterations_histogram.cbegin(), iterations_histogram.cend(), work.combined_iterations_histogram->cbegin(), work.combined_iterations_histogram->begin(), std::plus<>{});
-            results_queue.push(WorkResult{work});
+            if (std::ssize(iterations_histogram) != calc.max_iterations + 1) {
+                spdlog::debug("worker {}: iterations_histogram {} --> {}", id, iterations_histogram.size(), calc.max_iterations + 1);
+                iterations_histogram = std::vector<int>(static_cast<std::size_t>(calc.max_iterations + 1));
+            }
+
+            mandelbrot_calc(calc.image_size, calc.fractal_section, calc.max_iterations, iterations_histogram, *calc.results_per_point, calc.area);
+
+            {
+                std::lock_guard<std::mutex> lock(mtx);
+                std::transform(iterations_histogram.cbegin(), iterations_histogram.cend(), calc.combined_iterations_histogram->cbegin(), calc.combined_iterations_histogram->begin(), std::plus<>{});
+                supervisor_message_queue.push(SupervisorResultsFromWorker{calc.max_iterations, calc.image_size, calc.area, calc.fractal_section, calc.results_per_point});
+            }
         }
 
         // signal other workers or the supervisor

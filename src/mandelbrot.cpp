@@ -6,9 +6,8 @@
 
 #include "gradient.h"
 
-void mandelbrot_calc(const ImageSize& image, const Section& section, const int max_iterations,
-                     std::vector<int>& iterations_histogram, std::vector<CalculationResult>& results_per_point,
-                     const int start_x, const int start_y, const int work_size) noexcept
+void mandelbrot_calc(const ImageSize& image, const FractalSection& section, const int max_iterations,
+                     std::vector<int>& iterations_histogram, std::vector<CalculationResult>& results_per_point, const CalculationArea& area) noexcept
 {
     const double width = section.height * (static_cast<double>(image.width) / static_cast<double>(image.height));
 
@@ -24,10 +23,12 @@ void mandelbrot_calc(const ImageSize& image, const Section& section, const int m
 
     double final_magnitude = 0.0;
 
-    for (int pixel_y = start_y; pixel_y < (start_y + work_size); ++pixel_y) {
+    std::fill(iterations_histogram.begin(), iterations_histogram.end(), 0);
+
+    for (int pixel_y = area.start_y; pixel_y < (area.start_y + area.size); ++pixel_y) {
         const double y0 = std::lerp(y_top, y_bottom, static_cast<double>(pixel_y) / static_cast<double>(image.height));
 
-        for (int pixel_x = start_x; pixel_x < (start_x + work_size); ++pixel_x) {
+        for (int pixel_x = area.start_x; pixel_x < (area.start_x + area.size); ++pixel_x) {
             const double x0 = std::lerp(x_left, x_right, static_cast<double>(pixel_x) / static_cast<double>(image.width));
 
             double x = 0.0;

@@ -3,6 +3,7 @@ set(ALL_TARGETS
 )
 
 add_executable(mandelbrot main.cpp
+                          messages.h
                           mandelbrot.cpp mandelbrot.h
                           gradient.cpp gradient.h
                           supervisor.cpp supervisor.h
