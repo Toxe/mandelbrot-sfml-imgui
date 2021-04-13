@@ -27,7 +27,6 @@ int waiting_for_results = 0;
 
 void supervisor_set_phase(const Phase phase)
 {
-    spdlog::debug("supervisor: phase {} --> {}", supervisor_phase_name(supervisor_phase), supervisor_phase_name(phase));
     supervisor_phase = phase;
 }
 
@@ -90,10 +89,8 @@ void supervisor_receive_results(const SupervisorResultsFromWorker& results, sf::
 
 void supervisor_resize_combined_iterations_histogram_if_needed(const SupervisorImageRequest& image_request, std::vector<int>& combined_iterations_histogram)
 {
-    if (std::ssize(combined_iterations_histogram) != image_request.max_iterations + 1) {
-        spdlog::debug("supervisor: resize combined_iterations_histogram {} --> {}", combined_iterations_histogram.size(), image_request.max_iterations + 1);
+    if (std::ssize(combined_iterations_histogram) != image_request.max_iterations + 1)
         combined_iterations_histogram.resize(static_cast<std::size_t>(image_request.max_iterations + 1));
-    }
 }
 
 void supervisor_reset_combined_iterations_histogram(std::vector<int>& combined_iterations_histogram)
@@ -130,7 +127,7 @@ void supervisor(sf::Image& image, sf::Texture& texture, const unsigned int num_t
         const SupervisorMessage msg = supervisor_wait_for_message();
 
         if (std::holds_alternative<SupervisorQuit>(msg)) {
-            spdlog::debug("supervisor: received SupervisorQuit");
+            spdlog::debug("supervisor: quit");
             supervisor_set_phase(Phase::Shutdown);
             break;
         } else if (std::holds_alternative<SupervisorImageRequest>(msg)) {
@@ -170,7 +167,7 @@ void supervisor(sf::Image& image, sf::Texture& texture, const unsigned int num_t
     for (auto& t : workers)
         t.join();
 
-    spdlog::debug("supervisor: done");
+    spdlog::debug("supervisor: stopping");
 }
 
 std::future<void> supervisor_start(sf::Image& image, sf::Texture& texture, const unsigned int num_threads, const Gradient& gradient)

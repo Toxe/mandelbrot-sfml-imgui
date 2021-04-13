@@ -4,12 +4,10 @@
 
 #include <spdlog/spdlog.h>
 
-void worker_resize_iterations_histogram_if_needed(const int id, const WorkerCalc& calc, std::vector<int>& iterations_histogram)
+void worker_resize_iterations_histogram_if_needed(const WorkerCalc& calc, std::vector<int>& iterations_histogram)
 {
-    if (std::ssize(iterations_histogram) != calc.max_iterations + 1) {
-        spdlog::debug("worker {}: resize iterations_histogram {} --> {}", id, iterations_histogram.size(), calc.max_iterations + 1);
+    if (std::ssize(iterations_histogram) != calc.max_iterations + 1)
         iterations_histogram.resize(static_cast<std::size_t>(calc.max_iterations + 1));
-    }
 }
 
 void worker_combine_iterations_histogram(const std::vector<int>& iterations_histogram, std::vector<int>& combined_iterations_histogram)
@@ -39,11 +37,11 @@ void worker(const int id, std::mutex& mtx, std::condition_variable& cv_wk, std::
         const WorkerMessage msg = worker_wait_for_message(mtx, cv_wk, worker_message_queue);
 
         if (std::holds_alternative<WorkerQuit>(msg)) {
-            spdlog::debug("worker {}: received WorkerQuit", id);
+            spdlog::debug("worker {}: quit", id);
             break;
         } else if (std::holds_alternative<WorkerCalc>(msg)) {
             WorkerCalc calc{std::get<WorkerCalc>(msg)};
-            worker_resize_iterations_histogram_if_needed(id, calc, iterations_histogram);
+            worker_resize_iterations_histogram_if_needed(calc, iterations_histogram);
             mandelbrot_calc(calc.image_size, calc.fractal_section, calc.max_iterations, iterations_histogram, *calc.results_per_point, calc.area);
 
             {
