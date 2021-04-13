@@ -25,10 +25,10 @@ void mandelbrot_calc(const ImageSize& image, const FractalSection& section, cons
 
     std::fill(iterations_histogram.begin(), iterations_histogram.end(), 0);
 
-    for (int pixel_y = area.start_y; pixel_y < (area.start_y + area.size); ++pixel_y) {
+    for (int pixel_y = area.y; pixel_y < (area.y + area.height); ++pixel_y) {
         const double y0 = std::lerp(y_top, y_bottom, static_cast<double>(pixel_y) / static_cast<double>(image.height));
 
-        for (int pixel_x = area.start_x; pixel_x < (area.start_x + area.size); ++pixel_x) {
+        for (int pixel_x = area.x; pixel_x < (area.x + area.width); ++pixel_x) {
             const double x0 = std::lerp(x_left, x_right, static_cast<double>(pixel_x) / static_cast<double>(image.width));
 
             double x = 0.0;

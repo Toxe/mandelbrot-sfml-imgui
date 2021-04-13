@@ -16,8 +16,8 @@ struct ImageSize {
 };
 
 struct CalculationArea {
-    int start_x, start_y;
-    int size;
+    int x, y;
+    int width, height;
 };
 
 struct FractalSection {

@@ -54,9 +54,14 @@ void supervisor_create_work(const SupervisorImageRequest& request, std::vector<i
 
     std::lock_guard<std::mutex> lock(mtx);
 
-    for (int y = 0; y < (request.image_size.height / size); ++y)
-        for (int x = 0; x < (request.image_size.width / size); ++x)
-            worker_message_queue.push(WorkerCalc{request.max_iterations, request.image_size, {x * size, y * size, size}, request.fractal_section, &results_per_point, &combined_iterations_histogram});
+    for (int y = 0; y < request.image_size.height; y += size) {
+        const int height = std::min(request.image_size.height - y, size);
+
+        for (int x = 0; x < request.image_size.width; x += size) {
+            const int width = std::min(request.image_size.width - x, size);
+            worker_message_queue.push(WorkerCalc{request.max_iterations, request.image_size, {x, y, width, height}, request.fractal_section, &results_per_point, &combined_iterations_histogram});
+        }
+    }
 
     waiting_for_results = static_cast<int>(worker_message_queue.size());
 }
@@ -71,8 +76,8 @@ void supervisor_receive_results(const SupervisorResultsFromWorker& results, sf::
 {
     const float log_max_iterations = std::log(static_cast<float>(results.max_iterations));
 
-    for (int y = results.area.start_y; y < (results.area.start_y + results.area.size); ++y) {
-        for (int x = results.area.start_x; x < (results.area.start_x + results.area.size); ++x) {
+    for (int y = results.area.y; y < (results.area.y + results.area.height); ++y) {
+        for (int x = results.area.x; x < (results.area.x + results.area.width); ++x) {
             std::size_t pixel = static_cast<std::size_t>(y * results.image_size.width + x);
             const auto color = supervisor_calculation_result_to_color((*results.results_per_point)[pixel], log_max_iterations);
             image.setPixel(static_cast<unsigned int>(x), static_cast<unsigned int>(y), color);
