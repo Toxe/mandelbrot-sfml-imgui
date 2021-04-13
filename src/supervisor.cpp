@@ -30,6 +30,22 @@ void supervisor_set_phase(const Phase phase)
     supervisor_phase = phase;
 }
 
+void supervisor_cancel_calc()
+{
+    std::lock_guard<std::mutex> lock(mtx);
+
+    // empty the message queue
+    while (!worker_message_queue.empty()) {
+        worker_message_queue.pop();
+        --waiting_for_results;
+    }
+
+    if (waiting_for_results > 0)
+        supervisor_set_phase(Phase::Canceled); // wait until all workers have finished
+    else
+        supervisor_set_phase(Phase::Idle);
+}
+
 void supervisor_colorize(sf::Image& image, sf::Texture& texture, const int max_iterations, const Gradient& gradient, const std::vector<int>& iterations_histogram, const std::vector<CalculationResult>& results_per_point)
 {
     mandelbrot_colorize(max_iterations, gradient, image, iterations_histogram, results_per_point);
@@ -143,10 +159,16 @@ void supervisor(sf::Image& image, sf::Texture& texture, const unsigned int num_t
             supervisor_receive_results(results, image, texture);
 
             if (--waiting_for_results == 0) {
-                supervisor_set_phase(Phase::Coloring);
-                supervisor_colorize(image, texture, results.max_iterations, gradient, combined_iterations_histogram, results_per_point);
+                if (supervisor_phase != Phase::Canceled) {
+                    // if canceled there is no need to colorize the partial image
+                    supervisor_set_phase(Phase::Coloring);
+                    supervisor_colorize(image, texture, results.max_iterations, gradient, combined_iterations_histogram, results_per_point);
+                }
+
                 supervisor_set_phase(Phase::Idle);
             }
+        } else if (std::holds_alternative<SupervisorCancel>(msg)) {
+            supervisor_cancel_calc();
         }
 
         cv_wk.notify_one();
@@ -190,6 +212,13 @@ void supervisor_calc_image(const SupervisorImageRequest& image_request)
     supervisor_set_phase(Phase::RequestSent);
 }
 
+void supervisor_cancel_render()
+{
+    std::lock_guard<std::mutex> lock(mtx);
+    supervisor_message_queue.push(SupervisorCancel{});
+    cv_sv.notify_one();
+}
+
 const char* supervisor_phase_name(const Phase phase)
 {
     switch (phase) {
@@ -207,6 +236,8 @@ const char* supervisor_phase_name(const Phase phase)
         return "coloring";
     case Phase::Shutdown:
         return "shutdown";
+    case Phase::Canceled:
+        return "canceled";
     default:
         return "unknown";
     }

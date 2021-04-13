@@ -99,11 +99,9 @@ void render_ui(sf::RenderWindow& window, sf::Clock& clock, sf::Image& image, Sup
             render_time = 0.0f;
             supervisor_calc_image(image_request);
         }
-    }
 
-    ImGui::SameLine();
+        ImGui::SameLine();
 
-    if (phase == Phase::Idle) {
         if (ImGui::Button("Reset")) {
             image_request = SupervisorImageRequest{default_max_iterations, default_area_size, {static_cast<int>(image.getSize().x), static_cast<int>(image.getSize().y)}, default_fractal_section};
             is_rendering = true;
@@ -112,6 +110,10 @@ void render_ui(sf::RenderWindow& window, sf::Clock& clock, sf::Image& image, Sup
             supervisor_calc_image(image_request);
         }
     }
+
+    if (is_rendering)
+        if (ImGui::Button("Cancel"))
+            supervisor_cancel_render();
 
     ImGui::End();
 }

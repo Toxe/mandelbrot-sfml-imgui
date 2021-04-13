@@ -22,8 +22,9 @@ struct SupervisorResultsFromWorker {
 };
 
 struct SupervisorQuit {};
+struct SupervisorCancel {};
 
-using SupervisorMessage = std::variant<SupervisorImageRequest, SupervisorQuit, SupervisorResultsFromWorker>;
+using SupervisorMessage = std::variant<SupervisorImageRequest, SupervisorResultsFromWorker, SupervisorQuit, SupervisorCancel>;
 
 // ---- Worker messages ---------------
 struct WorkerCalc {
