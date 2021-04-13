@@ -93,6 +93,17 @@ void supervisor_reset_combined_iterations_histogram(std::vector<int>& combined_i
     std::fill(combined_iterations_histogram.begin(), combined_iterations_histogram.end(), 0);
 }
 
+SupervisorMessage supervisor_wait_for_message()
+{
+    std::unique_lock<std::mutex> lock(mtx);
+    cv.wait(lock, [&] { return !supervisor_message_queue.empty(); });
+
+    const SupervisorMessage msg = supervisor_message_queue.front();
+    supervisor_message_queue.pop();
+
+    return msg;
+}
+
 void supervisor(sf::Image& image, sf::Texture& texture, const unsigned int num_threads, const Gradient& gradient)
 {
     spdlog::debug("supervisor: starting");
@@ -108,15 +119,7 @@ void supervisor(sf::Image& image, sf::Texture& texture, const unsigned int num_t
     supervisor_set_phase(Phase::Idle);
 
     while (true) {
-        SupervisorMessage msg;
-
-        {
-            std::unique_lock<std::mutex> lock(mtx);
-            cv.wait(lock, [&] { return !supervisor_message_queue.empty(); });
-
-            msg = supervisor_message_queue.front();
-            supervisor_message_queue.pop();
-        }
+        const SupervisorMessage msg = supervisor_wait_for_message();
 
         if (std::holds_alternative<SupervisorQuit>(msg)) {
             spdlog::debug("supervisor: received SupervisorQuit");

@@ -18,6 +18,17 @@ void worker_combine_iterations_histogram(const std::vector<int>& iterations_hist
         combined_iterations_histogram.cbegin(), combined_iterations_histogram.begin(), std::plus<>{});
 }
 
+WorkerMessage worker_wait_for_message(std::mutex& mtx, std::condition_variable& cv, std::queue<WorkerMessage>& message_queue)
+{
+    std::unique_lock<std::mutex> lock(mtx);
+    cv.wait(lock, [&] { return !message_queue.empty(); });
+
+    const WorkerMessage msg = message_queue.front();
+    message_queue.pop();
+
+    return msg;
+}
+
 void worker(const int id, std::mutex& mtx, std::condition_variable& cv, std::queue<WorkerMessage>& worker_message_queue, std::queue<SupervisorMessage>& supervisor_message_queue)
 {
     spdlog::debug("worker {}: started", id);
@@ -25,15 +36,7 @@ void worker(const int id, std::mutex& mtx, std::condition_variable& cv, std::que
     std::vector<int> iterations_histogram;
 
     while (true) {
-        WorkerMessage msg;
-
-        {
-            std::unique_lock<std::mutex> lock(mtx);
-            cv.wait(lock, [&] { return !worker_message_queue.empty(); });
-
-            msg = worker_message_queue.front();
-            worker_message_queue.pop();
-        }
+        const WorkerMessage msg = worker_wait_for_message(mtx, cv, worker_message_queue);
 
         if (std::holds_alternative<WorkerQuit>(msg)) {
             spdlog::debug("worker {}: received WorkerQuit", id);
