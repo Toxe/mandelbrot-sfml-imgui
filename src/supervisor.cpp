@@ -69,11 +69,19 @@ void supervisor_receive_results(const SupervisorResultsFromWorker& results, sf::
     texture.update(image);
 }
 
-void supervisor(sf::Image& image, sf::Texture& texture, const unsigned int num_threads, const int max_iterations, const Gradient& gradient)
+void supervisor_resize_combined_iterations_histogram_if_needed(const SupervisorImageRequest& image_request, std::vector<int>& combined_iterations_histogram)
+{
+    if (std::ssize(combined_iterations_histogram) != image_request.max_iterations + 1) {
+        spdlog::debug("supervisor: resize combined_iterations_histogram {} --> {}", combined_iterations_histogram.size(), image_request.max_iterations + 1);
+        combined_iterations_histogram.resize(static_cast<std::size_t>(image_request.max_iterations + 1));
+    }
+}
+
+void supervisor(sf::Image& image, sf::Texture& texture, const unsigned int num_threads, const Gradient& gradient)
 {
     spdlog::debug("supervisor: starting");
 
-    std::vector<int> combined_iterations_histogram(static_cast<std::size_t>(max_iterations + 1));
+    std::vector<int> combined_iterations_histogram;
     std::vector<CalculationResult> results_per_point(static_cast<std::size_t>(image.getSize().x * image.getSize().y));
 
     for (unsigned int id = 0; id < num_threads; ++id)
@@ -96,6 +104,7 @@ void supervisor(sf::Image& image, sf::Texture& texture, const unsigned int num_t
         } else if (std::holds_alternative<SupervisorImageRequest>(msg)) {
             SupervisorImageRequest image_request{std::get<SupervisorImageRequest>(msg)};
             supervisor_clear_image(image_request.image_size, image, texture);
+            supervisor_resize_combined_iterations_histogram_if_needed(image_request, combined_iterations_histogram);
             supervisor_create_work(image_request, combined_iterations_histogram, results_per_point);
         } else if (std::holds_alternative<SupervisorResultsFromWorker>(msg)) {
             SupervisorResultsFromWorker results{std::get<SupervisorResultsFromWorker>(msg)};
@@ -123,9 +132,9 @@ void supervisor(sf::Image& image, sf::Texture& texture, const unsigned int num_t
     spdlog::debug("supervisor: done");
 }
 
-std::future<void> supervisor_start(sf::Image& image, sf::Texture& texture, const unsigned int num_threads, const int max_iterations, const Gradient& gradient)
+std::future<void> supervisor_start(sf::Image& image, sf::Texture& texture, const unsigned int num_threads, const Gradient& gradient)
 {
-    return std::async(std::launch::async, supervisor, std::ref(image), std::ref(texture), num_threads, max_iterations, gradient);
+    return std::async(std::launch::async, supervisor, std::ref(image), std::ref(texture), num_threads, gradient);
 }
 
 void supervisor_stop()
