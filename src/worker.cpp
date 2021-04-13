@@ -12,6 +12,12 @@ void worker_resize_iterations_histogram_if_needed(const int id, const WorkerCalc
     }
 }
 
+void worker_combine_iterations_histogram(const std::vector<int>& iterations_histogram, std::vector<int>& combined_iterations_histogram)
+{
+    std::transform(iterations_histogram.cbegin(), iterations_histogram.cend(),
+        combined_iterations_histogram.cbegin(), combined_iterations_histogram.begin(), std::plus<>{});
+}
+
 void worker(const int id, std::mutex& mtx, std::condition_variable& cv, std::queue<WorkerMessage>& worker_message_queue, std::queue<SupervisorMessage>& supervisor_message_queue)
 {
     spdlog::debug("worker {}: started", id);
@@ -39,7 +45,7 @@ void worker(const int id, std::mutex& mtx, std::condition_variable& cv, std::que
 
             {
                 std::lock_guard<std::mutex> lock(mtx);
-                std::transform(iterations_histogram.cbegin(), iterations_histogram.cend(), calc.combined_iterations_histogram->cbegin(), calc.combined_iterations_histogram->begin(), std::plus<>{});
+                worker_combine_iterations_histogram(iterations_histogram, *calc.combined_iterations_histogram);
                 supervisor_message_queue.push(SupervisorResultsFromWorker{calc.max_iterations, calc.image_size, calc.area, calc.fractal_section, calc.results_per_point});
             }
         }
