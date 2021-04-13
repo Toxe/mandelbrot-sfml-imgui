@@ -58,7 +58,7 @@ void supervisor_create_work(const SupervisorImageRequest& request, std::vector<i
         for (int x = 0; x < (request.image_size.width / size); ++x)
             worker_message_queue.push(WorkerCalc{request.max_iterations, request.image_size, {x * size, y * size, size}, request.fractal_section, &results_per_point, &combined_iterations_histogram});
 
-    waiting_for_results = worker_message_queue.size();
+    waiting_for_results = static_cast<int>(worker_message_queue.size());
 }
 
 void supervisor_receive_results(const SupervisorResultsFromWorker& results, sf::Image& image, sf::Texture& texture)
