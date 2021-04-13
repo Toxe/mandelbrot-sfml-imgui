@@ -77,6 +77,11 @@ void supervisor_resize_combined_iterations_histogram_if_needed(const SupervisorI
     }
 }
 
+void supervisor_reset_combined_iterations_histogram(std::vector<int>& combined_iterations_histogram)
+{
+    std::fill(combined_iterations_histogram.begin(), combined_iterations_histogram.end(), 0);
+}
+
 void supervisor(sf::Image& image, sf::Texture& texture, const unsigned int num_threads, const Gradient& gradient)
 {
     spdlog::debug("supervisor: starting");
@@ -105,6 +110,7 @@ void supervisor(sf::Image& image, sf::Texture& texture, const unsigned int num_t
             SupervisorImageRequest image_request{std::get<SupervisorImageRequest>(msg)};
             supervisor_clear_image(image_request.image_size, image, texture);
             supervisor_resize_combined_iterations_histogram_if_needed(image_request, combined_iterations_histogram);
+            supervisor_reset_combined_iterations_histogram(combined_iterations_histogram);
             supervisor_create_work(image_request, combined_iterations_histogram, results_per_point);
         } else if (std::holds_alternative<SupervisorResultsFromWorker>(msg)) {
             SupervisorResultsFromWorker results{std::get<SupervisorResultsFromWorker>(msg)};
