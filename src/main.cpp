@@ -21,6 +21,10 @@ const int default_area_size = 100;
 extern std::mutex paint_mtx;
 extern std::atomic<Phase> supervisor_phase;
 
+bool is_rendering = false;
+float render_time = 0.0f;
+sf::Clock render_clock;
+
 void poll_events(sf::RenderWindow& window)
 {
     sf::Event event;
@@ -61,8 +65,15 @@ void render_ui(sf::RenderWindow& window, sf::Clock& clock, sf::Image& image, Sup
 
     ImGui::Separator();
 
+    if (is_rendering) {
+        if (phase == Phase::Idle)
+            is_rendering = false;
+
+        render_time = render_clock.getElapsedTime().asSeconds();
+    }
+
     ImGui::Text("status: %s", supervisor_phase_name(phase));
-    ImGui::Text("render time: %.3fs", 0.0f);
+    ImGui::Text("render time: %.3fs", render_time);
 
     ImGui::Separator();
 
@@ -82,8 +93,12 @@ void render_ui(sf::RenderWindow& window, sf::Clock& clock, sf::Image& image, Sup
     ImGui::InputInt("tile size", &image_request.area_size, 100, 500);
 
     if (phase == Phase::Idle) {
-        if (ImGui::Button("Calculate"))
+        if (ImGui::Button("Calculate")) {
+            is_rendering = true;
+            render_clock.restart();
+            render_time = 0.0f;
             supervisor_calc_image(image_request);
+        }
     }
 
     ImGui::SameLine();
@@ -91,6 +106,9 @@ void render_ui(sf::RenderWindow& window, sf::Clock& clock, sf::Image& image, Sup
     if (phase == Phase::Idle) {
         if (ImGui::Button("Reset")) {
             image_request = SupervisorImageRequest{default_max_iterations, default_area_size, {static_cast<int>(image.getSize().x), static_cast<int>(image.getSize().y)}, default_fractal_section};
+            is_rendering = true;
+            render_clock.restart();
+            render_time = 0.0f;
             supervisor_calc_image(image_request);
         }
     }
