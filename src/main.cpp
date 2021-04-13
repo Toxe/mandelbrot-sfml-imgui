@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <atomic>
 #include <filesystem>
 #include <mutex>
 #include <string>
@@ -17,6 +18,7 @@ const FractalSection default_fractal_section = {-0.8, 0.0, 2.0};
 const int default_max_iterations = 5000;
 
 extern std::mutex paint_mtx;
+extern std::atomic<Phase> supervisor_phase;
 
 void poll_events(sf::RenderWindow& window)
 {
@@ -40,6 +42,7 @@ void render_ui(sf::RenderWindow& window, sf::Clock& clock, sf::Image& image, Sup
     static std::vector<float> fps(120);
     static std::size_t values_offset = 0;
 
+    const Phase phase = supervisor_phase;
     const ImVec4 gray_text{0.6f, 0.6f, 0.6f, 1.0f};
     const auto elapsed_time = clock.restart();
 
@@ -57,7 +60,7 @@ void render_ui(sf::RenderWindow& window, sf::Clock& clock, sf::Image& image, Sup
 
     ImGui::Separator();
 
-    ImGui::Text("status: %s", "idle");
+    ImGui::Text("status: %s", supervisor_phase_name(phase));
     ImGui::Text("render time: %.3fs", 0.0f);
 
     ImGui::Separator();
