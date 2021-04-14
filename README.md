@@ -1,3 +1,3 @@
-# SFML & ImGui Mandelbrot
+# Multi-threaded SFML + ImGui Mandelbrot
 
-A C++ Mandelbrot renderer using SFML and ImGui.
+A multi-threaded C++ Mandelbrot renderer using SFML + ImGui.
