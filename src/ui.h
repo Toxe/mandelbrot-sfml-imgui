@@ -3,6 +3,7 @@
 #include <SFML/Graphics.hpp>
 
 #include "app.h"
+#include "cli.h"
 #include "messages.h"
 #include "stopwatch.h"
 
@@ -13,7 +14,7 @@ class UI {
     sf::Clock frame_time_clock_;
 
 public:
-    UI(const App& app);
+    UI(const App& app, const CLI& cli);
 
     void shutdown();
     void render(const App& app, sf::Image& image);

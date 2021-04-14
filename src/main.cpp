@@ -1,5 +1,3 @@
-#include <thread>
-
 #include <spdlog/spdlog.h>
 #include <SFML/Graphics.hpp>
 
@@ -8,14 +6,13 @@
 #include "supervisor.h"
 #include "ui.h"
 
-int main()
+int main(int argc, char* argv[])
 {
-    spdlog::set_level(spdlog::level::debug);
+    CLI cli(argc, argv);
+    App app(cli);
+    UI ui(app, cli);
 
     const auto gradient = load_gradient("assets/gradients/benchmark.gradient");
-
-    App app;
-    UI ui(app);
 
     sf::Image image;
     image.create(app.window().getSize().x, app.window().getSize().y);
@@ -23,7 +20,7 @@ int main()
     texture.loadFromImage(image);
     sf::Sprite sprite(texture);
 
-    auto supervisor = supervisor_start(image, texture, std::thread::hardware_concurrency(), gradient);
+    auto supervisor = supervisor_start(image, texture, cli.num_threads(), gradient);
 
     while (app.window().isOpen()) {
         app.poll_events();

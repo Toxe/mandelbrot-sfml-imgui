@@ -7,7 +7,7 @@
 
 extern std::mutex paint_mtx;
 
-App::App()
+App::App(const CLI& cli)
 {
     // init window at half desktop height and 4:3 aspect ratio
     const auto desktop = sf::VideoMode::getDesktopMode();

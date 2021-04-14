@@ -15,12 +15,12 @@ const FractalSection default_fractal_section = {-0.8, 0.0, 2.0};
 extern std::mutex paint_mtx;
 extern std::atomic<Phase> supervisor_phase;
 
-UI::UI(const App& app) : supervisor_image_request_{make_default_supervisor_image_request(app)}
+UI::UI(const App& app, const CLI& cli) : supervisor_image_request_{make_default_supervisor_image_request(app)}
 {
     ImGui::SFML::Init(app.window(), false);
 
     ImFontConfig font_cfg;
-    font_cfg.SizePixels = 25.0f;
+    font_cfg.SizePixels = static_cast<float>(cli.font_size());
 
     ImGuiIO& io = ImGui::GetIO();
     io.Fonts->Clear();

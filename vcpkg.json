@@ -1,5 +1,5 @@
 {
     "name": "mandelbrot-sfml-imgui",
     "version": "0.0.1",
-    "dependencies": ["fmt", "spdlog", "sfml", "imgui", "imgui-sfml"]
+    "dependencies": ["clipp", "fmt", "spdlog", "sfml", "imgui", "imgui-sfml"]
 }
