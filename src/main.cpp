@@ -25,11 +25,9 @@ int main()
 
     auto supervisor = supervisor_start(image, texture, std::thread::hardware_concurrency(), gradient);
 
-    sf::Clock clock;
-
     while (app.window().isOpen()) {
         app.poll_events();
-        ui.render(app, clock, image);
+        ui.render(app, image);
         app.render(sprite);
     }
 

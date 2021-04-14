@@ -10,11 +10,13 @@ class UI {
     SupervisorImageRequest supervisor_image_request_;
     Stopwatch render_stopwatch_;
 
+    sf::Clock frame_time_clock_;
+
 public:
     UI(const App& app);
 
     void shutdown();
-    void render(const App& app, sf::Clock& clock, sf::Image& image);
+    void render(const App& app, sf::Image& image);
 
     SupervisorImageRequest make_default_supervisor_image_request(const App& app);
 };

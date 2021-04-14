@@ -40,14 +40,14 @@ void UI::shutdown()
     ImGui::SFML::Shutdown();
 }
 
-void UI::render(const App& app, sf::Clock& clock, sf::Image& image)
+void UI::render(const App& app, sf::Image& image)
 {
     static std::vector<float> fps(120);
     static std::size_t values_offset = 0;
 
     const Phase phase = supervisor_phase;
     const ImVec4 gray_text{0.6f, 0.6f, 0.6f, 1.0f};
-    const auto elapsed_time = clock.restart();
+    const auto elapsed_time = frame_time_clock_.restart();
 
     ImGui::SFML::Update(app.window(), elapsed_time);
     ImGui::Begin("Mandelbrot", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
