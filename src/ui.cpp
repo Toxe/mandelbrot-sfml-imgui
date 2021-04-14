@@ -57,7 +57,7 @@ void UI::render(const App& app, sf::Image& image)
     const auto fps_label = fmt::format("{:.1f} FPS ({:.3f} ms/frame)", current_fps, 1000.0f * elapsed_time_as_econds);
     fps[values_offset] = current_fps;
     values_offset = (values_offset + 1) % fps.size();
-    ImGui::PlotLines("", fps.data(), static_cast<int>(fps.size()), static_cast<int>(values_offset), fps_label.c_str(), 0.0f, 1.5f * std::max(65.0f, *std::max_element(fps.begin(), fps.end())), ImVec2(0, 100.0f));
+    ImGui::PlotLines("", fps.data(), static_cast<int>(fps.size()), static_cast<int>(values_offset), fps_label.c_str(), 0.0f, 1.5f * std::max(65.0f, *std::max_element(fps.begin(), fps.end())), ImVec2(0, static_cast<float>(4 * app.cli().font_size())));
 
     ImGui::Text("image size: %dx%d", image.getSize().x, image.getSize().y);
 

@@ -7,11 +7,11 @@
 
 extern std::mutex paint_mtx;
 
-App::App(const CLI& cli)
+App::App(const CLI& cli) : cli_{cli}
 {
-    spdlog::info("init {} mode {}x{}", cli.fullscreen() ? "fullscreen" : "window", cli.video_mode().width, cli.video_mode().height);
+    spdlog::info("init {} mode {}x{}", cli_.fullscreen() ? "fullscreen" : "window", cli_.video_mode().width, cli_.video_mode().height);
 
-    auto style = cli.fullscreen() ? sf::Style::Fullscreen : sf::Style::Default;
+    auto style = cli_.fullscreen() ? sf::Style::Fullscreen : sf::Style::Default;
     window_ = std::make_unique<sf::RenderWindow>(cli.video_mode(), "Mandelbrot", style);
     window_->setVerticalSyncEnabled(true);
     window_->requestFocus();
