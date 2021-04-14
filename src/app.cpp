@@ -9,14 +9,10 @@ extern std::mutex paint_mtx;
 
 App::App(const CLI& cli)
 {
-    // init window at half desktop height and 4:3 aspect ratio
-    const auto desktop = sf::VideoMode::getDesktopMode();
-    const auto window_height = desktop.height / 2;
-    const auto window_width = 4 * window_height / 3;
+    spdlog::info("init {} mode {}x{}", cli.fullscreen() ? "fullscreen" : "window", cli.video_mode().width, cli.video_mode().height);
 
-    spdlog::info("init window {}x{}", window_width, window_height);
-
-    window_ = std::make_unique<sf::RenderWindow>(sf::VideoMode(window_width, window_height), "Mandelbrot");
+    auto style = cli.fullscreen() ? sf::Style::Fullscreen : sf::Style::Default;
+    window_ = std::make_unique<sf::RenderWindow>(cli.video_mode(), "Mandelbrot", style);
     window_->setVerticalSyncEnabled(true);
     window_->requestFocus();
 }
