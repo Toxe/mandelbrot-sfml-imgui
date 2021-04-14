@@ -197,6 +197,11 @@ std::future<void> supervisor_start(sf::Image& image, sf::Texture& texture, const
     return std::async(std::launch::async, supervisor, std::ref(image), std::ref(texture), num_threads, gradient);
 }
 
+void supervisor_shutdown(std::future<void>& supervisor)
+{
+    supervisor.wait();
+}
+
 void supervisor_stop()
 {
     std::lock_guard<std::mutex> lock(mtx);

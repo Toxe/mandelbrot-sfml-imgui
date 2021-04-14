@@ -34,6 +34,5 @@ int main()
     }
 
     ui.shutdown();
-
-    supervisor.wait();
+    supervisor_shutdown(supervisor);
 }

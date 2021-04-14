@@ -19,6 +19,7 @@ enum class Phase {
 
 std::future<void> supervisor_start(sf::Image& image, sf::Texture& texture, const unsigned int num_threads, const Gradient& gradient);
 void supervisor_stop();
+void supervisor_shutdown(std::future<void>& supervisor);
 void supervisor_calc_image(const SupervisorImageRequest& image_request);
 const char* supervisor_phase_name(const Phase p);
 void supervisor_cancel_render();
