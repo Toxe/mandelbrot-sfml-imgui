@@ -17,7 +17,7 @@ CLI::CLI(int argc, char* argv[])
 
     fullscreen_ = false;
     num_threads_ = static_cast<int>(std::thread::hardware_concurrency());
-    font_size_ = 25;
+    font_size_ = 0;
 
     auto cli = (
         clipp::option("-h", "--help").set(show_help)
@@ -31,13 +31,16 @@ CLI::CLI(int argc, char* argv[])
         (clipp::option("-n", "--threads") & clipp::integer("num_threads", num_threads_))
             % fmt::format("number of threads (default: number of concurrent threads supported by the system: {})", num_threads_),
         (clipp::option("--font-size") & clipp::integer("font_size", font_size_))
-            % fmt::format("UI font size (default: {})", font_size_)
+            % "UI font size in pixels"
     );
 
     if (!clipp::parse(argc, argv, cli))
         show_usage_and_exit(cli, argv[0], description);
 
     video_mode_ = default_video_mode(fullscreen_);
+
+    if (font_size_ == 0)
+        font_size_ = default_font_size(video_mode_, fullscreen_);
 
     spdlog::set_level(log_level);
     spdlog::info("command line option --fullscreen: {}", fullscreen_);
@@ -70,3 +73,7 @@ sf::VideoMode CLI::default_video_mode(const int fullscreen) const
     }
 }
 
+int CLI::default_font_size(const sf::VideoMode& video_mode, const bool fullscreen) const
+{
+    return static_cast<int>(video_mode.height) / (fullscreen ? 120 : 60);
+}

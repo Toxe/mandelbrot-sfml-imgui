@@ -13,6 +13,7 @@ class CLI {
 
     void show_usage_and_exit(const clipp::group& cli, const std::string_view& argv0, const std::string_view& description) const;
     sf::VideoMode default_video_mode(const int fullscreen) const;
+    int default_font_size(const sf::VideoMode& video_mode, const bool fullscreen) const;
 
 public:
     CLI(int argc, char* argv[]);
