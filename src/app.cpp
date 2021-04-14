@@ -18,6 +18,7 @@ App::App()
 
     window_ = std::make_unique<sf::RenderWindow>(sf::VideoMode(window_width, window_height), "Mandelbrot");
     window_->setVerticalSyncEnabled(true);
+    window_->requestFocus();
 }
 
 void App::poll_events()
