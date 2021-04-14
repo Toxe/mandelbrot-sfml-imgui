@@ -4,9 +4,12 @@ set(ALL_TARGETS
 
 add_executable(mandelbrot main.cpp
                           messages.h
+                          app.cpp app.h
                           mandelbrot.cpp mandelbrot.h
                           gradient.cpp gradient.h
+                          stopwatch.h
                           supervisor.cpp supervisor.h
+                          ui.cpp ui.h
                           worker.cpp worker.h
 )
 
