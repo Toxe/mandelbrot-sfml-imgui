@@ -60,7 +60,7 @@ void UI::render(const App& app)
     values_offset = (values_offset + 1) % fps.size();
     ImGui::PlotLines("", fps.data(), static_cast<int>(fps.size()), static_cast<int>(values_offset), fps_label.c_str(), 0.0f, 1.5f * std::max(65.0f, *std::max_element(fps.begin(), fps.end())), ImVec2(0, 4.0f * font_size_));
 
-    ImGui::Text("image size: %dx%d", image.getSize().x, image.getSize().y);
+    ImGui::Text("image size: %dx%d", app.window().getSize().x, app.window().getSize().y);
 
     ImGui::Separator();
 
