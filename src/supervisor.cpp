@@ -87,7 +87,9 @@ void supervisor_create_work(const SupervisorImageRequest& request, std::vector<i
 void supervisor_receive_results(const SupervisorResultsFromWorker& results, sf::Texture& texture)
 {
     std::lock_guard<std::mutex> lock(paint_mtx);
-    texture.update(results.pixels.get(), results.area.width, results.area.height, results.area.x, results.area.y);
+    texture.update(results.pixels.get(),
+        static_cast<unsigned int>(results.area.width), static_cast<unsigned int>(results.area.height),
+        static_cast<unsigned int>(results.area.x), static_cast<unsigned int>(results.area.y));
 }
 
 void supervisor_resize_combined_iterations_histogram_if_needed(const SupervisorImageRequest& image_request, std::vector<int>& combined_iterations_histogram)
