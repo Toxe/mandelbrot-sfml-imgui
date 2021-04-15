@@ -98,6 +98,12 @@ void supervisor_resize_combined_iterations_histogram_if_needed(const SupervisorI
         combined_iterations_histogram.resize(static_cast<std::size_t>(image_request.max_iterations + 1));
 }
 
+void supervisor_resize_results_per_point_if_needed(const SupervisorImageRequest& image_request, std::vector<CalculationResult>& results_per_point)
+{
+    if (std::ssize(results_per_point) != (image_request.image_size.width * image_request.image_size.height))
+        results_per_point.resize(static_cast<std::size_t>(image_request.image_size.width * image_request.image_size.height));
+}
+
 void supervisor_reset_combined_iterations_histogram(std::vector<int>& combined_iterations_histogram)
 {
     std::fill(combined_iterations_histogram.begin(), combined_iterations_histogram.end(), 0);
@@ -121,7 +127,7 @@ void supervisor(sf::Image& image, sf::Texture& texture, const int num_threads, c
     supervisor_set_phase(Phase::Starting);
 
     std::vector<int> combined_iterations_histogram;
-    std::vector<CalculationResult> results_per_point(static_cast<std::size_t>(image.getSize().x * image.getSize().y));
+    std::vector<CalculationResult> results_per_point;
 
     for (int id = 0; id < num_threads; ++id)
         workers.emplace_back(worker, id, std::ref(mtx), std::ref(cv_wk), std::ref(cv_sv), std::ref(worker_message_queue), std::ref(supervisor_message_queue));
@@ -140,6 +146,7 @@ void supervisor(sf::Image& image, sf::Texture& texture, const int num_threads, c
             SupervisorImageRequest image_request{std::get<SupervisorImageRequest>(msg)};
             supervisor_clear_image(image_request.image_size, image, texture);
             supervisor_resize_combined_iterations_histogram_if_needed(image_request, combined_iterations_histogram);
+            supervisor_resize_results_per_point_if_needed(image_request, results_per_point);
             supervisor_reset_combined_iterations_histogram(combined_iterations_histogram);
             supervisor_create_work(image_request, combined_iterations_histogram, results_per_point);
             supervisor_set_phase(Phase::Waiting);
