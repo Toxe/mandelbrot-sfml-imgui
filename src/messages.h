@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include <variant>
 #include <vector>
 
@@ -19,6 +20,7 @@ struct SupervisorResultsFromWorker {
     CalculationArea area;
     FractalSection fractal_section;
     std::vector<CalculationResult>* results_per_point;
+    std::unique_ptr<sf::Uint8[]> pixels;
 };
 
 struct SupervisorQuit {};
@@ -34,6 +36,7 @@ struct WorkerCalc {
     FractalSection fractal_section;
     std::vector<CalculationResult>* results_per_point;
     std::vector<int>* combined_iterations_histogram;
+    std::unique_ptr<sf::Uint8[]> pixels;
 };
 
 struct WorkerQuit {};

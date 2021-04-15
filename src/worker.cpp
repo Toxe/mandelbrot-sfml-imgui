@@ -16,12 +16,34 @@ void worker_combine_iterations_histogram(const std::vector<int>& iterations_hist
         combined_iterations_histogram.cbegin(), combined_iterations_histogram.begin(), std::plus<>{});
 }
 
+sf::Uint8 worker_calculation_result_to_color(const CalculationResult& point, const float log_max_iterations)
+{
+    return static_cast<sf::Uint8>(255.0f - 255.0f * std::log(static_cast<float>(point.iter)) / log_max_iterations);
+}
+
+void worker_draw_pixels(const WorkerCalc& calc)
+{
+    const float log_max_iterations = std::log(static_cast<float>(calc.max_iterations));
+    auto p = calc.pixels.get();
+
+    for (int y = 0; y < calc.area.height; ++y) {
+        for (int x = 0; x < calc.area.width; ++x) {
+            const std::size_t point = static_cast<std::size_t>((y + calc.area.y) * calc.image_size.width + (x + calc.area.x));
+            const auto color = worker_calculation_result_to_color((*calc.results_per_point)[point], log_max_iterations);
+            *p++ = color;
+            *p++ = color;
+            *p++ = color;
+            *p++ = 255;
+        }
+    }
+}
+
 WorkerMessage worker_wait_for_message(std::mutex& mtx, std::condition_variable& cv, std::queue<WorkerMessage>& message_queue)
 {
     std::unique_lock<std::mutex> lock(mtx);
     cv.wait(lock, [&] { return !message_queue.empty(); });
 
-    const WorkerMessage msg = message_queue.front();
+    WorkerMessage msg = std::move(message_queue.front());
     message_queue.pop();
 
     return msg;
@@ -34,20 +56,21 @@ void worker(const int id, std::mutex& mtx, std::condition_variable& cv_wk, std::
     std::vector<int> iterations_histogram;
 
     while (true) {
-        const WorkerMessage msg = worker_wait_for_message(mtx, cv_wk, worker_message_queue);
+        WorkerMessage msg = worker_wait_for_message(mtx, cv_wk, worker_message_queue);
 
         if (std::holds_alternative<WorkerQuit>(msg)) {
             spdlog::debug("worker {}: quit", id);
             break;
         } else if (std::holds_alternative<WorkerCalc>(msg)) {
-            WorkerCalc calc{std::get<WorkerCalc>(msg)};
+            WorkerCalc calc = std::move(std::get<WorkerCalc>(msg));
             worker_resize_iterations_histogram_if_needed(calc, iterations_histogram);
             mandelbrot_calc(calc.image_size, calc.fractal_section, calc.max_iterations, iterations_histogram, *calc.results_per_point, calc.area);
+            worker_draw_pixels(calc);
 
             {
                 std::lock_guard<std::mutex> lock(mtx);
                 worker_combine_iterations_histogram(iterations_histogram, *calc.combined_iterations_histogram);
-                supervisor_message_queue.push(SupervisorResultsFromWorker{calc.max_iterations, calc.image_size, calc.area, calc.fractal_section, calc.results_per_point});
+                supervisor_message_queue.emplace(SupervisorResultsFromWorker{calc.max_iterations, calc.image_size, calc.area, calc.fractal_section, calc.results_per_point, std::move(calc.pixels)});
             }
         }
 

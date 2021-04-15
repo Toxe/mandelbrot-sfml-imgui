@@ -73,34 +73,21 @@ void supervisor_create_work(const SupervisorImageRequest& request, std::vector<i
 
         for (int x = 0; x < request.image_size.width; x += request.area_size) {
             const int width = std::min(request.image_size.width - x, request.area_size);
-            worker_message_queue.push(WorkerCalc{request.max_iterations, request.image_size, {x, y, width, height}, request.fractal_section, &results_per_point, &combined_iterations_histogram});
+            worker_message_queue.emplace(WorkerCalc{
+                request.max_iterations, request.image_size, {x, y, width, height},
+                request.fractal_section, &results_per_point, &combined_iterations_histogram,
+                std::make_unique<sf::Uint8[]>(static_cast<std::size_t>(4 * width * height))
+            });
         }
     }
 
     waiting_for_results = static_cast<int>(worker_message_queue.size());
 }
 
-sf::Color supervisor_calculation_result_to_color(const CalculationResult& point, const float log_max_iterations)
+void supervisor_receive_results(const SupervisorResultsFromWorker& results, sf::Texture& texture)
 {
-    const auto rgb = static_cast<sf::Uint8>(255.0f - 255.0f * std::log(static_cast<float>(point.iter)) / log_max_iterations);
-    return sf::Color(rgb, rgb, rgb);
-}
-
-void supervisor_receive_results(const SupervisorResultsFromWorker& results, sf::Image& image, sf::Texture& texture)
-{
-    const float log_max_iterations = std::log(static_cast<float>(results.max_iterations));
-
-    for (int y = results.area.y; y < (results.area.y + results.area.height); ++y) {
-        for (int x = results.area.x; x < (results.area.x + results.area.width); ++x) {
-            std::size_t pixel = static_cast<std::size_t>(y * results.image_size.width + x);
-            const auto color = supervisor_calculation_result_to_color((*results.results_per_point)[pixel], log_max_iterations);
-            image.setPixel(static_cast<unsigned int>(x), static_cast<unsigned int>(y), color);
-            ++pixel;
-        }
-    }
-
     std::lock_guard<std::mutex> lock(paint_mtx);
-    texture.update(image);
+    texture.update(results.pixels.get(), results.area.width, results.area.height, results.area.x, results.area.y);
 }
 
 void supervisor_resize_combined_iterations_histogram_if_needed(const SupervisorImageRequest& image_request, std::vector<int>& combined_iterations_histogram)
@@ -119,7 +106,7 @@ SupervisorMessage supervisor_wait_for_message()
     std::unique_lock<std::mutex> lock(mtx);
     cv_sv.wait(lock, [&] { return !supervisor_message_queue.empty(); });
 
-    const SupervisorMessage msg = supervisor_message_queue.front();
+    SupervisorMessage msg = std::move(supervisor_message_queue.front());
     supervisor_message_queue.pop();
 
     return msg;
@@ -140,7 +127,7 @@ void supervisor(sf::Image& image, sf::Texture& texture, const int num_threads, c
     supervisor_set_phase(Phase::Idle);
 
     while (true) {
-        const SupervisorMessage msg = supervisor_wait_for_message();
+        SupervisorMessage msg = supervisor_wait_for_message();
 
         if (std::holds_alternative<SupervisorQuit>(msg)) {
             spdlog::debug("supervisor: quit");
@@ -155,8 +142,8 @@ void supervisor(sf::Image& image, sf::Texture& texture, const int num_threads, c
             supervisor_create_work(image_request, combined_iterations_histogram, results_per_point);
             supervisor_set_phase(Phase::Waiting);
         } else if (std::holds_alternative<SupervisorResultsFromWorker>(msg)) {
-            SupervisorResultsFromWorker results{std::get<SupervisorResultsFromWorker>(msg)};
-            supervisor_receive_results(results, image, texture);
+            SupervisorResultsFromWorker results = std::move(std::get<SupervisorResultsFromWorker>(msg));
+            supervisor_receive_results(results, texture);
 
             if (--waiting_for_results == 0) {
                 if (supervisor_phase != Phase::Canceled) {
