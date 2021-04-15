@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include <SFML/Graphics.hpp>
+#include <SFML/Graphics/Image.hpp>
 
 #include "gradient.h"
 
