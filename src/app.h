@@ -8,7 +8,6 @@
 #include "mandelbrot.h"
 
 class App {
-    CLI cli_;
     std::unique_ptr<sf::RenderWindow> window_;
     std::unique_ptr<sf::Texture> texture_;
     std::unique_ptr<sf::Sprite> sprite_;
@@ -16,7 +15,6 @@ class App {
 public:
     App(const CLI& cli);
 
-    const CLI& cli() const { return cli_; }
     sf::RenderWindow& window() const { return *window_; };
     sf::Texture& texture() const { return *texture_; };
     sf::Sprite& sprite() const { return *sprite_; };
