@@ -41,7 +41,7 @@ void UI::shutdown()
     ImGui::SFML::Shutdown();
 }
 
-void UI::render(const App& app, sf::Image& image)
+void UI::render(const App& app)
 {
     static std::vector<float> fps(120);
     static std::size_t values_offset = 0;
@@ -92,6 +92,7 @@ void UI::render(const App& app, sf::Image& image)
     if (phase == Phase::Idle) {
         if (ImGui::Button("Calculate")) {
             render_stopwatch_.start();
+            supervisor_image_request_.image_size = ImageSize{static_cast<int>(app.window().getSize().x), static_cast<int>(app.window().getSize().y)};
             supervisor_calc_image(supervisor_image_request_);
         }
 

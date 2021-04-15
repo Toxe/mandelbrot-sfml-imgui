@@ -2,8 +2,7 @@
 
 #include <future>
 
-#include <SFML/Graphics.hpp>
-
+#include "app.h"
 #include "messages.h"
 
 enum class Phase {
@@ -17,7 +16,7 @@ enum class Phase {
     Canceled,
 };
 
-std::future<void> supervisor_start(sf::Image& image, sf::Texture& texture, const int num_threads, const Gradient& gradient);
+std::future<void> supervisor_start(App& app, const int num_threads, const Gradient& gradient);
 void supervisor_stop();
 void supervisor_shutdown(std::future<void>& supervisor);
 void supervisor_calc_image(const SupervisorImageRequest& image_request);

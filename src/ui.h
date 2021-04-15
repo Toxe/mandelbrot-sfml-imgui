@@ -1,7 +1,5 @@
 #pragma once
 
-#include <SFML/Graphics.hpp>
-
 #include "app.h"
 #include "cli.h"
 #include "messages.h"
@@ -17,7 +15,7 @@ public:
     UI(const App& app, const CLI& cli);
 
     void shutdown();
-    void render(const App& app, sf::Image& image);
+    void render(const App& app);
 
     SupervisorImageRequest make_default_supervisor_image_request(const App& app);
 };

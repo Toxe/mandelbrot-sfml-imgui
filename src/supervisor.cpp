@@ -10,6 +10,7 @@
 #include <vector>
 
 #include <spdlog/spdlog.h>
+#include <SFML/Graphics.hpp>
 
 #include "worker.h"
 
@@ -46,22 +47,28 @@ void supervisor_cancel_calc()
         supervisor_set_phase(Phase::Idle);
 }
 
-void supervisor_colorize(sf::Image& image, sf::Texture& texture, const int max_iterations, const Gradient& gradient, const std::vector<int>& iterations_histogram, const std::vector<CalculationResult>& results_per_point)
+void supervisor_colorize(const ImageSize& image_size, App& app, const int max_iterations, const Gradient& gradient, const std::vector<int>& iterations_histogram, const std::vector<CalculationResult>& results_per_point)
 {
+    sf::Image image;
+    image.create(static_cast<unsigned int>(image_size.width), static_cast<unsigned int>(image_size.height));
+
     mandelbrot_colorize(max_iterations, gradient, image, iterations_histogram, results_per_point);
 
     std::lock_guard<std::mutex> lock(paint_mtx);
-    texture.update(image);
+    app.update_texture(image);
 }
 
-void supervisor_clear_image(const ImageSize& image_size, sf::Image& image, sf::Texture& texture)
+void supervisor_clear_window(const ImageSize& image_size, App& app)
 {
-    for (int y = 0; y < image_size.height; ++y)
-        for (int x = 0; x < image_size.width; ++x)
-            image.setPixel(static_cast<unsigned int>(x), static_cast<unsigned int>(y), sf::Color::Blue);
+    sf::Image image;
+    image.create(static_cast<unsigned int>(image_size.width), static_cast<unsigned int>(image_size.height), sf::Color::Blue);
 
     std::lock_guard<std::mutex> lock(paint_mtx);
-    texture.update(image);
+
+    if (static_cast<int>(app.texture().getSize().x) != image_size.width || static_cast<int>(app.texture().getSize().y) != image_size.height)
+        app.resize_texture(image);
+    else
+        app.update_texture(image);
 }
 
 void supervisor_create_work(const SupervisorImageRequest& request, std::vector<int>& combined_iterations_histogram, std::vector<CalculationResult>& results_per_point)
@@ -84,12 +91,10 @@ void supervisor_create_work(const SupervisorImageRequest& request, std::vector<i
     waiting_for_results = static_cast<int>(worker_message_queue.size());
 }
 
-void supervisor_receive_results(const SupervisorResultsFromWorker& results, sf::Texture& texture)
+void supervisor_receive_results(const SupervisorResultsFromWorker& results, App& app)
 {
     std::lock_guard<std::mutex> lock(paint_mtx);
-    texture.update(results.pixels.get(),
-        static_cast<unsigned int>(results.area.width), static_cast<unsigned int>(results.area.height),
-        static_cast<unsigned int>(results.area.x), static_cast<unsigned int>(results.area.y));
+    app.update_texture(results.pixels.get(), results.area);
 }
 
 void supervisor_resize_combined_iterations_histogram_if_needed(const SupervisorImageRequest& image_request, std::vector<int>& combined_iterations_histogram)
@@ -120,7 +125,7 @@ SupervisorMessage supervisor_wait_for_message()
     return msg;
 }
 
-void supervisor(sf::Image& image, sf::Texture& texture, const int num_threads, const Gradient& gradient)
+void supervisor(App& app, const int num_threads, const Gradient& gradient)
 {
     spdlog::debug("supervisor: starting");
 
@@ -144,7 +149,7 @@ void supervisor(sf::Image& image, sf::Texture& texture, const int num_threads, c
         } else if (std::holds_alternative<SupervisorImageRequest>(msg)) {
             supervisor_set_phase(Phase::RequestReceived);
             SupervisorImageRequest image_request{std::get<SupervisorImageRequest>(msg)};
-            supervisor_clear_image(image_request.image_size, image, texture);
+            supervisor_clear_window(image_request.image_size, app);
             supervisor_resize_combined_iterations_histogram_if_needed(image_request, combined_iterations_histogram);
             supervisor_resize_results_per_point_if_needed(image_request, results_per_point);
             supervisor_reset_combined_iterations_histogram(combined_iterations_histogram);
@@ -152,13 +157,13 @@ void supervisor(sf::Image& image, sf::Texture& texture, const int num_threads, c
             supervisor_set_phase(Phase::Waiting);
         } else if (std::holds_alternative<SupervisorResultsFromWorker>(msg)) {
             SupervisorResultsFromWorker results = std::move(std::get<SupervisorResultsFromWorker>(msg));
-            supervisor_receive_results(results, texture);
+            supervisor_receive_results(results, app);
 
             if (--waiting_for_results == 0) {
                 if (supervisor_phase != Phase::Canceled) {
                     // if canceled there is no need to colorize the partial image
                     supervisor_set_phase(Phase::Coloring);
-                    supervisor_colorize(image, texture, results.max_iterations, gradient, combined_iterations_histogram, results_per_point);
+                    supervisor_colorize(results.image_size, app, results.max_iterations, gradient, combined_iterations_histogram, results_per_point);
                 }
 
                 supervisor_set_phase(Phase::Idle);
@@ -188,9 +193,9 @@ void supervisor(sf::Image& image, sf::Texture& texture, const int num_threads, c
     spdlog::debug("supervisor: stopping");
 }
 
-std::future<void> supervisor_start(sf::Image& image, sf::Texture& texture, const int num_threads, const Gradient& gradient)
+std::future<void> supervisor_start(App& app, const int num_threads, const Gradient& gradient)
 {
-    return std::async(std::launch::async, supervisor, std::ref(image), std::ref(texture), num_threads, gradient);
+    return std::async(std::launch::async, supervisor, std::ref(app), num_threads, gradient);
 }
 
 void supervisor_shutdown(std::future<void>& supervisor)
