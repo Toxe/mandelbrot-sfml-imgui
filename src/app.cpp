@@ -36,7 +36,7 @@ void App::poll_events()
         if (event.type == sf::Event::Closed) {
             supervisor_stop();
             window_->close();
-        } else if (event.type == sf::Event::KeyReleased && event.key.code == sf::Keyboard::Escape) {
+        } else if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape) {
             supervisor_stop();
             window_->close();
         }
