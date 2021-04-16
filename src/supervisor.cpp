@@ -14,6 +14,8 @@
 
 #include "worker.h"
 
+const sf::Color background_color(0x00, 0x00, 0x20);
+
 std::vector<std::thread> workers;
 std::condition_variable cv_sv;
 std::condition_variable cv_wk;
@@ -61,7 +63,7 @@ void supervisor_colorize(const ImageSize& image_size, App& app, const int max_it
 void supervisor_clear_window(const ImageSize& image_size, App& app)
 {
     sf::Image image;
-    image.create(static_cast<unsigned int>(image_size.width), static_cast<unsigned int>(image_size.height), sf::Color::Blue);
+    image.create(static_cast<unsigned int>(image_size.width), static_cast<unsigned int>(image_size.height), background_color);
 
     std::lock_guard<std::mutex> lock(paint_mtx);
 
