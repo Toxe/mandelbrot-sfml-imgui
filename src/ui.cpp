@@ -64,11 +64,13 @@ void UI::render(const App& app)
     if (!is_visible_)
         return;
 
+    const auto window_size = app.window().getSize();
+
     ImGui::Begin("Mandelbrot", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
 
     ImGui::PlotLines("", fps.data(), static_cast<int>(fps.size()), static_cast<int>(values_offset), fps_label.c_str(), 0.0f, 1.5f * std::max(65.0f, *std::max_element(fps.begin(), fps.end())), ImVec2(0, 4.0f * font_size_));
 
-    ImGui::Text("image size: %dx%d", app.window().getSize().x, app.window().getSize().y);
+    ImGui::Text("image size: %dx%d", window_size.x, window_size.y);
 
     ImGui::Separator();
 
@@ -95,7 +97,7 @@ void UI::render(const App& app)
     if (phase == Phase::Idle) {
         if (ImGui::Button("Calculate")) {
             render_stopwatch_.start();
-            supervisor_image_request_.image_size = ImageSize{static_cast<int>(app.window().getSize().x), static_cast<int>(app.window().getSize().y)};
+            supervisor_image_request_.image_size = ImageSize{static_cast<int>(window_size.x), static_cast<int>(window_size.y)};
             supervisor_calc_image(supervisor_image_request_);
         }
 
