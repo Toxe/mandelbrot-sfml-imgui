@@ -16,7 +16,7 @@ extern std::mutex paint_mtx;
 extern std::atomic<Phase> supervisor_phase;
 
 UI::UI(const App& app, const CLI& cli)
-    : supervisor_image_request_{make_default_supervisor_image_request(app)}, font_size_{static_cast<float>(cli.font_size())}
+    : supervisor_image_request_{make_default_supervisor_image_request(app)}, font_size_{static_cast<float>(cli.font_size())}, is_visible_{true}
 {
     ImGui::SFML::Init(app.window(), false);
 
@@ -49,23 +49,28 @@ void UI::render(const App& app)
     const Phase phase = supervisor_phase;
     const ImVec4 gray_text{0.6f, 0.6f, 0.6f, 1.0f};
 
-    ImGui::SFML::Update(app.window(), app.elapsed_time());
-    ImGui::Begin("Mandelbrot", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
+    if (render_stopwatch_.is_running())
+        if (phase == Phase::Idle)
+            render_stopwatch_.stop();
 
     const float elapsed_time_in_seconds = app.elapsed_time().asSeconds();
     const float current_fps = 1.0f / elapsed_time_in_seconds;
     const auto fps_label = fmt::format("{:.1f} FPS ({:.3f} ms/frame)", current_fps, 1000.0f * elapsed_time_in_seconds);
     fps[values_offset] = current_fps;
     values_offset = (values_offset + 1) % fps.size();
+
+    ImGui::SFML::Update(app.window(), app.elapsed_time());
+
+    if (!is_visible_)
+        return;
+
+    ImGui::Begin("Mandelbrot", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
+
     ImGui::PlotLines("", fps.data(), static_cast<int>(fps.size()), static_cast<int>(values_offset), fps_label.c_str(), 0.0f, 1.5f * std::max(65.0f, *std::max_element(fps.begin(), fps.end())), ImVec2(0, 4.0f * font_size_));
 
     ImGui::Text("image size: %dx%d", app.window().getSize().x, app.window().getSize().y);
 
     ImGui::Separator();
-
-    if (render_stopwatch_.is_running())
-        if (phase == Phase::Idle)
-            render_stopwatch_.stop();
 
     ImGui::Text("status: %s", supervisor_phase_name(phase));
     ImGui::Text("render time: %.3fs", render_stopwatch_.time());

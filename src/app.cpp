@@ -4,6 +4,7 @@
 #include <imgui-SFML.h>
 
 #include "supervisor.h"
+#include "ui.h"
 
 extern std::mutex paint_mtx;
 
@@ -32,7 +33,7 @@ void App::next_frame()
     elapsed_time_ = frame_time_clock_.restart();
 }
 
-void App::poll_events()
+void App::poll_events(UI& ui)
 {
     sf::Event event;
 
@@ -48,6 +49,8 @@ void App::poll_events()
                 window_->close();
             } else if (event.key.code == sf::Keyboard::Enter) {
                 toggle_fullscreen();
+            } else if (event.key.code == sf::Keyboard::Space) {
+                ui.toggle_visibility();
             }
         } else if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape) {
             supervisor_stop();

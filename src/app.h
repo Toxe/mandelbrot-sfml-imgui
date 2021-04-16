@@ -7,6 +7,8 @@
 #include "cli.h"
 #include "mandelbrot.h"
 
+class UI;
+
 class App {
     const char* window_title_ = "Mandelbrot";
 
@@ -33,7 +35,7 @@ public:
     void update_texture(const sf::Uint8* pixels, const CalculationArea& area);
 
     void next_frame();
-    void poll_events();
+    void poll_events(UI& ui);
     void render();
 
     void toggle_fullscreen();

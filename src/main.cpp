@@ -14,7 +14,7 @@ int main(int argc, char* argv[])
 
     while (app.window().isOpen()) {
         app.next_frame();
-        app.poll_events();
+        app.poll_events(ui);
         ui.render(app);
         app.render();
     }
