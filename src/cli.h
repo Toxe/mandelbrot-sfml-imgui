@@ -10,6 +10,8 @@ class CLI {
     int num_threads_;
     int font_size_;
     sf::VideoMode video_mode_;
+    sf::VideoMode default_window_video_mode_;
+    sf::VideoMode default_fullscreen_video_mode_;
 
     void show_usage_and_exit(const clipp::group& cli, const std::string_view& argv0, const std::string_view& description) const;
     sf::VideoMode default_video_mode(const int fullscreen) const;
@@ -22,4 +24,6 @@ public:
     int num_threads() const { return num_threads_; }
     int font_size() const { return font_size_; }
     sf::VideoMode video_mode() const { return video_mode_; };
+    sf::VideoMode default_window_video_mode() const { return default_window_video_mode_; };
+    sf::VideoMode default_fullscreen_video_mode() const { return default_fullscreen_video_mode_; };
 };

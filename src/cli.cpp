@@ -37,7 +37,9 @@ CLI::CLI(int argc, char* argv[])
     if (!clipp::parse(argc, argv, cli))
         show_usage_and_exit(cli, argv[0], description);
 
-    video_mode_ = default_video_mode(fullscreen_);
+    default_window_video_mode_ = default_video_mode(false);
+    default_fullscreen_video_mode_ = default_video_mode(true);
+    video_mode_ = fullscreen_ ? default_fullscreen_video_mode_ : default_window_video_mode_;
 
     if (font_size_ == 0)
         font_size_ = default_font_size(video_mode_, fullscreen_);
