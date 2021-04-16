@@ -9,12 +9,17 @@
 
 class App {
     const char* window_title_ = "Mandelbrot";
+
     bool is_fullscreen_;
     sf::VideoMode window_video_mode_;
     sf::VideoMode fullscreen_video_mode_;
+
     std::unique_ptr<sf::RenderWindow> window_;
     std::unique_ptr<sf::Texture> texture_;
     std::unique_ptr<sf::Sprite> sprite_;
+
+    sf::Clock frame_time_clock_;
+    sf::Time elapsed_time_;
 
 public:
     App(const CLI& cli);
@@ -27,9 +32,12 @@ public:
     void update_texture(const sf::Image& image);
     void update_texture(const sf::Uint8* pixels, const CalculationArea& area);
 
+    void next_frame();
     void poll_events();
     void render();
 
     void toggle_fullscreen();
     void adjust_view_to_window_size();
+
+    sf::Time elapsed_time() const { return elapsed_time_; };
 };

@@ -27,6 +27,11 @@ App::App(const CLI& cli)
     sprite_->setTexture(*texture_);
 }
 
+void App::next_frame()
+{
+    elapsed_time_ = frame_time_clock_.restart();
+}
+
 void App::poll_events()
 {
     sf::Event event;

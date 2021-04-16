@@ -48,14 +48,13 @@ void UI::render(const App& app)
 
     const Phase phase = supervisor_phase;
     const ImVec4 gray_text{0.6f, 0.6f, 0.6f, 1.0f};
-    const auto elapsed_time = frame_time_clock_.restart();
 
-    ImGui::SFML::Update(app.window(), elapsed_time);
+    ImGui::SFML::Update(app.window(), app.elapsed_time());
     ImGui::Begin("Mandelbrot", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
 
-    const float elapsed_time_as_econds = elapsed_time.asSeconds();
-    const float current_fps = 1.0f / elapsed_time_as_econds;
-    const auto fps_label = fmt::format("{:.1f} FPS ({:.3f} ms/frame)", current_fps, 1000.0f * elapsed_time_as_econds);
+    const float elapsed_time_in_seconds = app.elapsed_time().asSeconds();
+    const float current_fps = 1.0f / elapsed_time_in_seconds;
+    const auto fps_label = fmt::format("{:.1f} FPS ({:.3f} ms/frame)", current_fps, 1000.0f * elapsed_time_in_seconds);
     fps[values_offset] = current_fps;
     values_offset = (values_offset + 1) % fps.size();
     ImGui::PlotLines("", fps.data(), static_cast<int>(fps.size()), static_cast<int>(values_offset), fps_label.c_str(), 0.0f, 1.5f * std::max(65.0f, *std::max_element(fps.begin(), fps.end())), ImVec2(0, 4.0f * font_size_));
@@ -64,10 +63,9 @@ void UI::render(const App& app)
 
     ImGui::Separator();
 
-    if (render_stopwatch_.is_running()) {
+    if (render_stopwatch_.is_running())
         if (phase == Phase::Idle)
             render_stopwatch_.stop();
-    }
 
     ImGui::Text("status: %s", supervisor_phase_name(phase));
     ImGui::Text("render time: %.3fs", render_stopwatch_.time());

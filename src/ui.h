@@ -8,7 +8,6 @@
 class UI {
     SupervisorImageRequest supervisor_image_request_;
     Stopwatch render_stopwatch_;
-    sf::Clock frame_time_clock_;
     float font_size_;
 
 public:

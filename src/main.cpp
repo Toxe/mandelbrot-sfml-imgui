@@ -13,6 +13,7 @@ int main(int argc, char* argv[])
     auto supervisor = supervisor_start(app, cli.num_threads(), gradient);
 
     while (app.window().isOpen()) {
+        app.next_frame();
         app.poll_events();
         ui.render(app);
         app.render();
