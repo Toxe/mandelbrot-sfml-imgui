@@ -179,7 +179,7 @@ void supervisor(App& app, const int num_threads, const Gradient& gradient)
 
     {
         spdlog::debug("supervisor: signaling workers to stop");
-        std::unique_lock<std::mutex> lock(mtx);
+        std::lock_guard<std::mutex> lock(mtx);
 
         for (int i = 0; i < std::ssize(workers); ++i)
             worker_message_queue.push(WorkerQuit{});
