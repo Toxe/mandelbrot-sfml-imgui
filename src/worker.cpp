@@ -1,8 +1,13 @@
 #include "worker.h"
 
+#include <mutex>
 #include <thread>
 
 #include <spdlog/spdlog.h>
+
+#include "util/mutex_timer.h"
+
+extern MutexTimer mutex_timer_worker_combine_iterations_histogram;
 
 void worker_resize_iterations_histogram_if_needed(const WorkerCalc& calc, std::vector<int>& iterations_histogram)
 {
@@ -38,25 +43,14 @@ void worker_draw_pixels(const WorkerCalc& calc)
     }
 }
 
-WorkerMessage worker_wait_for_message(std::mutex& mtx, std::condition_variable& cv, std::queue<WorkerMessage>& message_queue)
-{
-    std::unique_lock<std::mutex> lock(mtx);
-    cv.wait(lock, [&] { return !message_queue.empty(); });
-
-    WorkerMessage msg = std::move(message_queue.front());
-    message_queue.pop();
-
-    return msg;
-}
-
-void worker(const int id, std::mutex& mtx, std::condition_variable& cv_wk, std::condition_variable& cv_sv, std::queue<WorkerMessage>& worker_message_queue, std::queue<SupervisorMessage>& supervisor_message_queue)
+void worker(const int id, std::mutex& mtx, MessageQueue<WorkerMessage>& worker_message_queue, MessageQueue<SupervisorMessage>& supervisor_message_queue)
 {
     spdlog::debug("worker {}: started", id);
 
     std::vector<int> iterations_histogram;
 
     while (true) {
-        WorkerMessage msg = worker_wait_for_message(mtx, cv_wk, worker_message_queue);
+        WorkerMessage msg = worker_message_queue.wait_for_message();
 
         if (std::holds_alternative<WorkerQuit>(msg)) {
             spdlog::debug("worker {}: quit", id);
@@ -68,13 +62,16 @@ void worker(const int id, std::mutex& mtx, std::condition_variable& cv_wk, std::
             worker_draw_pixels(calc);
 
             {
+                const auto t0 = std::chrono::high_resolution_clock::now();
                 std::lock_guard<std::mutex> lock(mtx);
+                mutex_timer_worker_combine_iterations_histogram.update(t0);
                 worker_combine_iterations_histogram(iterations_histogram, *calc.combined_iterations_histogram);
-                supervisor_message_queue.emplace(SupervisorResultsFromWorker{calc.max_iterations, calc.image_size, calc.area, calc.fractal_section, calc.results_per_point, std::move(calc.pixels)});
             }
+
+            supervisor_message_queue.send(SupervisorResultsFromWorker{calc.max_iterations, calc.image_size, calc.area, calc.fractal_section, calc.results_per_point, std::move(calc.pixels)});
         }
 
-        cv_sv.notify_one();
+        supervisor_message_queue.notify_one();
     }
 
     spdlog::debug("worker {}: stopping", id);

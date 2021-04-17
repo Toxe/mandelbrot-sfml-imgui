@@ -3,7 +3,6 @@
 #include <future>
 
 #include "app.h"
-#include "messages.h"
 
 enum class Phase {
     Starting,
@@ -15,6 +14,8 @@ enum class Phase {
     Shutdown,
     Canceled,
 };
+
+struct SupervisorImageRequest;
 
 std::future<void> supervisor_start(App& app, const int num_threads, const Gradient& gradient);
 void supervisor_stop();

@@ -5,6 +5,12 @@
 
 #include "supervisor.h"
 #include "ui.h"
+#include "util/mutex_timer.h"
+
+extern MutexTimer mutex_timer_app_render;
+extern MutexTimer mutex_timer_app_update_texture1;
+extern MutexTimer mutex_timer_app_update_texture2;
+extern MutexTimer mutex_timer_app_resize_texture;
 
 App::App(const CLI& cli)
     : is_fullscreen_{cli.fullscreen()}, window_video_mode_{cli.default_window_video_mode()}, fullscreen_video_mode_{cli.default_fullscreen_video_mode()}
@@ -61,7 +67,9 @@ void App::render()
     window_->clear();
 
     {
+        const auto t0 = std::chrono::high_resolution_clock::now();
         std::lock_guard<std::mutex> lock(mtx_);
+        mutex_timer_app_render.update(t0);
         window_->draw(*sprite_);
     }
 
@@ -71,7 +79,9 @@ void App::render()
 
 void App::resize_texture(const sf::Image& image)
 {
+    const auto t0 = std::chrono::high_resolution_clock::now();
     std::lock_guard<std::mutex> lock(mtx_);
+    mutex_timer_app_resize_texture.update(t0);
 
     texture_.reset(new sf::Texture());
     texture_->loadFromImage(image);
@@ -82,13 +92,19 @@ void App::resize_texture(const sf::Image& image)
 
 void App::update_texture(const sf::Image& image)
 {
+    const auto t0 = std::chrono::high_resolution_clock::now();
     std::lock_guard<std::mutex> lock(mtx_);
+    mutex_timer_app_update_texture1.update(t0);
+
     texture_->update(image);
 }
 
 void App::update_texture(const sf::Uint8* pixels, const CalculationArea& area)
 {
+    const auto t0 = std::chrono::high_resolution_clock::now();
     std::lock_guard<std::mutex> lock(mtx_);
+    mutex_timer_app_update_texture2.update(t0);
+
     texture_->update(pixels, static_cast<unsigned int>(area.width), static_cast<unsigned int>(area.height),
                              static_cast<unsigned int>(area.x), static_cast<unsigned int>(area.y));
 }

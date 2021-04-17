@@ -2,27 +2,25 @@
 
 #include <atomic>
 #include <cmath>
-#include <condition_variable>
 #include <future>
 #include <mutex>
-#include <queue>
 #include <thread>
 #include <vector>
 
 #include <spdlog/spdlog.h>
 #include <SFML/Graphics.hpp>
 
+#include "message_queue.h"
+#include "messages.h"
 #include "worker.h"
 
 const sf::Color background_color(0x00, 0x00, 0x20);
 
 std::vector<std::thread> workers;
-std::condition_variable cv_sv;
-std::condition_variable cv_wk;
 std::mutex mtx;
 
-std::queue<SupervisorMessage> supervisor_message_queue;
-std::queue<WorkerMessage> worker_message_queue;
+MessageQueue<SupervisorMessage> supervisor_message_queue;
+MessageQueue<WorkerMessage> worker_message_queue;
 
 std::atomic<Phase> supervisor_phase = Phase::Starting;
 int waiting_for_results = 0;
@@ -34,13 +32,8 @@ void supervisor_set_phase(const Phase phase)
 
 void supervisor_cancel_calc()
 {
-    std::lock_guard<std::mutex> lock(mtx);
-
     // empty the message queue
-    while (!worker_message_queue.empty()) {
-        worker_message_queue.pop();
-        --waiting_for_results;
-    }
+    waiting_for_results -= worker_message_queue.clear();
 
     if (waiting_for_results > 0)
         supervisor_set_phase(Phase::Canceled); // wait until all workers have finished
@@ -70,14 +63,12 @@ void supervisor_clear_window(const ImageSize& image_size, App& app)
 
 void supervisor_create_work(const SupervisorImageRequest& request, std::vector<int>& combined_iterations_histogram, std::vector<CalculationResult>& results_per_point)
 {
-    std::lock_guard<std::mutex> lock(mtx);
-
     for (int y = 0; y < request.image_size.height; y += request.area_size) {
         const int height = std::min(request.image_size.height - y, request.area_size);
 
         for (int x = 0; x < request.image_size.width; x += request.area_size) {
             const int width = std::min(request.image_size.width - x, request.area_size);
-            worker_message_queue.emplace(WorkerCalc{
+            worker_message_queue.send(WorkerCalc{
                 request.max_iterations, request.image_size, {x, y, width, height},
                 request.fractal_section, &results_per_point, &combined_iterations_histogram,
                 std::make_unique<sf::Uint8[]>(static_cast<std::size_t>(4 * width * height))
@@ -110,17 +101,6 @@ void supervisor_reset_combined_iterations_histogram(std::vector<int>& combined_i
     std::fill(combined_iterations_histogram.begin(), combined_iterations_histogram.end(), 0);
 }
 
-SupervisorMessage supervisor_wait_for_message()
-{
-    std::unique_lock<std::mutex> lock(mtx);
-    cv_sv.wait(lock, [&] { return !supervisor_message_queue.empty(); });
-
-    SupervisorMessage msg = std::move(supervisor_message_queue.front());
-    supervisor_message_queue.pop();
-
-    return msg;
-}
-
 void supervisor(App& app, const int num_threads, const Gradient& gradient)
 {
     spdlog::debug("supervisor: starting");
@@ -131,12 +111,12 @@ void supervisor(App& app, const int num_threads, const Gradient& gradient)
     std::vector<CalculationResult> results_per_point;
 
     for (int id = 0; id < num_threads; ++id)
-        workers.emplace_back(worker, id, std::ref(mtx), std::ref(cv_wk), std::ref(cv_sv), std::ref(worker_message_queue), std::ref(supervisor_message_queue));
+        workers.emplace_back(worker, id, std::ref(mtx), std::ref(worker_message_queue), std::ref(supervisor_message_queue));
 
     supervisor_set_phase(Phase::Idle);
 
     while (true) {
-        SupervisorMessage msg = supervisor_wait_for_message();
+        SupervisorMessage msg = supervisor_message_queue.wait_for_message();
 
         if (std::holds_alternative<SupervisorQuit>(msg)) {
             spdlog::debug("supervisor: quit");
@@ -168,18 +148,15 @@ void supervisor(App& app, const int num_threads, const Gradient& gradient)
             supervisor_cancel_calc();
         }
 
-        cv_wk.notify_one();
+        worker_message_queue.notify_one();
     }
 
-    {
-        spdlog::debug("supervisor: signaling workers to stop");
-        std::lock_guard<std::mutex> lock(mtx);
+    spdlog::debug("supervisor: signaling workers to stop");
 
-        for (int i = 0; i < std::ssize(workers); ++i)
-            worker_message_queue.push(WorkerQuit{});
-    }
+    for (int i = 0; i < std::ssize(workers); ++i)
+        worker_message_queue.send(WorkerQuit{});
 
-    cv_wk.notify_all();
+    worker_message_queue.notify_all();
 
     spdlog::debug("supervisor: waiting for workers to finish");
 
@@ -201,24 +178,21 @@ void supervisor_shutdown(std::future<void>& supervisor)
 
 void supervisor_stop()
 {
-    std::lock_guard<std::mutex> lock(mtx);
-    supervisor_message_queue.push(SupervisorQuit{});
-    cv_sv.notify_one();
+    supervisor_message_queue.send(SupervisorQuit{});
+    supervisor_message_queue.notify_one();
 }
 
 void supervisor_calc_image(const SupervisorImageRequest& image_request)
 {
-    std::lock_guard<std::mutex> lock(mtx);
-    supervisor_message_queue.push(image_request);
-    cv_sv.notify_one();
+    supervisor_message_queue.send(image_request);
+    supervisor_message_queue.notify_one();
     supervisor_set_phase(Phase::RequestSent);
 }
 
 void supervisor_cancel_render()
 {
-    std::lock_guard<std::mutex> lock(mtx);
-    supervisor_message_queue.push(SupervisorCancel{});
-    cv_sv.notify_one();
+    supervisor_message_queue.send(SupervisorCancel{});
+    supervisor_message_queue.notify_one();
 }
 
 const char* supervisor_phase_name(const Phase phase)
