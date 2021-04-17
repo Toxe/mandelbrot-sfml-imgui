@@ -7,6 +7,7 @@ add_executable(mandelbrot main.cpp
                           app.cpp app.h
                           cli.cpp cli.h
                           mandelbrot.cpp mandelbrot.h
+                          message_queue.h
                           gradient.cpp gradient.h
                           stopwatch.h
                           supervisor.cpp supervisor.h
