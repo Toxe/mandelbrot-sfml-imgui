@@ -6,8 +6,6 @@
 #include "supervisor.h"
 #include "ui.h"
 
-extern std::mutex paint_mtx;
-
 App::App(const CLI& cli)
     : is_fullscreen_{cli.fullscreen()}, window_video_mode_{cli.default_window_video_mode()}, fullscreen_video_mode_{cli.default_fullscreen_video_mode()}
 {
@@ -63,7 +61,7 @@ void App::render()
     window_->clear();
 
     {
-        std::lock_guard<std::mutex> lock(paint_mtx);
+        std::lock_guard<std::mutex> lock(mtx_);
         window_->draw(*sprite_);
     }
 
@@ -73,6 +71,8 @@ void App::render()
 
 void App::resize_texture(const sf::Image& image)
 {
+    std::lock_guard<std::mutex> lock(mtx_);
+
     texture_.reset(new sf::Texture());
     texture_->loadFromImage(image);
 
@@ -82,11 +82,13 @@ void App::resize_texture(const sf::Image& image)
 
 void App::update_texture(const sf::Image& image)
 {
+    std::lock_guard<std::mutex> lock(mtx_);
     texture_->update(image);
 }
 
 void App::update_texture(const sf::Uint8* pixels, const CalculationArea& area)
 {
+    std::lock_guard<std::mutex> lock(mtx_);
     texture_->update(pixels, static_cast<unsigned int>(area.width), static_cast<unsigned int>(area.height),
                              static_cast<unsigned int>(area.x), static_cast<unsigned int>(area.y));
 }

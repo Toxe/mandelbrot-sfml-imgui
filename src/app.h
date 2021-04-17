@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <mutex>
 
 #include <SFML/Graphics.hpp>
 
@@ -22,6 +23,8 @@ class App {
 
     sf::Clock frame_time_clock_;
     sf::Time elapsed_time_;
+
+    std::mutex mtx_;
 
 public:
     App(const CLI& cli);

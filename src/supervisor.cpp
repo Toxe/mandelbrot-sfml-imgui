@@ -20,7 +20,6 @@ std::vector<std::thread> workers;
 std::condition_variable cv_sv;
 std::condition_variable cv_wk;
 std::mutex mtx;
-std::mutex paint_mtx;
 
 std::queue<SupervisorMessage> supervisor_message_queue;
 std::queue<WorkerMessage> worker_message_queue;
@@ -55,8 +54,6 @@ void supervisor_colorize(const ImageSize& image_size, App& app, const int max_it
     image.create(static_cast<unsigned int>(image_size.width), static_cast<unsigned int>(image_size.height));
 
     mandelbrot_colorize(max_iterations, gradient, image, iterations_histogram, results_per_point);
-
-    std::lock_guard<std::mutex> lock(paint_mtx);
     app.update_texture(image);
 }
 
@@ -64,8 +61,6 @@ void supervisor_clear_window(const ImageSize& image_size, App& app)
 {
     sf::Image image;
     image.create(static_cast<unsigned int>(image_size.width), static_cast<unsigned int>(image_size.height), background_color);
-
-    std::lock_guard<std::mutex> lock(paint_mtx);
 
     if (static_cast<int>(app.texture().getSize().x) != image_size.width || static_cast<int>(app.texture().getSize().y) != image_size.height)
         app.resize_texture(image);
@@ -95,7 +90,6 @@ void supervisor_create_work(const SupervisorImageRequest& request, std::vector<i
 
 void supervisor_receive_results(const SupervisorResultsFromWorker& results, App& app)
 {
-    std::lock_guard<std::mutex> lock(paint_mtx);
     app.update_texture(results.pixels.get(), results.area);
 }
 
