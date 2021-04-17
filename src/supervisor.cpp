@@ -3,7 +3,6 @@
 #include <atomic>
 #include <cmath>
 #include <future>
-#include <mutex>
 #include <thread>
 #include <vector>
 
@@ -17,7 +16,6 @@
 const sf::Color background_color(0x00, 0x00, 0x20);
 
 std::vector<std::thread> workers;
-std::mutex mtx;
 
 MessageQueue<SupervisorMessage> supervisor_message_queue;
 MessageQueue<WorkerMessage> worker_message_queue;
@@ -111,7 +109,7 @@ void supervisor(App& app, const int num_threads, const Gradient& gradient)
     std::vector<CalculationResult> results_per_point;
 
     for (int id = 0; id < num_threads; ++id)
-        workers.emplace_back(worker, id, std::ref(mtx), std::ref(worker_message_queue), std::ref(supervisor_message_queue));
+        workers.emplace_back(worker, id, std::ref(worker_message_queue), std::ref(supervisor_message_queue));
 
     supervisor_set_phase(Phase::Idle);
 

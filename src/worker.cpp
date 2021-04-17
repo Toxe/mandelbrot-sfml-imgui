@@ -7,6 +7,8 @@
 
 #include "util/mutex_timer.h"
 
+std::mutex mtx;
+
 extern MutexTimer mutex_timer_worker_combine_iterations_histogram;
 
 void worker_resize_iterations_histogram_if_needed(const WorkerCalc& calc, std::vector<int>& iterations_histogram)
@@ -43,7 +45,7 @@ void worker_draw_pixels(const WorkerCalc& calc)
     }
 }
 
-void worker(const int id, std::mutex& mtx, MessageQueue<WorkerMessage>& worker_message_queue, MessageQueue<SupervisorMessage>& supervisor_message_queue)
+void worker(const int id, MessageQueue<WorkerMessage>& worker_message_queue, MessageQueue<SupervisorMessage>& supervisor_message_queue)
 {
     spdlog::debug("worker {}: started", id);
 
