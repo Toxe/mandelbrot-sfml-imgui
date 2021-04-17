@@ -1,5 +1,6 @@
 #pragma once
 
+#include <mutex>
 #include <string>
 #include <thread>
 
@@ -14,6 +15,7 @@ class MutexTimer {
     std::chrono::nanoseconds sum_ = 0ns;
     std::string mtx_name_;
     std::string label_;
+    std::mutex mtx_;
 
 public:
     MutexTimer(const std::string& mutex_name, const std::string& label) : mtx_name_{mutex_name}, label_{label} { }
@@ -21,6 +23,7 @@ public:
     void update(std::chrono::steady_clock::time_point t0)
     {
         const auto t = std::chrono::high_resolution_clock::now() - t0;
+        std::lock_guard<std::mutex> lock(mtx_);
         ++count_;
         sum_ += t;
     }
