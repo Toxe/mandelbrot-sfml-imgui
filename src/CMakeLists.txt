@@ -12,6 +12,7 @@ add_executable(mandelbrot main.cpp
                           supervisor.cpp supervisor.h
                           ui.cpp ui.h
                           worker.cpp worker.h
+                          util/mutex_timer.h
 )
 
 foreach(target ${ALL_TARGETS})
