@@ -49,6 +49,8 @@ void App::poll_events(UI& ui)
                 toggle_fullscreen();
             } else if (event.key.code == sf::Keyboard::Space) {
                 ui.toggle_visibility();
+            } else if (event.key.code == sf::Keyboard::F1) {
+                ui.toggle_help();
             }
         } else if (event.type == sf::Event::Resized) {
             adjust_view_to_window_size();
