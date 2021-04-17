@@ -17,7 +17,7 @@ const FractalSection default_fractal_section = {-0.8, 0.0, 2.0};
 extern std::atomic<Phase> supervisor_phase;
 
 UI::UI(const App& app, const CLI& cli)
-    : supervisor_image_request_{make_default_supervisor_image_request(app)}, font_size_{static_cast<float>(cli.font_size())}, is_visible_{true}
+    : supervisor_image_request_{make_default_supervisor_image_request(app)}, font_size_{static_cast<float>(cli.font_size())}
 {
     ImGui::SFML::Init(app.window(), false);
 
@@ -69,20 +69,11 @@ void UI::render(const App& app)
     ImGui::PlotLines("", fps.data(), static_cast<int>(fps.size()), static_cast<int>(values_offset), fps_label.c_str(), 0.0f, 1.5f * std::max(65.0f, *std::max_element(fps.begin(), fps.end())), ImVec2(0, 4.0f * font_size_));
 
     ImGui::Text("image size: %dx%d", window_size.x, window_size.y);
-
-    ImGui::Separator();
-
     ImGui::Text("status: %s", supervisor_phase_name(phase));
     ImGui::Text("render time: %.3fs", render_stopwatch_.time());
 
-    ImGui::Separator();
-
-    ImGui::TextColored(gray_text, "Left/right click: zoom in/out");
-    ImGui::TextColored(gray_text, "Left drag: zoom in area");
-    ImGui::TextColored(gray_text, "Right drag: move around");
-    ImGui::TextColored(gray_text, "Space: show/hide UI");
-    ImGui::TextColored(gray_text, "   F1: fullscreen");
-    ImGui::TextColored(gray_text, "  ESC: quit");
+    if (ImGui::Button("Help (F1)"))
+        toggle_help();
 
     ImGui::NewLine();
 
@@ -113,6 +104,24 @@ void UI::render(const App& app)
             supervisor_cancel_render();
 
     ImGui::End();
+
+    if (show_help_) {
+        ImGui::Begin("Help", &show_help_, ImGuiWindowFlags_AlwaysAutoResize);
+
+        ImGui::Text("Left/right click: zoom in/out");
+        ImGui::Text("Left drag: zoom in area");
+        ImGui::Text("Right drag: move around");
+        ImGui::Separator();
+        ImGui::Text("Enter: fullscreen");
+        ImGui::Text("Space: show/hide UI");
+        ImGui::Text("   F1: show/hide help");
+        ImGui::Text("  ESC: quit");
+
+        if (ImGui::Button("Close"))
+            toggle_help();
+
+        ImGui::End();
+    }
 }
 
 void UI::help(const std::string& text)
