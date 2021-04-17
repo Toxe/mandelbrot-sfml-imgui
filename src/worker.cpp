@@ -70,8 +70,6 @@ void worker(const int id, std::mutex& mtx, MessageQueue<WorkerMessage>& worker_m
 
             supervisor_message_queue.send(SupervisorResultsFromWorker{calc.max_iterations, calc.image_size, calc.area, calc.fractal_section, calc.results_per_point, std::move(calc.pixels)});
         }
-
-        supervisor_message_queue.notify_one();
     }
 
     spdlog::debug("worker {}: stopping", id);

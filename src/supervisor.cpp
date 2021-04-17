@@ -73,10 +73,10 @@ void supervisor_create_work(const SupervisorImageRequest& request, std::vector<i
                 request.fractal_section, &results_per_point, &combined_iterations_histogram,
                 std::make_unique<sf::Uint8[]>(static_cast<std::size_t>(4 * width * height))
             });
+
+            ++waiting_for_results;
         }
     }
-
-    waiting_for_results = static_cast<int>(worker_message_queue.size());
 }
 
 void supervisor_receive_results(const SupervisorResultsFromWorker& results, App& app)
@@ -147,16 +147,12 @@ void supervisor(App& app, const int num_threads, const Gradient& gradient)
         } else if (std::holds_alternative<SupervisorCancel>(msg)) {
             supervisor_cancel_calc();
         }
-
-        worker_message_queue.notify_one();
     }
 
     spdlog::debug("supervisor: signaling workers to stop");
 
     for (int i = 0; i < std::ssize(workers); ++i)
         worker_message_queue.send(WorkerQuit{});
-
-    worker_message_queue.notify_all();
 
     spdlog::debug("supervisor: waiting for workers to finish");
 
@@ -179,20 +175,17 @@ void supervisor_shutdown(std::future<void>& supervisor)
 void supervisor_stop()
 {
     supervisor_message_queue.send(SupervisorQuit{});
-    supervisor_message_queue.notify_one();
 }
 
 void supervisor_calc_image(const SupervisorImageRequest& image_request)
 {
     supervisor_message_queue.send(image_request);
-    supervisor_message_queue.notify_one();
     supervisor_set_phase(Phase::RequestSent);
 }
 
 void supervisor_cancel_render()
 {
     supervisor_message_queue.send(SupervisorCancel{});
-    supervisor_message_queue.notify_one();
 }
 
 const char* supervisor_phase_name(const Phase phase)

@@ -34,10 +34,14 @@ public:
 template <typename T>
 void MessageQueue<T>::send(T&& msg)
 {
-    const auto t0 = std::chrono::high_resolution_clock::now();
-    std::lock_guard<std::mutex> lock(mtx_);
-    mutex_timer_message_queue_wait_for_message.update(t0);
-    queue_.emplace(std::move(msg));
+    {
+        const auto t0 = std::chrono::high_resolution_clock::now();
+        std::lock_guard<std::mutex> lock(mtx_);
+        mutex_timer_message_queue_wait_for_message.update(t0);
+        queue_.emplace(std::move(msg));
+    }
+
+    cv_.notify_one();
 }
 
 template <typename T>
