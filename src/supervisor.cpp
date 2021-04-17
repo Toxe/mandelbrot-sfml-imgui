@@ -39,24 +39,23 @@ void supervisor_cancel_calc()
         supervisor_set_phase(Phase::Idle);
 }
 
-void supervisor_colorize(const ImageSize& image_size, App& app, const int max_iterations, const Gradient& gradient, const std::vector<int>& iterations_histogram, const std::vector<CalculationResult>& results_per_point)
+void supervisor_colorize(sf::Image& render_image, App& app, const int max_iterations, const Gradient& gradient, const std::vector<int>& iterations_histogram, const std::vector<CalculationResult>& results_per_point)
 {
-    sf::Image image;
-    image.create(static_cast<unsigned int>(image_size.width), static_cast<unsigned int>(image_size.height));
-
-    mandelbrot_colorize(max_iterations, gradient, image, iterations_histogram, results_per_point);
-    app.update_texture(image);
+    mandelbrot_colorize(max_iterations, gradient, render_image, iterations_histogram, results_per_point);
+    app.update_texture(render_image);
 }
 
-void supervisor_clear_window(const ImageSize& image_size, App& app)
+void supervisor_resize_and_clear_render_image(const ImageSize& image_size, sf::Image& render_image)
 {
-    sf::Image image;
-    image.create(static_cast<unsigned int>(image_size.width), static_cast<unsigned int>(image_size.height), background_color);
+    render_image.create(static_cast<unsigned int>(image_size.width), static_cast<unsigned int>(image_size.height), background_color);
+}
 
-    if (static_cast<int>(app.texture().getSize().x) != image_size.width || static_cast<int>(app.texture().getSize().y) != image_size.height)
-        app.resize_texture(image);
+void supervisor_update_texture(const sf::Image& render_image, App& app)
+{
+    if (app.texture().getSize() != render_image.getSize())
+        app.resize_texture(render_image);
     else
-        app.update_texture(image);
+        app.update_texture(render_image);
 }
 
 void supervisor_create_work(const SupervisorImageRequest& request, std::vector<int>& combined_iterations_histogram, std::vector<CalculationResult>& results_per_point)
@@ -107,6 +106,7 @@ void supervisor(App& app, const int num_threads, const Gradient& gradient)
 
     std::vector<int> combined_iterations_histogram;
     std::vector<CalculationResult> results_per_point;
+    sf::Image render_image;
 
     for (int id = 0; id < num_threads; ++id)
         workers.emplace_back(worker, id, std::ref(worker_message_queue), std::ref(supervisor_message_queue));
@@ -123,7 +123,8 @@ void supervisor(App& app, const int num_threads, const Gradient& gradient)
         } else if (std::holds_alternative<SupervisorImageRequest>(msg)) {
             supervisor_set_phase(Phase::RequestReceived);
             SupervisorImageRequest image_request{std::get<SupervisorImageRequest>(msg)};
-            supervisor_clear_window(image_request.image_size, app);
+            supervisor_resize_and_clear_render_image(image_request.image_size, render_image);
+            supervisor_update_texture(render_image, app);
             supervisor_resize_combined_iterations_histogram_if_needed(image_request, combined_iterations_histogram);
             supervisor_resize_results_per_point_if_needed(image_request, results_per_point);
             supervisor_reset_combined_iterations_histogram(combined_iterations_histogram);
@@ -137,7 +138,7 @@ void supervisor(App& app, const int num_threads, const Gradient& gradient)
                 if (supervisor_phase != Phase::Canceled) {
                     // if canceled there is no need to colorize the partial image
                     supervisor_set_phase(Phase::Coloring);
-                    supervisor_colorize(results.image_size, app, results.max_iterations, gradient, combined_iterations_histogram, results_per_point);
+                    supervisor_colorize(render_image, app, results.max_iterations, gradient, combined_iterations_histogram, results_per_point);
                 }
 
                 supervisor_set_phase(Phase::Idle);
