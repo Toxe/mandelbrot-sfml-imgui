@@ -1,6 +1,8 @@
 #include "ui.h"
 
+#include <algorithm>
 #include <atomic>
+#include <limits>
 
 #include <fmt/core.h>
 #include <imgui-SFML.h>
@@ -87,11 +89,11 @@ void UI::render(const App& app)
 
     ImGui::NewLine();
 
-    ImGui::InputDouble("center_x", &supervisor_image_request_.fractal_section.center_x, 0.1, 1.0);
-    ImGui::InputDouble("center_y", &supervisor_image_request_.fractal_section.center_y, 0.1, 1.0);
-    ImGui::InputDouble("fractal height", &supervisor_image_request_.fractal_section.height, 0.1, 1.0);
-    ImGui::InputInt("iterations", &supervisor_image_request_.max_iterations, 100, 1000);
-    ImGui::InputInt("tile size", &supervisor_image_request_.area_size, 100, 500);
+    input_double("center_x", supervisor_image_request_.fractal_section.center_x, 0.1, 1.0, -5.0, 5.0);
+    input_double("center_y", supervisor_image_request_.fractal_section.center_y, 0.1, 1.0, -5.0, 5.0);
+    input_double("fractal height", supervisor_image_request_.fractal_section.height, 0.1, 1.0, 1000.0 * std::numeric_limits<double>::min(), 10.0);
+    input_int("iterations", supervisor_image_request_.max_iterations, 100, 1000, 10, 1'000'000);
+    input_int("tile size", supervisor_image_request_.area_size, 100, 500, 10, 10'000);
 
     if (phase == Phase::Idle) {
         if (ImGui::Button("Calculate")) {
@@ -114,4 +116,34 @@ void UI::render(const App& app)
             supervisor_cancel_render();
 
     ImGui::End();
+}
+
+void UI::help(const std::string& text)
+{
+    ImGui::TextDisabled("(?)");
+    if (ImGui::IsItemHovered()) {
+        ImGui::BeginTooltip();
+        ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+        ImGui::TextUnformatted(text.c_str());
+        ImGui::PopTextWrapPos();
+        ImGui::EndTooltip();
+    }
+}
+
+void UI::input_int(const char* label, int& value, const int small_inc, const int big_inc, const int min, const int max)
+{
+    if (ImGui::InputInt(label, &value, small_inc, big_inc))
+        value = std::clamp(value, min, max);
+
+    ImGui::SameLine();
+    help(fmt::format("{} to {}\n\n     -/+ to change by {}\nCTRL -/+ to change by {}", min, max, small_inc, big_inc));
+}
+
+void UI::input_double(const char* label, double& value, const double small_inc, const double big_inc, const double min, const double max)
+{
+    if (ImGui::InputDouble(label, &value, small_inc, big_inc))
+        value = std::clamp(value, min, max);
+
+    ImGui::SameLine();
+    help(fmt::format("{} to {}\n\n     -/+ to change by {}\nCTRL -/+ to change by {}", min, max, small_inc, big_inc));
 }
