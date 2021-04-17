@@ -138,6 +138,8 @@ void UI::help(const std::string& text)
 
 void UI::input_int(const char* label, int& value, const int small_inc, const int big_inc, const int min, const int max)
 {
+    ImGui::SetNextItemWidth(ImGui::GetFontSize() * 10);
+
     if (ImGui::InputInt(label, &value, small_inc, big_inc))
         value = std::clamp(value, min, max);
 
@@ -147,6 +149,8 @@ void UI::input_int(const char* label, int& value, const int small_inc, const int
 
 void UI::input_double(const char* label, double& value, const double small_inc, const double big_inc, const double min, const double max)
 {
+    ImGui::SetNextItemWidth(ImGui::GetFontSize() * 10);
+
     if (ImGui::InputDouble(label, &value, small_inc, big_inc))
         value = std::clamp(value, min, max);
 
