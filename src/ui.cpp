@@ -21,12 +21,9 @@ UI::UI(const App& app, const CLI& cli)
 {
     ImGui::SFML::Init(app.window(), false);
 
-    ImFontConfig font_cfg;
-    font_cfg.SizePixels = font_size_;
-
     ImGuiIO& io = ImGui::GetIO();
     io.Fonts->Clear();
-    io.Fonts->AddFontDefault(&font_cfg);
+    io.Fonts->AddFontFromFileTTF("assets/fonts/Inconsolata-SemiBold.ttf", font_size_);
 
     ImGui::SFML::UpdateFontTexture();
 }

@@ -77,5 +77,5 @@ sf::VideoMode CLI::default_video_mode(const int fullscreen) const
 
 int CLI::default_font_size(const sf::VideoMode& video_mode, const bool fullscreen) const
 {
-    return static_cast<int>(video_mode.height) / (fullscreen ? 120 : 60);
+    return static_cast<int>(video_mode.height) / (fullscreen ? 96 : 48);
 }
