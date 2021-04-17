@@ -5,11 +5,7 @@
 
 #include <spdlog/spdlog.h>
 
-#include "util/mutex_timer.h"
-
 std::mutex mtx;
-
-extern MutexTimer mutex_timer_worker_combine_iterations_histogram;
 
 void worker_resize_iterations_histogram_if_needed(const WorkerCalc& calc, std::vector<int>& iterations_histogram)
 {
@@ -64,9 +60,7 @@ void worker(const int id, MessageQueue<WorkerMessage>& worker_message_queue, Mes
             worker_draw_pixels(calc);
 
             {
-                const auto t0 = std::chrono::high_resolution_clock::now();
                 std::lock_guard<std::mutex> lock(mtx);
-                mutex_timer_worker_combine_iterations_histogram.update(t0);
                 worker_combine_iterations_histogram(iterations_histogram, *calc.combined_iterations_histogram);
             }
 
