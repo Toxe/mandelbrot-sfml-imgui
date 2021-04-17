@@ -52,9 +52,6 @@ void App::poll_events(UI& ui)
             } else if (event.key.code == sf::Keyboard::Space) {
                 ui.toggle_visibility();
             }
-        } else if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape) {
-            supervisor_stop();
-            window_->close();
         } else if (event.type == sf::Event::Resized) {
             adjust_view_to_window_size();
         }
