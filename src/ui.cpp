@@ -12,7 +12,6 @@ const int default_max_iterations = 5000;
 const int default_area_size = 100;
 const FractalSection default_fractal_section = {-0.8, 0.0, 2.0};
 
-extern std::mutex paint_mtx;
 extern std::atomic<Phase> supervisor_phase;
 
 UI::UI(const App& app, const CLI& cli)
