@@ -39,6 +39,12 @@ void UI::shutdown()
 
 void UI::render(App& app)
 {
+    render_main_window(app);
+    render_help_window();
+}
+
+void UI::render_main_window(App& app)
+{
     static std::vector<float> fps(120);
     static std::size_t values_offset = 0;
 
@@ -103,7 +109,10 @@ void UI::render(App& app)
             supervisor_cancel_render();
 
     ImGui::End();
+}
 
+void UI::render_help_window()
+{
     if (show_help_) {
         ImGui::Begin("Help", &show_help_, ImGuiWindowFlags_AlwaysAutoResize);
 

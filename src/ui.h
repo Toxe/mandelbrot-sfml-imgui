@@ -18,6 +18,9 @@ class UI {
     void input_int(const char* label, int& value, const int small_inc, const int big_inc, const int min, const int max);
     void input_double(const char* label, double& value, const double small_inc, const double big_inc, const double min, const double max);
 
+    void render_main_window(App& app);
+    void render_help_window();
+
 public:
     UI(const App& app, const CLI& cli);
 
