@@ -45,12 +45,12 @@ void App::poll_events(UI& ui)
             if (!ImGui::GetIO().WantCaptureKeyboard) {
                 if (event.key.code == sf::Keyboard::Escape) {
                     quit();
-                } else if (event.key.code == sf::Keyboard::Enter) {
-                    toggle_fullscreen();
                 } else if (event.key.code == sf::Keyboard::Space) {
                     ui.toggle_visibility();
                 } else if (event.key.code == sf::Keyboard::F1) {
                     ui.toggle_help();
+                } else if (event.key.code == sf::Keyboard::F10) {
+                    toggle_fullscreen();
                 }
             }
         } else if (event.type == sf::Event::Resized) {

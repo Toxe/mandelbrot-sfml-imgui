@@ -112,9 +112,9 @@ void UI::render(const App& app)
         ImGui::Text("Left drag: zoom in area");
         ImGui::Text("Right drag: move around");
         ImGui::Separator();
-        ImGui::Text("Enter: fullscreen");
         ImGui::Text("Space: show/hide UI");
         ImGui::Text("   F1: show/hide help");
+        ImGui::Text("  F10: fullscreen");
         ImGui::Text("  ESC: quit");
 
         if (ImGui::Button("Close"))
