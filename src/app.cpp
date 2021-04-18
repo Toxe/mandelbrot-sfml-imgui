@@ -4,7 +4,6 @@
 #include <imgui-SFML.h>
 #include <imgui.h>
 
-#include "supervisor.h"
 #include "ui.h"
 
 App::App(const CLI& cli)
@@ -46,6 +45,9 @@ void App::poll_events(UI& ui)
             if (!ImGui::GetIO().WantCaptureKeyboard) {
                 if (event.key.code == sf::Keyboard::Escape) {
                     quit();
+                } else if (event.key.code == sf::Keyboard::Enter) {
+                    if (supervisor_phase_ == Phase::Idle)
+                        ui.calculate_image(window_->getSize());
                 } else if (event.key.code == sf::Keyboard::Space) {
                     ui.toggle_visibility();
                 } else if (event.key.code == sf::Keyboard::F1) {

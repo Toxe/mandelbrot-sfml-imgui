@@ -82,18 +82,14 @@ void UI::render(const App& app)
     input_int("tile size", supervisor_image_request_.area_size, 100, 500, 10, 10'000);
 
     if (phase == Phase::Idle) {
-        if (ImGui::Button("Calculate")) {
-            render_stopwatch_.start();
-            supervisor_image_request_.image_size = ImageSize{static_cast<int>(window_size.x), static_cast<int>(window_size.y)};
-            supervisor_calc_image(supervisor_image_request_);
-        }
+        if (ImGui::Button("Calculate"))
+            calculate_image(window_size);
 
         ImGui::SameLine();
 
         if (ImGui::Button("Reset")) {
             supervisor_image_request_ = make_default_supervisor_image_request(app);
-            render_stopwatch_.start();
-            supervisor_calc_image(supervisor_image_request_);
+            calculate_image(window_size);
         }
     }
 
@@ -110,6 +106,7 @@ void UI::render(const App& app)
         ImGui::Text("Left drag: zoom in area");
         ImGui::Text("Right drag: move around");
         ImGui::Separator();
+        ImGui::Text("Enter: calculate image");
         ImGui::Text("Space: show/hide UI");
         ImGui::Text("   F1: show/hide help");
         ImGui::Text("  F10: fullscreen");
@@ -154,4 +151,11 @@ void UI::input_double(const char* label, double& value, const double small_inc, 
 
     ImGui::SameLine();
     help(fmt::format("{} to {}\n\n     -/+ to change by {}\nCTRL -/+ to change by {}", min, max, small_inc, big_inc));
+}
+
+void UI::calculate_image(const sf::Vector2u& window_size)
+{
+    render_stopwatch_.start();
+    supervisor_image_request_.image_size = ImageSize{static_cast<int>(window_size.x), static_cast<int>(window_size.y)};
+    supervisor_calc_image(supervisor_image_request_);
 }

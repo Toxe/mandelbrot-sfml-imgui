@@ -28,4 +28,6 @@ public:
     void toggle_help() { show_help_ = !show_help_; };
 
     SupervisorImageRequest make_default_supervisor_image_request(const App& app);
+
+    void calculate_image(const sf::Vector2u& window_size);
 };
