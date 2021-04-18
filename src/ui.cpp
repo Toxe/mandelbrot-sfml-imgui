@@ -37,7 +37,7 @@ void UI::shutdown()
     ImGui::SFML::Shutdown();
 }
 
-void UI::render(const App& app)
+void UI::render(App& app)
 {
     static std::vector<float> fps(120);
     static std::size_t values_offset = 0;
@@ -72,6 +72,11 @@ void UI::render(const App& app)
 
     if (ImGui::Button("Help (F1)"))
         toggle_help();
+
+    ImGui::SameLine();
+
+    if (ImGui::Button("Fullscreen (F10)"))
+        app.toggle_fullscreen();
 
     ImGui::NewLine();
 

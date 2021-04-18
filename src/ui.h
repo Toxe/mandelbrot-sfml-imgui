@@ -22,7 +22,7 @@ public:
     UI(const App& app, const CLI& cli);
 
     void shutdown();
-    void render(const App& app);
+    void render(App& app);
 
     void toggle_visibility() { is_visible_ = !is_visible_; };
     void toggle_help() { show_help_ = !show_help_; };
