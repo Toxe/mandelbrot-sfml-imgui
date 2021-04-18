@@ -41,6 +41,8 @@ public:
     void poll_events(UI& ui);
     void render();
 
+    void quit();
+
     void toggle_fullscreen();
     void adjust_view_to_window_size();
 

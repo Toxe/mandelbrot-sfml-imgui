@@ -40,13 +40,11 @@ void App::poll_events(UI& ui)
         ImGui::SFML::ProcessEvent(event);
 
         if (event.type == sf::Event::Closed) {
-            supervisor_stop();
-            window_->close();
+            quit();
         } else if (event.type == sf::Event::KeyPressed) {
             if (!ImGui::GetIO().WantCaptureKeyboard) {
                 if (event.key.code == sf::Keyboard::Escape) {
-                    supervisor_stop();
-                    window_->close();
+                    quit();
                 } else if (event.key.code == sf::Keyboard::Enter) {
                     toggle_fullscreen();
                 } else if (event.key.code == sf::Keyboard::Space) {
@@ -96,6 +94,12 @@ void App::update_texture(const sf::Uint8* pixels, const CalculationArea& area)
     std::lock_guard<std::mutex> lock(mtx_);
     texture_->update(pixels, static_cast<unsigned int>(area.width), static_cast<unsigned int>(area.height),
                              static_cast<unsigned int>(area.x), static_cast<unsigned int>(area.y));
+}
+
+void App::quit()
+{
+    supervisor_stop();
+    window_->close();
 }
 
 void App::toggle_fullscreen()
