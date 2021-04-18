@@ -9,6 +9,7 @@
 #include <spdlog/spdlog.h>
 #include <SFML/Graphics.hpp>
 
+#include "app.h"
 #include "message_queue.h"
 #include "messages.h"
 #include "worker.h"
@@ -185,6 +186,11 @@ void supervisor_calc_image(const SupervisorImageRequest& image_request)
 void supervisor_cancel_render()
 {
     supervisor_message_queue.send(SupervisorCancel{});
+}
+
+Phase supervisor_get_phase()
+{
+    return supervisor_phase;
 }
 
 const char* supervisor_phase_name(const Phase phase)

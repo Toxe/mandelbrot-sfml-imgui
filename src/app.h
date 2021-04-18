@@ -7,6 +7,7 @@
 
 #include "cli.h"
 #include "mandelbrot.h"
+#include "supervisor.h"
 
 class UI;
 
@@ -25,6 +26,7 @@ class App {
     sf::Time elapsed_time_;
 
     std::mutex mtx_;
+    Phase supervisor_phase_ = Phase::Starting;
 
 public:
     App(const CLI& cli);
@@ -32,6 +34,8 @@ public:
     sf::RenderWindow& window() const { return *window_; };
     sf::Texture& texture() const { return *texture_; };
     sf::Sprite& sprite() const { return *sprite_; };
+
+    Phase supervisor_phase() const { return supervisor_phase_; };
 
     void resize_texture(const sf::Image& image);
     void update_texture(const sf::Image& image);

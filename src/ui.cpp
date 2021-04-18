@@ -14,8 +14,6 @@ const int default_max_iterations = 5000;
 const int default_area_size = 100;
 const FractalSection default_fractal_section = {-0.8, 0.0, 2.0};
 
-extern std::atomic<Phase> supervisor_phase;
-
 UI::UI(const App& app, const CLI& cli)
     : supervisor_image_request_{make_default_supervisor_image_request(app)}, font_size_{static_cast<float>(cli.font_size())}
 {
@@ -44,7 +42,7 @@ void UI::render(const App& app)
     static std::vector<float> fps(120);
     static std::size_t values_offset = 0;
 
-    const Phase phase = supervisor_phase;
+    const Phase phase = app.supervisor_phase();
     const ImVec4 gray_text{0.6f, 0.6f, 0.6f, 1.0f};
 
     if (render_stopwatch_.is_running())

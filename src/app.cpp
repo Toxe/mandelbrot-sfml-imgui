@@ -29,6 +29,7 @@ App::App(const CLI& cli)
 
 void App::next_frame()
 {
+    supervisor_phase_ = supervisor_get_phase();
     elapsed_time_ = frame_time_clock_.restart();
 }
 
