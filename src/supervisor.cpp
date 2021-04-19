@@ -67,7 +67,7 @@ void supervisor_create_work(const SupervisorImageRequest& request, std::vector<i
 
         for (int x = 0; x < request.image_size.width; x += request.area_size) {
             const int width = std::min(request.image_size.width - x, request.area_size);
-            worker_message_queue.send(WorkerCalc{
+            worker_message_queue.send(WorkerCalculate{
                 request.max_iterations, request.image_size, {x, y, width, height},
                 request.fractal_section, &results_per_point, &combined_iterations_histogram,
                 std::make_unique<sf::Uint8[]>(static_cast<std::size_t>(4 * width * height))
@@ -106,9 +106,9 @@ void supervisor_create_colorization_requests(const int max_iterations, const Ima
     }
 }
 
-void supervisor_receive_results(const SupervisorResultsFromWorker& results, App& app)
+void supervisor_receive_results(const SupervisorCalculationResults& calculation_results, App& app)
 {
-    app.update_texture(results.pixels.get(), results.area);
+    app.update_texture(calculation_results.pixels.get(), calculation_results.area);
 }
 
 void supervisor_receive_colorization_results(const SupervisorColorizationResults& colorization_results, App& app)
@@ -182,16 +182,16 @@ void supervisor(App& app, const int num_threads, const Gradient& gradient)
             supervisor_reset_combined_iterations_histogram(combined_iterations_histogram);
             supervisor_create_work(image_request, combined_iterations_histogram, results_per_point);
             supervisor_set_phase(Phase::Waiting);
-        } else if (std::holds_alternative<SupervisorResultsFromWorker>(msg)) {
-            SupervisorResultsFromWorker results = std::move(std::get<SupervisorResultsFromWorker>(msg));
-            supervisor_receive_results(results, app);
+        } else if (std::holds_alternative<SupervisorCalculationResults>(msg)) {
+            SupervisorCalculationResults calculation_results = std::move(std::get<SupervisorCalculationResults>(msg));
+            supervisor_receive_results(calculation_results, app);
 
             if (--waiting_for_results == 0) {
                 if (supervisor_phase != Phase::Canceled) {
                     // if canceled there is no need to colorize the partial image
                     supervisor_set_phase(Phase::Coloring);
-                    supervisor_equalize_combined_iterations_histogram(results.max_iterations, combined_iterations_histogram, equalized_iterations);
-                    supervisor_create_colorization_requests(results.max_iterations, results.image_size, gradient, combined_iterations_histogram, results_per_point, equalized_iterations, colorization_buffer);
+                    supervisor_equalize_combined_iterations_histogram(calculation_results.max_iterations, combined_iterations_histogram, equalized_iterations);
+                    supervisor_create_colorization_requests(calculation_results.max_iterations, calculation_results.image_size, gradient, combined_iterations_histogram, results_per_point, equalized_iterations, colorization_buffer);
                 }
             }
         } else if (std::holds_alternative<SupervisorColorizationResults>(msg)) {

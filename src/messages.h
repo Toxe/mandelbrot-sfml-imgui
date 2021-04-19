@@ -32,7 +32,7 @@ struct SupervisorImageRequest {
     FractalSection fractal_section;
 };
 
-struct SupervisorResultsFromWorker {
+struct SupervisorCalculationResults {
     int max_iterations;
     ImageSize image_size;
     CalculationArea area;
@@ -49,10 +49,10 @@ struct SupervisorColorizationResults {
 struct SupervisorQuit {};
 struct SupervisorCancel {};
 
-using SupervisorMessage = std::variant<SupervisorImageRequest, SupervisorResultsFromWorker, SupervisorColorizationResults, SupervisorQuit, SupervisorCancel>;
+using SupervisorMessage = std::variant<SupervisorImageRequest, SupervisorCalculationResults, SupervisorColorizationResults, SupervisorQuit, SupervisorCancel>;
 
 // ---- Worker messages ---------------
-struct WorkerCalc {
+struct WorkerCalculate {
     int max_iterations;
     ImageSize image_size;
     CalculationArea area;
@@ -75,4 +75,4 @@ struct WorkerColorize {
 
 struct WorkerQuit {};
 
-using WorkerMessage = std::variant<WorkerCalc, WorkerColorize, WorkerQuit>;
+using WorkerMessage = std::variant<WorkerCalculate, WorkerColorize, WorkerQuit>;

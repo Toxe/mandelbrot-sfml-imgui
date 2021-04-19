@@ -9,10 +9,10 @@
 
 std::mutex mtx;
 
-void worker_resize_iterations_histogram_if_needed(const WorkerCalc& calc, std::vector<int>& iterations_histogram)
+void worker_resize_iterations_histogram_if_needed(const WorkerCalculate& calculate, std::vector<int>& iterations_histogram)
 {
-    if (std::ssize(iterations_histogram) != calc.max_iterations + 1)
-        iterations_histogram.resize(static_cast<std::size_t>(calc.max_iterations + 1));
+    if (std::ssize(iterations_histogram) != calculate.max_iterations + 1)
+        iterations_histogram.resize(static_cast<std::size_t>(calculate.max_iterations + 1));
 }
 
 void worker_combine_iterations_histogram(const std::vector<int>& iterations_histogram, std::vector<int>& combined_iterations_histogram)
@@ -26,15 +26,15 @@ sf::Uint8 worker_calculation_result_to_color(const CalculationResult& point, con
     return static_cast<sf::Uint8>(255.0f - 255.0f * std::log(static_cast<float>(point.iter)) / log_max_iterations);
 }
 
-void worker_draw_pixels(const WorkerCalc& calc)
+void worker_draw_pixels(const WorkerCalculate& calculate)
 {
-    const float log_max_iterations = std::log(static_cast<float>(calc.max_iterations));
-    auto p = calc.pixels.get();
+    const float log_max_iterations = std::log(static_cast<float>(calculate.max_iterations));
+    auto p = calculate.pixels.get();
 
-    for (int y = 0; y < calc.area.height; ++y) {
-        for (int x = 0; x < calc.area.width; ++x) {
-            const std::size_t point = static_cast<std::size_t>((y + calc.area.y) * calc.image_size.width + (x + calc.area.x));
-            const auto color = worker_calculation_result_to_color((*calc.results_per_point)[point], log_max_iterations);
+    for (int y = 0; y < calculate.area.height; ++y) {
+        for (int x = 0; x < calculate.area.width; ++x) {
+            const std::size_t point = static_cast<std::size_t>((y + calculate.area.y) * calculate.image_size.width + (x + calculate.area.x));
+            const auto color = worker_calculation_result_to_color((*calculate.results_per_point)[point], log_max_iterations);
             *p++ = color;
             *p++ = color;
             *p++ = color;
@@ -54,18 +54,18 @@ void worker(const int id, MessageQueue<WorkerMessage>& worker_message_queue, Mes
 
         if (std::holds_alternative<WorkerQuit>(msg)) {
             break;
-        } else if (std::holds_alternative<WorkerCalc>(msg)) {
-            WorkerCalc calc = std::move(std::get<WorkerCalc>(msg));
-            worker_resize_iterations_histogram_if_needed(calc, iterations_histogram);
-            mandelbrot_calc(calc.image_size, calc.fractal_section, calc.max_iterations, iterations_histogram, *calc.results_per_point, calc.area);
-            worker_draw_pixels(calc);
+        } else if (std::holds_alternative<WorkerCalculate>(msg)) {
+            WorkerCalculate calculate = std::move(std::get<WorkerCalculate>(msg));
+            worker_resize_iterations_histogram_if_needed(calculate, iterations_histogram);
+            mandelbrot_calc(calculate.image_size, calculate.fractal_section, calculate.max_iterations, iterations_histogram, *calculate.results_per_point, calculate.area);
+            worker_draw_pixels(calculate);
 
             {
                 std::lock_guard<std::mutex> lock(mtx);
-                worker_combine_iterations_histogram(iterations_histogram, *calc.combined_iterations_histogram);
+                worker_combine_iterations_histogram(iterations_histogram, *calculate.combined_iterations_histogram);
             }
 
-            supervisor_message_queue.send(SupervisorResultsFromWorker{calc.max_iterations, calc.image_size, calc.area, calc.fractal_section, calc.results_per_point, std::move(calc.pixels)});
+            supervisor_message_queue.send(SupervisorCalculationResults{calculate.max_iterations, calculate.image_size, calculate.area, calculate.fractal_section, calculate.results_per_point, std::move(calculate.pixels)});
         } else if (std::holds_alternative<WorkerColorize>(msg)) {
             WorkerColorize colorize = std::move(std::get<WorkerColorize>(msg));
             mandelbrot_colorize(colorize);
