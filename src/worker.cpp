@@ -51,7 +51,6 @@ void worker(const int id, MessageQueue<WorkerMessage>& worker_message_queue, Mes
         WorkerMessage msg = worker_message_queue.wait_for_message();
 
         if (std::holds_alternative<WorkerQuit>(msg)) {
-            spdlog::debug("worker {}: quit", id);
             break;
         } else if (std::holds_alternative<WorkerCalc>(msg)) {
             WorkerCalc calc = std::move(std::get<WorkerCalc>(msg));

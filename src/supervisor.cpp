@@ -118,7 +118,6 @@ void supervisor(App& app, const int num_threads, const Gradient& gradient)
         SupervisorMessage msg = supervisor_message_queue.wait_for_message();
 
         if (std::holds_alternative<SupervisorQuit>(msg)) {
-            spdlog::debug("supervisor: quit");
             supervisor_set_phase(Phase::Shutdown);
             break;
         } else if (std::holds_alternative<SupervisorImageRequest>(msg)) {
