@@ -87,11 +87,11 @@ void equalize_histogram(const std::vector<int>& iterations_histogram, const int 
 
 void mandelbrot_colorize(WorkerColorize& colorize) noexcept
 {
-    for (int y = colorize.area.y; y < (colorize.area.y + colorize.area.height); ++y) {
-        auto point = colorize.results_per_point->cbegin() + (y * colorize.area.width + colorize.area.x);
+    for (int y = colorize.start_row; y < (colorize.start_row + colorize.num_rows); ++y) {
+        auto point = colorize.results_per_point->cbegin() + (y * colorize.row_width);
 
-        for (int x = colorize.area.x; x < (colorize.area.x + colorize.area.width); ++x) {
-            std::size_t p = static_cast<std::size_t>(4 * (y * colorize.area.width + x));
+        for (int x = 0; x < colorize.row_width; ++x) {
+            std::size_t p = static_cast<std::size_t>(4 * (y * colorize.row_width + x));
 
             if (point->iter == colorize.max_iterations) {
                 // points inside the Mandelbrot Set are always painted black

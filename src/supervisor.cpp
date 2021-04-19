@@ -98,7 +98,7 @@ void supervisor_send_colorization_messages(const int max_iterations, const Image
         next_start_row = start_row + num_rows;
 
         worker_message_queue.send(WorkerColorize{
-            max_iterations, {0, start_row, image_size.width, num_rows}, &gradient,
+            max_iterations, start_row, num_rows, image_size.width, &gradient,
             &combined_iterations_histogram, &results_per_point, &equalized_iterations, &colorization_buffer
         });
 
@@ -114,8 +114,8 @@ void supervisor_receive_calculation_results(const SupervisorCalculationResults& 
 void supervisor_receive_colorization_results(const SupervisorColorizationResults& colorization_results, App& app)
 {
     auto data = colorization_results.colorization_buffer->data();
-    std::size_t p = static_cast<std::size_t>(4 * (colorization_results.area.y * colorization_results.area.width + colorization_results.area.x));
-    app.update_texture(&data[p], colorization_results.area);
+    std::size_t p = static_cast<std::size_t>(4 * (colorization_results.start_row * colorization_results.row_width));
+    app.update_texture(&data[p], CalculationArea{0, colorization_results.start_row, colorization_results.row_width, colorization_results.num_rows});
 }
 
 void supervisor_resize_combined_iterations_histogram_if_needed(const SupervisorImageRequest& image_request, std::vector<int>& combined_iterations_histogram)

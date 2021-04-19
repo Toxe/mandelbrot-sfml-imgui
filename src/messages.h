@@ -42,7 +42,9 @@ struct SupervisorCalculationResults {
 };
 
 struct SupervisorColorizationResults {
-    CalculationArea area;
+    int start_row;
+    int num_rows;
+    int row_width;
     std::vector<sf::Uint8>* colorization_buffer;
 };
 
@@ -64,7 +66,9 @@ struct WorkerCalculate {
 
 struct WorkerColorize {
     int max_iterations;
-    CalculationArea area;
+    int start_row;
+    int num_rows;
+    int row_width;
     Gradient* gradient;
     std::vector<int>* combined_iterations_histogram;
     std::vector<CalculationResult>* results_per_point;

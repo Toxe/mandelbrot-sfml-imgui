@@ -69,7 +69,7 @@ void worker(const int id, MessageQueue<WorkerMessage>& worker_message_queue, Mes
         } else if (std::holds_alternative<WorkerColorize>(msg)) {
             WorkerColorize colorize = std::move(std::get<WorkerColorize>(msg));
             mandelbrot_colorize(colorize);
-            supervisor_message_queue.send(SupervisorColorizationResults{colorize.area, colorize.colorization_buffer});
+            supervisor_message_queue.send(SupervisorColorizationResults{colorize.start_row, colorize.num_rows, colorize.row_width, colorize.colorization_buffer});
         }
     }
 
