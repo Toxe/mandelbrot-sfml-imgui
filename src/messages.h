@@ -64,7 +64,6 @@ struct WorkerCalculate {
 
 struct WorkerColorize {
     int max_iterations;
-    ImageSize image_size;
     CalculationArea area;
     Gradient* gradient;
     std::vector<int>* combined_iterations_histogram;

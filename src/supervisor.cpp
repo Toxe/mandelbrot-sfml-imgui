@@ -98,7 +98,7 @@ void supervisor_send_colorization_messages(const int max_iterations, const Image
         next_start_row = start_row + num_rows;
 
         worker_message_queue.send(WorkerColorize{
-            max_iterations, image_size, {0, start_row, image_size.width, num_rows}, &gradient,
+            max_iterations, {0, start_row, image_size.width, num_rows}, &gradient,
             &combined_iterations_histogram, &results_per_point, &equalized_iterations, &colorization_buffer
         });
 
