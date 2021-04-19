@@ -18,7 +18,7 @@ enum class Phase {
 class App;
 struct SupervisorImageRequest;
 
-std::future<void> supervisor_start(App& app, const int num_threads, const Gradient& gradient);
+std::future<void> supervisor_start(App& app, const int num_threads, Gradient& gradient);
 void supervisor_stop();
 void supervisor_shutdown(std::future<void>& supervisor);
 void supervisor_calc_image(const SupervisorImageRequest& image_request);

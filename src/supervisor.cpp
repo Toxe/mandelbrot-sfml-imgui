@@ -78,9 +78,9 @@ void supervisor_create_work(const SupervisorImageRequest& request, std::vector<i
     }
 }
 
-void supervisor_create_colorization_requests(const int max_iterations, const ImageSize& image_size, const Gradient& gradient,
-    const std::vector<int>& combined_iterations_histogram, const std::vector<CalculationResult>& results_per_point,
-    const std::vector<float>& equalized_iterations, std::vector<sf::Uint8>& colorization_buffer)
+void supervisor_create_colorization_requests(const int max_iterations, const ImageSize& image_size, Gradient& gradient,
+    std::vector<int>& combined_iterations_histogram, std::vector<CalculationResult>& results_per_point,
+    std::vector<float>& equalized_iterations, std::vector<sf::Uint8>& colorization_buffer)
 {
     const int min_rows_per_thread = image_size.height / std::ssize(workers);
     int extra_rows = image_size.height % std::ssize(workers);
@@ -147,7 +147,7 @@ void supervisor_reset_combined_iterations_histogram(std::vector<int>& combined_i
     std::fill(combined_iterations_histogram.begin(), combined_iterations_histogram.end(), 0);
 }
 
-void supervisor(App& app, const int num_threads, const Gradient& gradient)
+void supervisor(App& app, const int num_threads, Gradient& gradient)
 {
     spdlog::debug("supervisor: starting");
 
@@ -221,9 +221,9 @@ void supervisor(App& app, const int num_threads, const Gradient& gradient)
     spdlog::debug("supervisor: stopping");
 }
 
-std::future<void> supervisor_start(App& app, const int num_threads, const Gradient& gradient)
+std::future<void> supervisor_start(App& app, const int num_threads, Gradient& gradient)
 {
-    return std::async(std::launch::async, supervisor, std::ref(app), num_threads, gradient);
+    return std::async(std::launch::async, supervisor, std::ref(app), num_threads, std::ref(gradient));
 }
 
 void supervisor_shutdown(std::future<void>& supervisor)

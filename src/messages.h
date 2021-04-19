@@ -42,8 +42,8 @@ struct SupervisorCalculationResults {
 };
 
 struct SupervisorColorizationResults {
-    const CalculationArea area;
-    const std::vector<sf::Uint8>* colorization_buffer;
+    CalculationArea area;
+    std::vector<sf::Uint8>* colorization_buffer;
 };
 
 struct SupervisorQuit {};
@@ -63,13 +63,13 @@ struct WorkerCalculate {
 };
 
 struct WorkerColorize {
-    const int max_iterations;
-    const ImageSize image_size;
-    const CalculationArea area;
-    const Gradient* gradient;
-    const std::vector<int>* combined_iterations_histogram;
-    const std::vector<CalculationResult>* results_per_point;
-    const std::vector<float>* equalized_iterations;
+    int max_iterations;
+    ImageSize image_size;
+    CalculationArea area;
+    Gradient* gradient;
+    std::vector<int>* combined_iterations_histogram;
+    std::vector<CalculationResult>* results_per_point;
+    std::vector<float>* equalized_iterations;
     std::vector<sf::Uint8>* colorization_buffer;
 };
 
