@@ -5,6 +5,8 @@
 
 #include <spdlog/spdlog.h>
 
+#include "mandelbrot.h"
+
 std::mutex mtx;
 
 void worker_resize_iterations_histogram_if_needed(const WorkerCalc& calc, std::vector<int>& iterations_histogram)
@@ -64,6 +66,10 @@ void worker(const int id, MessageQueue<WorkerMessage>& worker_message_queue, Mes
             }
 
             supervisor_message_queue.send(SupervisorResultsFromWorker{calc.max_iterations, calc.image_size, calc.area, calc.fractal_section, calc.results_per_point, std::move(calc.pixels)});
+        } else if (std::holds_alternative<WorkerColorize>(msg)) {
+            WorkerColorize colorize = std::move(std::get<WorkerColorize>(msg));
+            mandelbrot_colorize(colorize);
+            supervisor_message_queue.send(SupervisorColorizationResults{colorize.area, colorize.colorization_buffer});
         }
     }
 

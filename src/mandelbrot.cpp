@@ -1,10 +1,9 @@
 #include "mandelbrot.h"
 
 #include <algorithm>
+#include <cassert>
 #include <cmath>
 #include <numeric>
-
-#include "gradient.h"
 
 void mandelbrot_calc(const ImageSize& image, const FractalSection& section, const int max_iterations,
                      std::vector<int>& iterations_histogram, std::vector<CalculationResult>& results_per_point, const CalculationArea& area) noexcept
@@ -65,8 +64,10 @@ void mandelbrot_calc(const ImageSize& image, const FractalSection& section, cons
     }
 }
 
-std::vector<float> equalize_histogram(const std::vector<int>& iterations_histogram, const int max_iterations)
+void equalize_histogram(const std::vector<int>& iterations_histogram, const int max_iterations, std::vector<float>& equalized_iterations)
 {
+    assert(iterations_histogram.size() == equalized_iterations.size());
+
     // Calculate the CDF (Cumulative Distribution Function) by accumulating all iteration counts.
     // Element [0] is unused and iterations_histogram[max_iterations] should be zero (as we do not count
     // the iterations of the points inside the Mandelbrot Set).
@@ -80,38 +81,41 @@ std::vector<float> equalize_histogram(const std::vector<int>& iterations_histogr
 
     // normalize all values from the CDF that are bigger than zero to a range of 0.0 .. max_iterations
     const auto f = static_cast<float>(max_iterations) / static_cast<float>(total_iterations - *cdf_min);
-    std::vector<float> equalized_iterations(iterations_histogram.size());
     std::transform(cdf.cbegin(), cdf.cend(), equalized_iterations.begin(),
                    [=](const auto& c) { return c > 0 ? f * static_cast<float>(c - *cdf_min) : 0.0f; });
-
-    return equalized_iterations;
 }
 
-void mandelbrot_colorize(const int max_iterations, const Gradient& gradient,
-                         sf::Image& image, const std::vector<int>& iterations_histogram, const std::vector<CalculationResult>& results_per_point) noexcept
+void mandelbrot_colorize(WorkerColorize& colorize) noexcept
 {
-    const auto equalized_iterations = equalize_histogram(iterations_histogram, max_iterations);
-    const auto image_size = image.getSize();
+    for (int y = colorize.area.y; y < (colorize.area.y + colorize.area.height); ++y) {
+        auto point = colorize.results_per_point->cbegin() + (y * colorize.area.width + colorize.area.x);
 
-    auto point = results_per_point.cbegin();
+        for (int x = colorize.area.x; x < (colorize.area.x + colorize.area.width); ++x) {
+            std::size_t p = static_cast<std::size_t>(4 * (y * colorize.area.width + x));
 
-    for (unsigned int y = 0; y < image_size.y; ++y) {
-        for (unsigned int x = 0; x < image_size.x; ++x) {
-            if (point->iter == max_iterations) {
+            if (point->iter == colorize.max_iterations) {
                 // points inside the Mandelbrot Set are always painted black
-                image.setPixel(x, y, sf::Color::Black);
+                (*colorize.colorization_buffer)[p++] = 0;
+                (*colorize.colorization_buffer)[p++] = 0;
+                (*colorize.colorization_buffer)[p++] = 0;
+                (*colorize.colorization_buffer)[p++] = 255;
             } else {
                 // The equalized iteration value (in the range of 0 .. max_iterations) represents the
                 // position of the pixel color in the color gradiant and needs to be mapped to 0.0 .. 1.0.
                 // To achieve smooth coloring we need to edge the equalized iteration towards the next
                 // iteration, determined by the distance between the two iterations.
-                const auto iter_curr = equalized_iterations[static_cast<std::size_t>(point->iter)];
-                const auto iter_next = equalized_iterations[static_cast<std::size_t>(point->iter + 1)];
+                const auto iter_curr = (*colorize.equalized_iterations)[static_cast<std::size_t>(point->iter)];
+                const auto iter_next = (*colorize.equalized_iterations)[static_cast<std::size_t>(point->iter + 1)];
 
                 const auto smoothed_iteration = std::lerp(iter_curr, iter_next, point->distance_to_next_iteration);
-                const auto pos_in_gradient = smoothed_iteration / static_cast<float>(max_iterations);
+                const auto pos_in_gradient = smoothed_iteration / static_cast<float>(colorize.max_iterations);
 
-                image.setPixel(x, y, color_from_gradient(gradient, pos_in_gradient));
+                const auto color = color_from_gradient(*colorize.gradient, pos_in_gradient);
+
+                (*colorize.colorization_buffer)[p++] = color.r;
+                (*colorize.colorization_buffer)[p++] = color.g;
+                (*colorize.colorization_buffer)[p++] = color.b;
+                (*colorize.colorization_buffer)[p++] = color.a;
             }
 
             ++point;
