@@ -106,7 +106,7 @@ void supervisor_send_colorization_messages(const int max_iterations, const Image
     }
 }
 
-void supervisor_receive_results(const SupervisorCalculationResults& calculation_results, App& app)
+void supervisor_receive_calculation_results(const SupervisorCalculationResults& calculation_results, App& app)
 {
     app.update_texture(calculation_results.pixels.get(), calculation_results.area);
 }
@@ -184,7 +184,7 @@ void supervisor(App& app, const int num_threads, Gradient& gradient)
             supervisor_set_phase(Phase::Waiting);
         } else if (std::holds_alternative<SupervisorCalculationResults>(msg)) {
             SupervisorCalculationResults calculation_results = std::move(std::get<SupervisorCalculationResults>(msg));
-            supervisor_receive_results(calculation_results, app);
+            supervisor_receive_calculation_results(calculation_results, app);
 
             if (--waiting_for_results == 0) {
                 if (supervisor_phase != Phase::Canceled) {
