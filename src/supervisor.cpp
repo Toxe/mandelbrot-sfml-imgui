@@ -60,7 +60,7 @@ void supervisor_update_texture(const sf::Image& render_image, App& app)
         app.update_texture(render_image);
 }
 
-void supervisor_create_work(const SupervisorImageRequest& request, std::vector<int>& combined_iterations_histogram, std::vector<CalculationResult>& results_per_point)
+void supervisor_send_calculation_messages(const SupervisorImageRequest& request, std::vector<int>& combined_iterations_histogram, std::vector<CalculationResult>& results_per_point)
 {
     for (int y = 0; y < request.image_size.height; y += request.area_size) {
         const int height = std::min(request.image_size.height - y, request.area_size);
@@ -78,7 +78,7 @@ void supervisor_create_work(const SupervisorImageRequest& request, std::vector<i
     }
 }
 
-void supervisor_create_colorization_requests(const int max_iterations, const ImageSize& image_size, Gradient& gradient,
+void supervisor_send_colorization_messages(const int max_iterations, const ImageSize& image_size, Gradient& gradient,
     std::vector<int>& combined_iterations_histogram, std::vector<CalculationResult>& results_per_point,
     std::vector<float>& equalized_iterations, std::vector<sf::Uint8>& colorization_buffer)
 {
@@ -180,7 +180,7 @@ void supervisor(App& app, const int num_threads, Gradient& gradient)
             supervisor_resize_equalized_iterations_if_needed(image_request, equalized_iterations);
             supervisor_resize_colorization_buffer_if_needed(image_request, colorization_buffer);
             supervisor_reset_combined_iterations_histogram(combined_iterations_histogram);
-            supervisor_create_work(image_request, combined_iterations_histogram, results_per_point);
+            supervisor_send_calculation_messages(image_request, combined_iterations_histogram, results_per_point);
             supervisor_set_phase(Phase::Waiting);
         } else if (std::holds_alternative<SupervisorCalculationResults>(msg)) {
             SupervisorCalculationResults calculation_results = std::move(std::get<SupervisorCalculationResults>(msg));
@@ -191,7 +191,7 @@ void supervisor(App& app, const int num_threads, Gradient& gradient)
                     // if canceled there is no need to colorize the partial image
                     supervisor_set_phase(Phase::Coloring);
                     supervisor_equalize_combined_iterations_histogram(calculation_results.max_iterations, combined_iterations_histogram, equalized_iterations);
-                    supervisor_create_colorization_requests(calculation_results.max_iterations, calculation_results.image_size, gradient, combined_iterations_histogram, results_per_point, equalized_iterations, colorization_buffer);
+                    supervisor_send_colorization_messages(calculation_results.max_iterations, calculation_results.image_size, gradient, combined_iterations_histogram, results_per_point, equalized_iterations, colorization_buffer);
                 }
             }
         } else if (std::holds_alternative<SupervisorColorizationResults>(msg)) {
