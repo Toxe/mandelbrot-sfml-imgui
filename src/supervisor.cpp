@@ -17,7 +17,7 @@
 
 const sf::Color background_color(0x00, 0x00, 0x20);
 
-std::vector<std::thread> workers;
+std::vector<Worker> workers;
 
 MessageQueue<SupervisorMessage> supervisor_message_queue;
 MessageQueue<WorkerMessage> worker_message_queue;
@@ -159,8 +159,12 @@ void supervisor(App& app, const int num_threads, Gradient& gradient)
     std::vector<sf::Uint8> colorization_buffer;
     sf::Image render_image;
 
-    for (int id = 0; id < num_threads; ++id)
-        workers.emplace_back(worker, id, std::ref(worker_message_queue), std::ref(supervisor_message_queue));
+    workers.reserve(static_cast<std::size_t>(num_threads));
+
+    for (int id = 0; id < num_threads; ++id) {
+        workers.emplace_back(id, worker_message_queue, supervisor_message_queue);
+        workers.back().run();
+    }
 
     supervisor_set_phase(Phase::Idle);
 
@@ -215,8 +219,8 @@ void supervisor(App& app, const int num_threads, Gradient& gradient)
 
     spdlog::debug("supervisor: waiting for workers to finish");
 
-    for (auto& t : workers)
-        t.join();
+    for (auto& w : workers)
+        w.join();
 
     spdlog::debug("supervisor: stopping");
 }
