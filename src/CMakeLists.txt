@@ -2,18 +2,19 @@ set(ALL_TARGETS
     mandelbrot
 )
 
-add_executable(mandelbrot main.cpp
-                          messages.h
-                          app.cpp app.h
-                          cli.cpp cli.h
-                          mandelbrot.cpp mandelbrot.h
-                          message_queue.h
-                          gradient.cpp gradient.h
-                          stopwatch.h
-                          supervisor.cpp supervisor.h
-                          ui.cpp ui.h
-                          worker.cpp worker.h
-                          util/mutex_timer.h
+add_executable(mandelbrot
+    app.cpp app.h
+    cli.cpp cli.h
+    gradient.cpp gradient.h
+    main.cpp
+    mandelbrot.cpp mandelbrot.h
+    message_queue.h
+    messages.h
+    stopwatch.h
+    supervisor.cpp supervisor.h
+    ui.cpp ui.h
+    util/mutex_timer.h
+    worker.cpp worker.h
 )
 
 foreach(target ${ALL_TARGETS})
