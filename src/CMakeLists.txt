@@ -10,6 +10,7 @@ add_executable(mandelbrot
     mandelbrot.cpp mandelbrot.h
     message_queue.h
     messages.h
+    phase.cpp phase.h
     stopwatch.h
     supervisor.cpp supervisor.h
     ui.cpp ui.h

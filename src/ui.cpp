@@ -8,6 +8,7 @@
 #include <imgui-SFML.h>
 #include <imgui.h>
 
+#include "phase.h"
 #include "supervisor.h"
 
 const int default_max_iterations = 5000;
@@ -73,7 +74,7 @@ void UI::render_main_window(App& app)
     ImGui::PlotLines("", fps.data(), static_cast<int>(fps.size()), static_cast<int>(values_offset), fps_label.c_str(), 0.0f, 1.5f * std::max(65.0f, *std::max_element(fps.begin(), fps.end())), ImVec2(0, 4.0f * font_size_));
 
     ImGui::Text("image size: %dx%d", window_size.x, window_size.y);
-    ImGui::Text("status: %s", supervisor_phase_name(phase));
+    ImGui::Text("status: %s", phase_name(phase));
     ImGui::Text("render time: %.3fs", render_stopwatch_.time());
 
     if (ImGui::Button("Help (F1)"))

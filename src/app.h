@@ -7,6 +7,7 @@
 
 #include "cli.h"
 #include "mandelbrot.h"
+#include "phase.h"
 #include "supervisor.h"
 
 class UI;
