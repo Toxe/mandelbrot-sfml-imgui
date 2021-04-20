@@ -50,7 +50,7 @@ void Worker::main()
     if (std::holds_alternative<WorkerCalculate>(msg))
         handle_calculate_message(std::move(std::get<WorkerCalculate>(msg)));
     else if (std::holds_alternative<WorkerColorize>(msg))
-        handle_calculate_message(std::move(std::get<WorkerColorize>(msg)));
+        handle_colorize_message(std::move(std::get<WorkerColorize>(msg)));
 
     return true;
 }
@@ -69,7 +69,7 @@ void Worker::handle_calculate_message(WorkerCalculate calculate)
     supervisor_message_queue_.send(SupervisorCalculationResults{calculate.max_iterations, calculate.image_size, calculate.area, calculate.fractal_section, calculate.results_per_point, std::move(calculate.pixels)});
 }
 
-void Worker::handle_calculate_message(WorkerColorize colorize)
+void Worker::handle_colorize_message(WorkerColorize colorize)
 {
     mandelbrot_colorize(colorize);
     supervisor_message_queue_.send(SupervisorColorizationResults{colorize.start_row, colorize.num_rows, colorize.row_width, colorize.colorization_buffer});

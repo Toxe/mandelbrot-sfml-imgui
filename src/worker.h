@@ -24,7 +24,7 @@ class Worker {
 
     [[nodiscard]] bool handle_message(WorkerMessage msg);
     void handle_calculate_message(WorkerCalculate calculate);
-    void handle_calculate_message(WorkerColorize colorize);
+    void handle_colorize_message(WorkerColorize colorize);
 
     void resize_iterations_histogram_if_needed(const WorkerCalculate& calculate);
     void combine_iterations_histogram(std::vector<int>& combined_iterations_histogram);
