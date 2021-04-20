@@ -22,14 +22,14 @@ class Worker {
 
     void main();
 
-    bool handle_message(WorkerMessage msg);
+    [[nodiscard]] bool handle_message(WorkerMessage msg);
     void handle_calculate_message(WorkerCalculate calculate);
     void handle_calculate_message(WorkerColorize colorize);
 
     void resize_iterations_histogram_if_needed(const WorkerCalculate& calculate);
     void combine_iterations_histogram(std::vector<int>& combined_iterations_histogram);
 
-    sf::Uint8 calculation_result_to_grayscale(const CalculationResult& point, const float log_max_iterations);
+    [[nodiscard]] sf::Uint8 calculation_result_to_grayscale(const CalculationResult& point, const float log_max_iterations);
     void draw_pixels(const WorkerCalculate& calculate);
 
 public:

@@ -42,7 +42,7 @@ void Worker::main()
     spdlog::debug("Worker {}: stopping", id_);
 }
 
-bool Worker::handle_message(WorkerMessage msg)
+[[nodiscard]] bool Worker::handle_message(WorkerMessage msg)
 {
     if (std::holds_alternative<WorkerQuit>(msg))
         return false;
@@ -87,7 +87,7 @@ void Worker::combine_iterations_histogram(std::vector<int>& combined_iterations_
         combined_iterations_histogram.cbegin(), combined_iterations_histogram.begin(), std::plus<>{});
 }
 
-sf::Uint8 Worker::calculation_result_to_grayscale(const CalculationResult& point, const float log_max_iterations)
+[[nodiscard]] sf::Uint8 Worker::calculation_result_to_grayscale(const CalculationResult& point, const float log_max_iterations)
 {
     return static_cast<sf::Uint8>(255.0f - 255.0f * std::log(static_cast<float>(point.iter)) / log_max_iterations);
 }
