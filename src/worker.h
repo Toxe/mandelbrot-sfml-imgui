@@ -12,7 +12,7 @@
 class Worker {
     inline static std::mutex mtx_;
 
-    int id_;
+    const int id_;
     std::thread thread_;
 
     MessageQueue<WorkerMessage>& worker_message_queue_;
