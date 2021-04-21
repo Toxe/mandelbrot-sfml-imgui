@@ -8,7 +8,7 @@ class Stopwatch {
     sf::Clock clock_;
 
 public:
-    bool is_running() const { return running_; }
+    [[nodiscard]] bool is_running() const { return running_; }
 
     void start()
     {
@@ -23,7 +23,7 @@ public:
         elapsed_time_ = clock_.getElapsedTime().asSeconds();
     }
 
-    float time()
+    [[nodiscard]] float time()
     {
         if (!running_)
             return elapsed_time_;
