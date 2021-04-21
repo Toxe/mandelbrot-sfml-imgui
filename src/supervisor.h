@@ -6,7 +6,7 @@
 
 #include <SFML/Graphics.hpp>
 
-#include "app.h"
+#include "gradient.h"
 #include "message_queue.h"
 #include "messages.h"
 #include "phase.h"
@@ -25,7 +25,8 @@ class Supervisor {
 
     std::vector<Worker> workers_;
 
-    App& app_;
+
+    Gradient gradient_;
 
     MessageQueue<WorkerMessage> worker_message_queue_;
     MessageQueue<SupervisorMessage> supervisor_message_queue_;
@@ -58,7 +59,7 @@ class Supervisor {
     void resize_and_reset_buffers_if_needed(const SupervisorImageRequest& image_request);
 
 public:
-    Supervisor(App& app, const int num_threads);
+    Supervisor(const int num_threads, Window& window, const Gradient& gradient);
     ~Supervisor();
 
     void run();

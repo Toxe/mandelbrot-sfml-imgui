@@ -9,7 +9,7 @@ int main(int argc, char* argv[])
     App app(cli);
     UI ui(cli, app.window());
 
-    Supervisor supervisor(app, cli.num_threads());
+    Supervisor supervisor(cli.num_threads(), app.window(), app.gradient());
     supervisor.run();
 
     while (app.window().isOpen()) {

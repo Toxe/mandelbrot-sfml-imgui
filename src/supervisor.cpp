@@ -4,11 +4,10 @@
 
 #include <spdlog/spdlog.h>
 
-#include "gradient.h"
 #include "mandelbrot.h"
 
-Supervisor::Supervisor(App& app, const int num_threads) :
-    num_threads_{num_threads}, app_{app}
+Supervisor::Supervisor(const int num_threads, Window& window, const Gradient& gradient)
+    : num_threads_{num_threads}, window_{window}, gradient_{gradient}
 {
 }
 
@@ -188,7 +187,7 @@ void Supervisor::send_colorization_messages(const int max_iterations, const Imag
         next_start_row = start_row + num_rows;
 
         worker_message_queue_.send(WorkerColorize{
-            max_iterations, start_row, num_rows, image_size.width, &app_.get_gradient(),
+            max_iterations, start_row, num_rows, image_size.width, &gradient_,
             &combined_iterations_histogram_, &results_per_point_, &equalized_iterations_, &colorization_buffer_
         });
 
