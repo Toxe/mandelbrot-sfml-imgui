@@ -38,13 +38,13 @@ void UI::shutdown()
     ImGui::SFML::Shutdown();
 }
 
-void UI::render(App& app)
+void UI::render(App& app, Supervisor& supervisor)
 {
-    render_main_window(app);
+    render_main_window(app, supervisor);
     render_help_window();
 }
 
-void UI::render_main_window(App& app)
+void UI::render_main_window(App& app, Supervisor& supervisor)
 {
     static std::vector<float> fps(120);
     static std::size_t values_offset = 0;
@@ -95,19 +95,19 @@ void UI::render_main_window(App& app)
 
     if (phase == Phase::Idle) {
         if (ImGui::Button("Calculate"))
-            calculate_image(window_size);
+            calculate_image(supervisor, window_size);
 
         ImGui::SameLine();
 
         if (ImGui::Button("Reset")) {
             supervisor_image_request_ = make_default_supervisor_image_request(app);
-            calculate_image(window_size);
+            calculate_image(supervisor, window_size);
         }
     }
 
     if (render_stopwatch_.is_running())
         if (ImGui::Button("Cancel"))
-            supervisor_cancel_render();
+            supervisor.cancel_calculation();
 
     ImGui::End();
 }
@@ -168,9 +168,9 @@ void UI::input_double(const char* label, double& value, const double small_inc, 
     help(fmt::format("{} to {}\n\n     -/+ to change by {}\nCTRL -/+ to change by {}", min, max, small_inc, big_inc));
 }
 
-void UI::calculate_image(const sf::Vector2u& window_size)
+void UI::calculate_image(Supervisor& supervisor, const sf::Vector2u& window_size)
 {
     render_stopwatch_.start();
     supervisor_image_request_.image_size = ImageSize{static_cast<int>(window_size.x), static_cast<int>(window_size.y)};
-    supervisor_calc_image(supervisor_image_request_);
+    supervisor.calculate_image(supervisor_image_request_);
 }

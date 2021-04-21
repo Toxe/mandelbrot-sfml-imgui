@@ -24,15 +24,17 @@ App::App(const CLI& cli)
 
     sprite_ = std::make_unique<sf::Sprite>();
     sprite_->setTexture(*texture_);
+
+    gradient_ = load_gradient("assets/gradients/benchmark.gradient");
 }
 
-void App::next_frame()
+void App::next_frame(const Supervisor& supervisor)
 {
-    supervisor_phase_ = supervisor_get_phase();
+    supervisor_phase_ = supervisor.get_phase();
     elapsed_time_ = frame_time_clock_.restart();
 }
 
-void App::poll_events(UI& ui)
+void App::poll_events(Supervisor& supervisor, UI& ui)
 {
     sf::Event event;
 
@@ -40,14 +42,14 @@ void App::poll_events(UI& ui)
         ImGui::SFML::ProcessEvent(event);
 
         if (event.type == sf::Event::Closed) {
-            quit();
+            quit(supervisor);
         } else if (event.type == sf::Event::KeyPressed) {
             if (!ImGui::GetIO().WantCaptureKeyboard) {
                 if (event.key.code == sf::Keyboard::Escape) {
-                    quit();
+                    quit(supervisor);
                 } else if (event.key.code == sf::Keyboard::Enter) {
                     if (supervisor_phase_ == Phase::Idle)
-                        ui.calculate_image(window_->getSize());
+                        ui.calculate_image(supervisor, window_->getSize());
                 } else if (event.key.code == sf::Keyboard::Space) {
                     ui.toggle_visibility();
                 } else if (event.key.code == sf::Keyboard::F1) {
@@ -99,9 +101,9 @@ void App::update_texture(const sf::Uint8* pixels, const CalculationArea& area)
                              static_cast<unsigned int>(area.x), static_cast<unsigned int>(area.y));
 }
 
-void App::quit()
+void App::quit(Supervisor& supervisor)
 {
-    supervisor_stop();
+    supervisor.shutdown();
     window_->close();
 }
 

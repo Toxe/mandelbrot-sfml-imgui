@@ -9,16 +9,16 @@ int main(int argc, char* argv[])
     App app(cli);
     UI ui(app, cli);
 
-    auto gradient = load_gradient("assets/gradients/benchmark.gradient");
-    auto supervisor = supervisor_start(app, cli.num_threads(), gradient);
+    Supervisor supervisor(app, cli.num_threads());
+    supervisor.run();
 
     while (app.window().isOpen()) {
-        app.next_frame();
-        app.poll_events(ui);
-        ui.render(app);
+        app.next_frame(supervisor);
+        app.poll_events(supervisor, ui);
+        ui.render(app, supervisor);
         app.render();
     }
 
     ui.shutdown();
-    supervisor_shutdown(supervisor);
+    supervisor.shutdown();
 }

@@ -6,14 +6,18 @@
 #include <SFML/Graphics.hpp>
 
 #include "cli.h"
+#include "gradient.h"
 #include "mandelbrot.h"
 #include "phase.h"
 #include "supervisor.h"
 
+class Supervisor;
 class UI;
 
 class App {
     const char* window_title_ = "Mandelbrot";
+
+    Gradient gradient_;
 
     bool is_fullscreen_;
     sf::VideoMode window_video_mode_;
@@ -42,14 +46,16 @@ public:
     void update_texture(const sf::Image& image);
     void update_texture(const sf::Uint8* pixels, const CalculationArea& area);
 
-    void next_frame();
-    void poll_events(UI& ui);
+    void next_frame(const Supervisor& supervisor);
+    void poll_events(Supervisor& supervisor, UI& ui);
     void render();
 
-    void quit();
+    void quit(Supervisor& supervisor);
 
     void toggle_fullscreen();
     void adjust_view_to_window_size();
 
     sf::Time elapsed_time() const { return elapsed_time_; };
+
+    Gradient& get_gradient() { return gradient_; }
 };

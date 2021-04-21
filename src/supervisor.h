@@ -1,27 +1,73 @@
 #pragma once
 
-#include <future>
+#include <atomic>
+#include <thread>
+#include <vector>
 
-#include "gradient.h"
+#include <SFML/Graphics.hpp>
 
-enum class Phase {
-    Starting,
-    Idle,
-    RequestSent,
-    RequestReceived,
-    Waiting,
-    Coloring,
-    Shutdown,
-    Canceled,
-};
+#include "app.h"
+#include "message_queue.h"
+#include "messages.h"
+#include "phase.h"
+#include "worker.h"
 
 class App;
 struct SupervisorImageRequest;
 
-std::future<void> supervisor_start(App& app, const int num_threads, Gradient& gradient);
-void supervisor_stop();
-void supervisor_shutdown(std::future<void>& supervisor);
-void supervisor_calc_image(const SupervisorImageRequest& image_request);
-Phase supervisor_get_phase();
-const char* supervisor_phase_name(const Phase p);
-void supervisor_cancel_render();
+class Supervisor {
+    const sf::Color background_color_ = sf::Color{0x00, 0x00, 0x20};
+
+    std::atomic<Phase> phase_ = Phase::Starting;
+
+    const int num_threads_;
+    std::thread thread_;
+
+    std::vector<Worker> workers_;
+
+    App& app_;
+
+    MessageQueue<WorkerMessage> worker_message_queue_;
+    MessageQueue<SupervisorMessage> supervisor_message_queue_;
+
+    int waiting_for_calculation_results_ = 0;
+    int waiting_for_colorization_results_ = 0;
+
+    std::vector<int> combined_iterations_histogram_;
+    std::vector<CalculationResult> results_per_point_;
+    std::vector<float> equalized_iterations_;
+    std::vector<sf::Uint8> colorization_buffer_;
+    sf::Image render_buffer_;
+
+    void main();
+
+    [[nodiscard]] bool handle_message(SupervisorMessage msg);
+    void handle_image_request_message(SupervisorImageRequest image_request);
+    void handle_calculation_results_message(SupervisorCalculationResults calculation_results);
+    void handle_colorization_results_message(SupervisorColorizationResults colorization_results);
+    void handle_cancel_message(SupervisorCancel);
+
+    void start_workers();
+    void shutdown_workers();
+
+    void set_phase(const Phase phase);
+
+    void send_calculation_messages(const SupervisorImageRequest& image_request);
+    void send_colorization_messages(const int max_iterations, const ImageSize& image_size);
+
+    void resize_and_reset_buffers_if_needed(const SupervisorImageRequest& image_request);
+
+public:
+    Supervisor(App& app, const int num_threads);
+    ~Supervisor();
+
+    void run();
+    void join();
+
+    void shutdown();
+
+    void calculate_image(const SupervisorImageRequest& image_request);
+    void cancel_calculation();
+
+    [[nodiscard]] Phase get_phase() const { return phase_; };
+};

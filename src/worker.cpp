@@ -18,8 +18,7 @@ Worker::Worker(Worker&& other) :
 
 Worker::~Worker()
 {
-    if (thread_.joinable())
-        join();
+    join();
 }
 
 void Worker::run()
@@ -29,17 +28,18 @@ void Worker::run()
 
 void Worker::join()
 {
-    thread_.join();
+    if (thread_.joinable())
+        thread_.join();
 }
 
 void Worker::main()
 {
-    spdlog::debug("Worker {}: started", id_);
+    spdlog::debug("worker {}: started", id_);
 
     while (handle_message(worker_message_queue_.wait_for_message()))
         ;
 
-    spdlog::debug("Worker {}: stopping", id_);
+    spdlog::debug("worker {}: stopping", id_);
 }
 
 [[nodiscard]] bool Worker::handle_message(WorkerMessage msg)
