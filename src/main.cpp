@@ -7,7 +7,7 @@ int main(int argc, char* argv[])
 {
     CLI cli(argc, argv);
     App app(cli);
-    UI ui(app, cli);
+    UI ui(cli, app.window());
 
     Supervisor supervisor(app, cli.num_threads());
     supervisor.run();

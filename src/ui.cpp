@@ -8,6 +8,8 @@
 #include <imgui-SFML.h>
 #include <imgui.h>
 
+#include "app.h"
+#include "cli.h"
 #include "phase.h"
 #include "supervisor.h"
 
@@ -15,10 +17,10 @@ const int default_max_iterations = 5000;
 const int default_area_size = 100;
 const FractalSection default_fractal_section = {-0.8, 0.0, 2.0};
 
-UI::UI(const App& app, const CLI& cli)
-    : supervisor_image_request_{make_default_supervisor_image_request(app)}, font_size_{static_cast<float>(cli.font_size())}
+UI::UI(const CLI& cli, sf::RenderWindow& window)
+    : supervisor_image_request_{make_default_supervisor_image_request(window.getSize())}, font_size_{static_cast<float>(cli.font_size())}
 {
-    ImGui::SFML::Init(app.window(), false);
+    ImGui::SFML::Init(window, false);
 
     ImGuiIO& io = ImGui::GetIO();
     io.Fonts->Clear();
@@ -27,9 +29,8 @@ UI::UI(const App& app, const CLI& cli)
     ImGui::SFML::UpdateFontTexture();
 }
 
-SupervisorImageRequest UI::make_default_supervisor_image_request(const App& app)
+SupervisorImageRequest UI::make_default_supervisor_image_request(const sf::Vector2u& window_size)
 {
-    const auto window_size = app.window().getSize();
     return {default_max_iterations, default_area_size, {static_cast<int>(window_size.x), static_cast<int>(window_size.y)}, default_fractal_section};
 }
 
@@ -100,7 +101,7 @@ void UI::render_main_window(App& app, Supervisor& supervisor)
         ImGui::SameLine();
 
         if (ImGui::Button("Reset")) {
-            supervisor_image_request_ = make_default_supervisor_image_request(app);
+            supervisor_image_request_ = make_default_supervisor_image_request(window_size);
             calculate_image(supervisor, window_size);
         }
     }

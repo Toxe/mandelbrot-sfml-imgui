@@ -2,11 +2,14 @@
 
 #include <string>
 
-#include "app.h"
-#include "cli.h"
+#include <SFML/Graphics/RenderWindow.hpp>
+
 #include "messages.h"
 #include "stopwatch.h"
 #include "supervisor.h"
+
+class App;
+class CLI;
 
 class UI {
     SupervisorImageRequest supervisor_image_request_;
@@ -23,7 +26,7 @@ class UI {
     void render_help_window();
 
 public:
-    UI(const App& app, const CLI& cli);
+    UI(const CLI& cli, sf::RenderWindow& window);
 
     void shutdown();
     void render(App& app, Supervisor& supervisor);
@@ -31,7 +34,7 @@ public:
     void toggle_visibility() { is_visible_ = !is_visible_; };
     void toggle_help() { show_help_ = !show_help_; };
 
-    SupervisorImageRequest make_default_supervisor_image_request(const App& app);
+    SupervisorImageRequest make_default_supervisor_image_request(const sf::Vector2u& window_size);
 
     void calculate_image(Supervisor& supervisor, const sf::Vector2u& window_size);
 };
