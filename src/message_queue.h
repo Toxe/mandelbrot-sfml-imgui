@@ -54,7 +54,7 @@ int MessageQueue<T>::clear()
 
     while (!queue_.empty()) {
         queue_.pop();
-        --messages_removed;
+        ++messages_removed;
     }
 
     return messages_removed;
