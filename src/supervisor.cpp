@@ -18,6 +18,8 @@ Supervisor::~Supervisor()
 
 void Supervisor::run(const int num_threads, const Gradient& gradient)
 {
+    set_phase(Phase::Starting);
+
     num_threads_ = num_threads;
     gradient_ = gradient;
 
