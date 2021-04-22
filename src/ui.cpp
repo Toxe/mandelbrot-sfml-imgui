@@ -161,7 +161,7 @@ void UI::input_int(const char* label, InputValue<int>& value, const int small_in
 {
     int val = value.get();
 
-    ImGui::SetNextItemWidth(ImGui::GetFontSize() * 10);
+    ImGui::SetNextItemWidth(ImGui::GetFontSize() * 15);
 
     if (ImGui::InputInt(label, &val, small_inc, big_inc))
         value.set(std::clamp(val, min, max));
@@ -174,9 +174,9 @@ void UI::input_double(const char* label, InputValue<double>& value, const double
 {
     double val = value.get();
 
-    ImGui::SetNextItemWidth(ImGui::GetFontSize() * 10);
+    ImGui::SetNextItemWidth(ImGui::GetFontSize() * 15);
 
-    if (ImGui::InputDouble(label, &val, small_inc, big_inc))
+    if (ImGui::InputDouble(label, &val, small_inc, big_inc, "%.16lf"))
         value.set(std::clamp(val, min, max));
 
     ImGui::SameLine();
