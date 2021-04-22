@@ -50,7 +50,6 @@ void UI::render_main_window(App& app)
     static std::size_t values_offset = 0;
 
     const Phase phase = app.supervisor_phase();
-    const ImVec4 gray_text{0.6f, 0.6f, 0.6f, 1.0f};
 
     if (render_stopwatch_.is_running())
         if (phase == Phase::Idle)
@@ -87,10 +86,14 @@ void UI::render_main_window(App& app)
 
     input_int("number of threads", num_threads_, 1, 10, 1, 1'000);
 
-    if (num_threads_.changed() && phase == Phase::Idle) {
-        if (ImGui::Button("change")) {
-            app.change_num_threads(num_threads_.get());
-            num_threads_.changed(false);
+    if (num_threads_.changed()) {
+        if (phase == Phase::Idle) {
+            if (ImGui::Button("change")) {
+                app.change_num_threads(num_threads_.get());
+                num_threads_.changed(false);
+            }
+        } else {
+            ImGui::TextDisabled("waiting for calculation to finish...");
         }
     }
 
