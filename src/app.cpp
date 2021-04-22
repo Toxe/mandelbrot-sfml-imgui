@@ -50,7 +50,7 @@ void App::shutdown()
     supervisor_.shutdown();
 }
 
-void App::calculate_image(SupervisorImageRequest& image_request)
+void App::calculate_image(SupervisorImageRequest image_request)
 {
     image_request.image_size = window_.size();
     supervisor_.calculate_image(image_request);

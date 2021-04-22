@@ -70,7 +70,7 @@ public:
     void restart(const int num_threads);
     void shutdown();
 
-    void calculate_image(const SupervisorImageRequest& image_request);
+    void calculate_image(const SupervisorImageRequest image_request);
     void cancel_calculation();
 
     [[nodiscard]] Phase get_phase() const { return phase_; };

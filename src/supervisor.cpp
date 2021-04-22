@@ -58,7 +58,7 @@ void Supervisor::shutdown()
     join();
 }
 
-void Supervisor::calculate_image(const SupervisorImageRequest& image_request)
+void Supervisor::calculate_image(const SupervisorImageRequest image_request)
 {
     set_phase(Phase::RequestSent);
     supervisor_message_queue_.send(image_request);
