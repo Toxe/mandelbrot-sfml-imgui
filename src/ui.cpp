@@ -119,9 +119,12 @@ void UI::render_main_window(App& app)
         }
     }
 
-    if (render_stopwatch_.is_running())
-        if (ImGui::Button("Cancel"))
+    if (render_stopwatch_.is_running()) {
+        if (ImGui::Button("Cancel")) {
             app.cancel_calculation();
+            render_stopwatch_.stop();
+        }
+    }
 
     ImGui::End();
 }
