@@ -25,6 +25,7 @@ public:
     [[nodiscard]] Window& window() { return window_; };
     [[nodiscard]] Phase supervisor_phase() const { return supervisor_phase_; };
     [[nodiscard]] sf::Time elapsed_time() const { return elapsed_time_; };
+    [[nodiscard]] bool running() const { return window_.is_open(); };
 
     void next_frame(const Supervisor& supervisor);
     void poll_events(Supervisor& supervisor, UI& ui);

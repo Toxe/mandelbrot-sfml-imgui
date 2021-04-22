@@ -13,11 +13,11 @@ int main(int argc, char* argv[])
     Supervisor supervisor(cli.num_threads(), app.window(), app.gradient());
     supervisor.run();
 
-    while (app.window().is_open()) {
+    while (app.running()) {
         app.next_frame(supervisor);
         app.poll_events(supervisor, ui);
 
-        if (app.window().is_open()) {
+        if (app.running()) {
             ui.render(app, supervisor);
             app.render();
         }
