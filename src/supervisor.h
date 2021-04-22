@@ -10,6 +10,7 @@
 #include "message_queue.h"
 #include "messages.h"
 #include "phase.h"
+#include "window.h"
 #include "worker.h"
 
 class App;
@@ -25,6 +26,7 @@ class Supervisor {
 
     std::vector<Worker> workers_;
 
+    Window& window_;
 
     Gradient gradient_;
 

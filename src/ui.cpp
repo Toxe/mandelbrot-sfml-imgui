@@ -5,7 +5,6 @@
 #include <limits>
 
 #include <fmt/core.h>
-#include <imgui-SFML.h>
 #include <imgui.h>
 
 #include "app.h"
@@ -17,26 +16,14 @@ const int default_max_iterations = 5000;
 const int default_area_size = 100;
 const FractalSection default_fractal_section = {-0.8, 0.0, 2.0};
 
-UI::UI(const CLI& cli, sf::RenderWindow& window)
-    : supervisor_image_request_{make_default_supervisor_image_request(window.getSize())}, font_size_{static_cast<float>(cli.font_size())}
+UI::UI(const CLI& cli, Window& window)
+    : supervisor_image_request_{make_default_supervisor_image_request(window.size())}, font_size_{static_cast<float>(cli.font_size())}
 {
-    ImGui::SFML::Init(window, false);
-
-    ImGuiIO& io = ImGui::GetIO();
-    io.Fonts->Clear();
-    io.Fonts->AddFontFromFileTTF("assets/fonts/Inconsolata-SemiBold.ttf", font_size_);
-
-    ImGui::SFML::UpdateFontTexture();
 }
 
-SupervisorImageRequest UI::make_default_supervisor_image_request(const sf::Vector2u& window_size)
+SupervisorImageRequest UI::make_default_supervisor_image_request(const ImageSize& window_size)
 {
-    return {default_max_iterations, default_area_size, {static_cast<int>(window_size.x), static_cast<int>(window_size.y)}, default_fractal_section};
-}
-
-void UI::shutdown()
-{
-    ImGui::SFML::Shutdown();
+    return {default_max_iterations, default_area_size, window_size, default_fractal_section};
 }
 
 void UI::render(App& app, Supervisor& supervisor)
@@ -63,18 +50,16 @@ void UI::render_main_window(App& app, Supervisor& supervisor)
     fps[values_offset] = current_fps;
     values_offset = (values_offset + 1) % fps.size();
 
-    ImGui::SFML::Update(app.window(), app.elapsed_time());
-
     if (!is_visible_)
         return;
 
-    const auto window_size = app.window().getSize();
+    const auto window_size = app.window().size();
 
     ImGui::Begin("Mandelbrot", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
 
     ImGui::PlotLines("", fps.data(), static_cast<int>(fps.size()), static_cast<int>(values_offset), fps_label.c_str(), 0.0f, 1.5f * std::max(65.0f, *std::max_element(fps.begin(), fps.end())), ImVec2(0, 4.0f * font_size_));
 
-    ImGui::Text("image size: %dx%d", window_size.x, window_size.y);
+    ImGui::Text("image size: %dx%d", window_size.width, window_size.height);
     ImGui::Text("status: %s", phase_name(phase));
     ImGui::Text("render time: %.3fs", render_stopwatch_.time());
 
@@ -84,7 +69,7 @@ void UI::render_main_window(App& app, Supervisor& supervisor)
     ImGui::SameLine();
 
     if (ImGui::Button("Fullscreen (F10)"))
-        app.toggle_fullscreen();
+        app.window().toggle_fullscreen();
 
     ImGui::NewLine();
 
@@ -169,9 +154,9 @@ void UI::input_double(const char* label, double& value, const double small_inc, 
     help(fmt::format("{} to {}\n\n     -/+ to change by {}\nCTRL -/+ to change by {}", min, max, small_inc, big_inc));
 }
 
-void UI::calculate_image(Supervisor& supervisor, const sf::Vector2u& window_size)
+void UI::calculate_image(Supervisor& supervisor, const ImageSize& window_size)
 {
     render_stopwatch_.start();
-    supervisor_image_request_.image_size = ImageSize{static_cast<int>(window_size.x), static_cast<int>(window_size.y)};
+    supervisor_image_request_.image_size = window_size;
     supervisor.calculate_image(supervisor_image_request_);
 }

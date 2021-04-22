@@ -15,6 +15,7 @@ add_executable(mandelbrot
     supervisor.cpp supervisor.h
     ui.cpp ui.h
     util/mutex_timer.h
+    window.cpp window.h
     worker.cpp worker.h
 )
 

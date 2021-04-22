@@ -87,7 +87,7 @@ void Supervisor::handle_image_request_message(SupervisorImageRequest image_reque
 
 void Supervisor::handle_calculation_results_message(SupervisorCalculationResults calculation_results)
 {
-    app_.update_texture(calculation_results.pixels.get(), calculation_results.area);
+    window_.update_texture(calculation_results.pixels.get(), calculation_results.area);
 
     if (--waiting_for_calculation_results_ == 0) {
         if (phase_ != Phase::Canceled) {
@@ -103,7 +103,7 @@ void Supervisor::handle_colorization_results_message(SupervisorColorizationResul
 {
     auto data = colorization_results.colorization_buffer->data();
     std::size_t p = static_cast<std::size_t>(4 * (colorization_results.start_row * colorization_results.row_width));
-    app_.update_texture(&data[p], CalculationArea{0, colorization_results.start_row, colorization_results.row_width, colorization_results.num_rows});
+    window_.update_texture(&data[p], CalculationArea{0, colorization_results.start_row, colorization_results.row_width, colorization_results.num_rows});
 
     if (--waiting_for_colorization_results_ == 0)
         if (phase_ != Phase::Canceled)
@@ -215,8 +215,8 @@ void Supervisor::resize_and_reset_buffers_if_needed(const SupervisorImageRequest
     // update render buffer and window texture
     render_buffer_.create(static_cast<unsigned int>(image_request.image_size.width), static_cast<unsigned int>(image_request.image_size.height), background_color_);
 
-    if (app_.texture().getSize() != render_buffer_.getSize())
-        app_.resize_texture(render_buffer_);
+    if (window_.texture().getSize() != render_buffer_.getSize())
+        window_.resize_texture(render_buffer_);
     else
-        app_.update_texture(render_buffer_);
+        window_.update_texture(render_buffer_);
 }
