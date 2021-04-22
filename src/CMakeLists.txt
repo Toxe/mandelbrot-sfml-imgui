@@ -6,6 +6,7 @@ add_executable(mandelbrot
     app.cpp app.h
     cli.cpp cli.h
     gradient.cpp gradient.h
+    input_value.h
     main.cpp
     mandelbrot.cpp mandelbrot.h
     message_queue.h

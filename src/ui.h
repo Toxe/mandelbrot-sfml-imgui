@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include "messages.h"
+#include "input_value.h"
 #include "stopwatch.h"
 #include "window.h"
 
@@ -10,10 +10,14 @@ class App;
 class CLI;
 
 class UI {
-    int num_threads_;
-    bool changed_num_threads_ = false;
+    InputValue<int> num_threads_;
+    InputValue<int> max_iterations_;
+    InputValue<int> area_size_;
+    InputValue<double> center_x_;
+    InputValue<double> center_y_;
+    InputValue<double> fractal_height_;
+
     float font_size_;
-    SupervisorImageRequest supervisor_image_request_;
 
     Stopwatch render_stopwatch_;
 
@@ -21,11 +25,14 @@ class UI {
     bool show_help_ = false;
 
     void help(const std::string& text);
-    void input_int(const char* label, int& value, bool* value_changed, const int small_inc, const int big_inc, const int min, const int max);
-    void input_double(const char* label, double& value, bool* value_changed, const double small_inc, const double big_inc, const double min, const double max);
+    void input_int(const char* label, InputValue<int>& value, const int small_inc, const int big_inc, const int min, const int max);
+    void input_double(const char* label, InputValue<double>& value, const double small_inc, const double big_inc, const double min, const double max);
 
     void render_main_window(App& app);
     void render_help_window();
+
+    void reset_image_request_input_values_to_default();
+    [[nodiscard]] bool image_request_input_values_have_changed();
 
 public:
     UI(const CLI& cli);
@@ -34,8 +41,6 @@ public:
 
     void toggle_visibility() { is_visible_ = !is_visible_; };
     void toggle_help() { show_help_ = !show_help_; };
-
-    SupervisorImageRequest make_default_supervisor_image_request();
 
     void calculate_image(App& app);
 };
