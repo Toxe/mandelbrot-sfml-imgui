@@ -41,6 +41,8 @@ void Supervisor::main()
         ;
 
     set_phase(Phase::Shutdown);
+
+    clear_message_queues();
     shutdown_workers();
 
     spdlog::debug("supervisor: stopping");
@@ -155,6 +157,15 @@ void Supervisor::shutdown_workers()
         w.join();
 
     workers_.clear();
+}
+
+void Supervisor::clear_message_queues()
+{
+    supervisor_message_queue_.clear();
+    worker_message_queue_.clear();
+
+    waiting_for_calculation_results_ = 0;
+    waiting_for_colorization_results_ = 0;
 }
 
 void Supervisor::set_phase(const Phase phase)

@@ -52,6 +52,7 @@ class Supervisor {
 
     void start_workers();
     void shutdown_workers();
+    void clear_message_queues();
 
     void set_phase(const Phase phase);
 
