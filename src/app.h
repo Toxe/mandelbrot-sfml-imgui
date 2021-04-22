@@ -3,15 +3,16 @@
 #include "gradient.h"
 #include "mandelbrot.h"
 #include "phase.h"
+#include "supervisor.h"
 #include "window.h"
 
 class CLI;
-class Supervisor;
 class UI;
 
 class App {
     Gradient gradient_;
     Window window_;
+    Supervisor supervisor_;
 
     sf::Clock frame_time_clock_;
     sf::Time elapsed_time_;
@@ -27,8 +28,13 @@ public:
     [[nodiscard]] sf::Time elapsed_time() const { return elapsed_time_; };
     [[nodiscard]] bool running() const { return window_.is_open(); };
 
-    void next_frame(const Supervisor& supervisor);
-    void poll_events(Supervisor& supervisor, UI& ui);
+    void next_frame();
+    void poll_events(UI& ui);
 
     void render();
+
+    void calculate_image(SupervisorImageRequest& image_request);
+    void cancel_calculation();
+
+    void shutdown();
 };

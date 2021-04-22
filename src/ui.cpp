@@ -16,23 +16,23 @@ const int default_max_iterations = 5000;
 const int default_area_size = 100;
 const FractalSection default_fractal_section = {-0.8, 0.0, 2.0};
 
-UI::UI(const CLI& cli, Window& window)
-    : supervisor_image_request_{make_default_supervisor_image_request(window.size())}, font_size_{static_cast<float>(cli.font_size())}
+UI::UI(const CLI& cli)
+    : supervisor_image_request_{make_default_supervisor_image_request()}, font_size_{static_cast<float>(cli.font_size())}
 {
 }
 
-SupervisorImageRequest UI::make_default_supervisor_image_request(const ImageSize& window_size)
+SupervisorImageRequest UI::make_default_supervisor_image_request()
 {
-    return {default_max_iterations, default_area_size, window_size, default_fractal_section};
+    return {default_max_iterations, default_area_size, {0, 0}, default_fractal_section};
 }
 
-void UI::render(App& app, Supervisor& supervisor)
+void UI::render(App& app)
 {
-    render_main_window(app, supervisor);
+    render_main_window(app);
     render_help_window();
 }
 
-void UI::render_main_window(App& app, Supervisor& supervisor)
+void UI::render_main_window(App& app)
 {
     static std::vector<float> fps(120);
     static std::size_t values_offset = 0;
@@ -81,19 +81,19 @@ void UI::render_main_window(App& app, Supervisor& supervisor)
 
     if (phase == Phase::Idle) {
         if (ImGui::Button("Calculate"))
-            calculate_image(supervisor, window_size);
+            calculate_image(app);
 
         ImGui::SameLine();
 
         if (ImGui::Button("Reset")) {
-            supervisor_image_request_ = make_default_supervisor_image_request(window_size);
-            calculate_image(supervisor, window_size);
+            supervisor_image_request_ = make_default_supervisor_image_request();
+            calculate_image(app);
         }
     }
 
     if (render_stopwatch_.is_running())
         if (ImGui::Button("Cancel"))
-            supervisor.cancel_calculation();
+            app.cancel_calculation();
 
     ImGui::End();
 }
@@ -154,9 +154,8 @@ void UI::input_double(const char* label, double& value, const double small_inc, 
     help(fmt::format("{} to {}\n\n     -/+ to change by {}\nCTRL -/+ to change by {}", min, max, small_inc, big_inc));
 }
 
-void UI::calculate_image(Supervisor& supervisor, const ImageSize& window_size)
+void UI::calculate_image(App& app)
 {
     render_stopwatch_.start();
-    supervisor_image_request_.image_size = window_size;
-    supervisor.calculate_image(supervisor_image_request_);
+    app.calculate_image(supervisor_image_request_);
 }

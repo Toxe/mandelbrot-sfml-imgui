@@ -6,8 +6,8 @@
 
 #include "mandelbrot.h"
 
-Supervisor::Supervisor(const int num_threads, Window& window, const Gradient& gradient)
-    : num_threads_{num_threads}, window_{window}, gradient_{gradient}
+Supervisor::Supervisor(Window& window)
+    : window_{window}
 {
 }
 
@@ -16,8 +16,11 @@ Supervisor::~Supervisor()
     join();
 }
 
-void Supervisor::run()
+void Supervisor::run(const int num_threads, const Gradient& gradient)
 {
+    num_threads_ = num_threads;
+    gradient_ = gradient;
+
     thread_ = std::thread(&Supervisor::main, this);
 }
 

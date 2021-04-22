@@ -21,7 +21,7 @@ class Supervisor {
 
     std::atomic<Phase> phase_ = Phase::Starting;
 
-    const int num_threads_;
+    int num_threads_;
     std::thread thread_;
 
     std::vector<Worker> workers_;
@@ -61,10 +61,10 @@ class Supervisor {
     void resize_and_reset_buffers_if_needed(const SupervisorImageRequest& image_request);
 
 public:
-    Supervisor(const int num_threads, Window& window, const Gradient& gradient);
+    Supervisor(Window& window);
     ~Supervisor();
 
-    void run();
+    void run(const int num_threads, const Gradient& gradient);
     void join();
 
     void shutdown();
