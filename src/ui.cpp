@@ -120,9 +120,15 @@ void UI::render_main_window(App& app)
     }
 
     if (render_stopwatch_.is_running()) {
-        if (ImGui::Button("Cancel")) {
-            app.cancel_calculation();
-            render_stopwatch_.stop();
+        if (phase == Phase::Waiting) {
+            if (ImGui::Button("Cancel")) {
+                app.cancel_calculation();
+                render_stopwatch_.stop();
+            }
+        }
+    } else {
+        if (phase == Phase::Canceled) {
+            ImGui::TextDisabled("waiting for calculation to finish...");
         }
     }
 
