@@ -108,6 +108,8 @@ void Supervisor::handle_calculation_results_message(SupervisorCalculationResults
             set_phase(Phase::Coloring);
             equalize_histogram(combined_iterations_histogram_, calculation_results.max_iterations, equalized_iterations_);
             send_colorization_messages(calculation_results.max_iterations, calculation_results.image_size);
+        } else {
+            set_phase(Phase::Idle);
         }
     }
 }
