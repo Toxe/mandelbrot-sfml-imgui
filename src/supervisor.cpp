@@ -46,6 +46,12 @@ void Supervisor::main()
     spdlog::debug("supervisor: stopping");
 }
 
+void Supervisor::restart(const int num_threads)
+{
+    shutdown();
+    run(num_threads, gradient_);
+}
+
 void Supervisor::shutdown()
 {
     supervisor_message_queue_.send(SupervisorQuit{});
@@ -147,6 +153,8 @@ void Supervisor::shutdown_workers()
 
     for (auto& w : workers_)
         w.join();
+
+    workers_.clear();
 }
 
 void Supervisor::set_phase(const Phase phase)

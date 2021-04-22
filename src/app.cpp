@@ -45,6 +45,11 @@ void App::render()
     }
 }
 
+void App::shutdown()
+{
+    supervisor_.shutdown();
+}
+
 void App::calculate_image(SupervisorImageRequest& image_request)
 {
     image_request.image_size = window_.size();
@@ -56,7 +61,7 @@ void App::cancel_calculation()
     supervisor_.cancel_calculation();
 }
 
-void App::shutdown()
+void App::change_num_threads(const int num_threads)
 {
-    supervisor_.shutdown();
+    supervisor_.restart(num_threads);
 }

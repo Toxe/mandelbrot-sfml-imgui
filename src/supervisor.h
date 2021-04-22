@@ -67,6 +67,7 @@ public:
     void run(const int num_threads, const Gradient& gradient);
     void join();
 
+    void restart(const int num_threads);
     void shutdown();
 
     void calculate_image(const SupervisorImageRequest& image_request);
