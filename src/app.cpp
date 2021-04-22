@@ -3,10 +3,9 @@
 #include <spdlog/spdlog.h>
 
 #include "cli.h"
-#include "ui.h"
 
 App::App(const CLI& cli)
-    : window_{Window(cli)}, supervisor_{Supervisor(window_)}
+    : window_{Window(cli)}, supervisor_{Supervisor(window_)}, ui_{UI(cli)}
 {
     gradient_ = load_gradient("assets/gradients/benchmark.gradient");
     supervisor_.run(cli.num_threads(), gradient_);
@@ -20,7 +19,7 @@ void App::next_frame()
     window_.next_frame(elapsed_time_);
 }
 
-void App::poll_events(UI& ui)
+void App::poll_events()
 {
     sf::Event event;
 
@@ -28,11 +27,11 @@ void App::poll_events(UI& ui)
         if (event.type == sf::Event::KeyPressed) {
             if (event.key.code == sf::Keyboard::Enter) {
                 if (supervisor_phase_ == Phase::Idle)
-                    ui.calculate_image(*this);
+                    ui_.calculate_image(*this);
             } else if (event.key.code == sf::Keyboard::Space) {
-                ui.toggle_visibility();
+                ui_.toggle_visibility();
             } else if (event.key.code == sf::Keyboard::F1) {
-                ui.toggle_help();
+                ui_.toggle_help();
             }
         }
     }
@@ -40,7 +39,10 @@ void App::poll_events(UI& ui)
 
 void App::render()
 {
-    window_.render();
+    if (running()) {
+        ui_.render(*this);
+        window_.render();
+    }
 }
 
 void App::calculate_image(SupervisorImageRequest& image_request)

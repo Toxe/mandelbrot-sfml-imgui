@@ -4,15 +4,16 @@
 #include "mandelbrot.h"
 #include "phase.h"
 #include "supervisor.h"
+#include "ui.h"
 #include "window.h"
 
 class CLI;
-class UI;
 
 class App {
     Gradient gradient_;
     Window window_;
     Supervisor supervisor_;
+    UI ui_;
 
     sf::Clock frame_time_clock_;
     sf::Time elapsed_time_;
@@ -29,7 +30,7 @@ public:
     [[nodiscard]] bool running() const { return window_.is_open(); };
 
     void next_frame();
-    void poll_events(UI& ui);
+    void poll_events();
 
     void render();
 
