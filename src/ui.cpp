@@ -115,7 +115,7 @@ void UI::render_main_window(App& app)
     }
 
     if (app.supervisor_status().calculation_running()) {
-        if (phase == Phase::Waiting)
+        if (phase == Phase::Calculating)
             if (ImGui::Button("Cancel"))
                 app.cancel_calculation();
     } else {

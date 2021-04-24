@@ -96,7 +96,7 @@ void Supervisor::handle_image_request_message(SupervisorImageRequest image_reque
     status_.start_calculation(Phase::RequestReceived);
     resize_and_reset_buffers_if_needed(image_request);
     send_calculation_messages(image_request);
-    status_.set_phase(Phase::Waiting);
+    status_.set_phase(Phase::Calculating);
 }
 
 void Supervisor::handle_calculation_results_message(SupervisorCalculationResults calculation_results)

@@ -11,8 +11,8 @@ const char* phase_name(const Phase phase)
         return "request sent";
     case Phase::RequestReceived:
         return "request received";
-    case Phase::Waiting:
-        return "waiting";
+    case Phase::Calculating:
+        return "calculating";
     case Phase::Coloring:
         return "coloring";
     case Phase::Shutdown:
