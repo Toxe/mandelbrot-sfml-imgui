@@ -16,6 +16,8 @@ const int default_max_iterations = 5000;
 const int default_area_size = 100;
 const FractalSection default_fractal_section = {-0.8, 0.0, 2.0};
 
+const ImVec4 color_light_gray{0.7f, 0.7f, 0.7f, 1.0f};
+
 UI::UI(const CLI& cli)
     : num_threads_{cli.num_threads()},
     font_size_{static_cast<float>(cli.font_size())}
@@ -65,9 +67,17 @@ void UI::render_main_window(App& app)
 
     ImGui::PlotLines("", fps.data(), static_cast<int>(fps.size()), static_cast<int>(values_offset), fps_label.c_str(), 0.0f, 1.5f * std::max(65.0f, *std::max_element(fps.begin(), fps.end())), ImVec2(0, 4.0f * font_size_));
 
-    ImGui::Text("image size: %dx%d", window_size.width, window_size.height);
-    ImGui::Text("status: %s", phase_name(phase));
-    ImGui::Text("render time: %.3fs", app.supervisor_status().calculation_time());
+    ImGui::TextColored(color_light_gray, "image size:");
+    ImGui::SameLine();
+    ImGui::Text("%dx%d", window_size.width, window_size.height);
+
+    ImGui::TextColored(color_light_gray, "status:");
+    ImGui::SameLine();
+    ImGui::Text("%s", phase_name(phase));
+
+    ImGui::TextColored(color_light_gray, "render time:");
+    ImGui::SameLine();
+    ImGui::Text("%.3fs", app.supervisor_status().calculation_time());
 
     if (ImGui::Button("Help (F1)"))
         toggle_help();
