@@ -3,6 +3,9 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 project("SFML & ImGui Mandelbrot" LANGUAGES CXX)
 
+# adjust or override some CMake defaults
+include(cmake/OverrideCMakeDefaults.cmake)
+
 # default compiler options and warnings
 include(cmake/DefaultCompilerOptionsAndWarnings.cmake)
 
