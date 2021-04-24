@@ -2,6 +2,8 @@
 
 #include <string>
 
+#include <imgui.h>
+
 #include "input_value.h"
 #include "window.h"
 
@@ -11,6 +13,8 @@ class CLI;
 class UI {
     const char* main_window_title_ = "Mandelbrot";
     const char* help_window_title_ = "Help";
+
+    ImVec2 main_window_size_;
 
     InputValue<int> num_threads_;
     InputValue<int> max_iterations_;
