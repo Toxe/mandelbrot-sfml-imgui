@@ -1,6 +1,5 @@
 #pragma once
 
-#include <atomic>
 #include <thread>
 #include <vector>
 
@@ -9,7 +8,7 @@
 #include "gradient.h"
 #include "message_queue.h"
 #include "messages.h"
-#include "phase.h"
+#include "supervisor_status.h"
 #include "window.h"
 #include "worker.h"
 
@@ -19,7 +18,7 @@ struct SupervisorImageRequest;
 class Supervisor {
     const sf::Color background_color_ = sf::Color{0x00, 0x00, 0x20};
 
-    std::atomic<Phase> phase_ = Phase::Starting;
+    SupervisorStatus status_;
 
     int num_threads_;
     std::thread thread_;
@@ -54,8 +53,6 @@ class Supervisor {
     void shutdown_workers();
     void clear_message_queues();
 
-    void set_phase(const Phase phase);
-
     void send_calculation_messages(const SupervisorImageRequest& image_request);
     void send_colorization_messages(const int max_iterations, const ImageSize& image_size);
 
@@ -74,5 +71,5 @@ public:
     void calculate_image(const SupervisorImageRequest image_request);
     void cancel_calculation();
 
-    [[nodiscard]] Phase get_phase() const { return phase_; };
+    [[nodiscard]] SupervisorStatus& status() { return status_; };
 };

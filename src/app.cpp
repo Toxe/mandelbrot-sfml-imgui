@@ -13,9 +13,7 @@ App::App(const CLI& cli)
 
 void App::next_frame()
 {
-    supervisor_phase_ = supervisor_.get_phase();
     elapsed_time_ = frame_time_clock_.restart();
-
     window_.next_frame(elapsed_time_);
 }
 
@@ -26,7 +24,7 @@ void App::poll_events()
     while (window_.poll_event(event)) {
         if (event.type == sf::Event::KeyPressed) {
             if (event.key.code == sf::Keyboard::Enter) {
-                if (supervisor_phase_ == Phase::Idle)
+                if (supervisor_.status().phase() == Phase::Idle)
                     ui_.calculate_image(*this);
             } else if (event.key.code == sf::Keyboard::Space) {
                 ui_.toggle_visibility();

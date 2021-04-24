@@ -2,7 +2,6 @@
 
 #include "gradient.h"
 #include "mandelbrot.h"
-#include "phase.h"
 #include "supervisor.h"
 #include "ui.h"
 #include "window.h"
@@ -18,14 +17,12 @@ class App {
     sf::Clock frame_time_clock_;
     sf::Time elapsed_time_;
 
-    Phase supervisor_phase_ = Phase::Starting;
-
 public:
     App(const CLI& cli);
 
     [[nodiscard]] Gradient& gradient() { return gradient_; }
     [[nodiscard]] Window& window() { return window_; };
-    [[nodiscard]] Phase supervisor_phase() const { return supervisor_phase_; };
+    [[nodiscard]] SupervisorStatus& supervisor_status() { return supervisor_.status(); };
     [[nodiscard]] sf::Time elapsed_time() const { return elapsed_time_; };
     [[nodiscard]] bool running() const { return window_.is_open(); };
 

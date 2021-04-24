@@ -19,7 +19,7 @@ Supervisor::~Supervisor()
 
 void Supervisor::run(const int num_threads, const Gradient& gradient)
 {
-    set_phase(Phase::Starting);
+    status_.set_phase(Phase::Starting);
 
     num_threads_ = num_threads;
     gradient_ = gradient;
@@ -38,12 +38,12 @@ void Supervisor::main()
     spdlog::debug("supervisor: starting");
 
     start_workers();
-    set_phase(Phase::Idle);
+    status_.set_phase(Phase::Idle);
 
     while (handle_message(supervisor_message_queue_.wait_for_message()))
         ;
 
-    set_phase(Phase::Shutdown);
+    status_.set_phase(Phase::Shutdown);
 
     clear_message_queues();
     shutdown_workers();
@@ -65,7 +65,7 @@ void Supervisor::shutdown()
 
 void Supervisor::calculate_image(const SupervisorImageRequest image_request)
 {
-    set_phase(Phase::RequestSent);
+    status_.set_phase(Phase::RequestSent);
     supervisor_message_queue_.send(image_request);
 }
 
@@ -93,10 +93,10 @@ void Supervisor::cancel_calculation()
 
 void Supervisor::handle_image_request_message(SupervisorImageRequest image_request)
 {
-    set_phase(Phase::RequestReceived);
+    status_.start_calculation(Phase::RequestReceived);
     resize_and_reset_buffers_if_needed(image_request);
     send_calculation_messages(image_request);
-    set_phase(Phase::Waiting);
+    status_.set_phase(Phase::Waiting);
 }
 
 void Supervisor::handle_calculation_results_message(SupervisorCalculationResults calculation_results)
@@ -104,13 +104,13 @@ void Supervisor::handle_calculation_results_message(SupervisorCalculationResults
     window_.update_texture(calculation_results.pixels.get(), calculation_results.area);
 
     if (--waiting_for_calculation_results_ == 0) {
-        if (phase_ != Phase::Canceled) {
+        if (status_.phase() != Phase::Canceled) {
             // if canceled there is no need to colorize the partial image
-            set_phase(Phase::Coloring);
+            status_.set_phase(Phase::Coloring);
             equalize_histogram(combined_iterations_histogram_, calculation_results.max_iterations, equalized_iterations_);
             send_colorization_messages(calculation_results.max_iterations, calculation_results.image_size);
         } else {
-            set_phase(Phase::Idle);
+            status_.stop_calculation(Phase::Idle);
         }
     }
 
@@ -124,8 +124,8 @@ void Supervisor::handle_colorization_results_message(SupervisorColorizationResul
     window_.update_texture(&data[p], CalculationArea{0, colorization_results.start_row, colorization_results.row_width, colorization_results.num_rows});
 
     if (--waiting_for_colorization_results_ == 0)
-        if (phase_ != Phase::Canceled)
-            set_phase(Phase::Idle);
+        if (status_.phase() != Phase::Canceled)
+            status_.stop_calculation(Phase::Idle);
 
     assert(waiting_for_calculation_results_ >= 0);
 }
@@ -136,9 +136,9 @@ void Supervisor::handle_cancel_message(SupervisorCancel)
     waiting_for_calculation_results_ -= worker_message_queue_.clear();
 
     if (waiting_for_calculation_results_ > 0)
-        set_phase(Phase::Canceled); // wait until all workers have finished
+        status_.set_phase(Phase::Canceled); // wait until all workers have finished
     else
-        set_phase(Phase::Idle);
+        status_.stop_calculation(Phase::Idle);
 }
 
 void Supervisor::start_workers()
@@ -175,11 +175,6 @@ void Supervisor::clear_message_queues()
 
     waiting_for_calculation_results_ = 0;
     waiting_for_colorization_results_ = 0;
-}
-
-void Supervisor::set_phase(const Phase phase)
-{
-    phase_ = phase;
 }
 
 void Supervisor::send_calculation_messages(const SupervisorImageRequest& image_request)

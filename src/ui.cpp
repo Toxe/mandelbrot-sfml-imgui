@@ -10,7 +10,6 @@
 #include "app.h"
 #include "cli.h"
 #include "messages.h"
-#include "phase.h"
 #include "supervisor.h"
 
 const int default_max_iterations = 5000;
@@ -49,11 +48,7 @@ void UI::render_main_window(App& app)
     static std::vector<float> fps(120);
     static std::size_t values_offset = 0;
 
-    const Phase phase = app.supervisor_phase();
-
-    if (render_stopwatch_.is_running())
-        if (phase == Phase::Idle)
-            render_stopwatch_.stop();
+    const Phase phase = app.supervisor_status().phase();
 
     const float elapsed_time_in_seconds = app.elapsed_time().asSeconds();
     const float current_fps = 1.0f / elapsed_time_in_seconds;
@@ -72,7 +67,7 @@ void UI::render_main_window(App& app)
 
     ImGui::Text("image size: %dx%d", window_size.width, window_size.height);
     ImGui::Text("status: %s", phase_name(phase));
-    ImGui::Text("render time: %.3fs", render_stopwatch_.time());
+    ImGui::Text("render time: %.3fs", app.supervisor_status().calculation_time());
 
     if (ImGui::Button("Help (F1)"))
         toggle_help();
@@ -119,17 +114,13 @@ void UI::render_main_window(App& app)
         }
     }
 
-    if (render_stopwatch_.is_running()) {
-        if (phase == Phase::Waiting) {
-            if (ImGui::Button("Cancel")) {
+    if (app.supervisor_status().calculation_running()) {
+        if (phase == Phase::Waiting)
+            if (ImGui::Button("Cancel"))
                 app.cancel_calculation();
-                render_stopwatch_.stop();
-            }
-        }
     } else {
-        if (phase == Phase::Canceled) {
+        if (phase == Phase::Canceled)
             ImGui::TextDisabled("waiting for calculation to finish...");
-        }
     }
 
     ImGui::End();
@@ -197,6 +188,5 @@ void UI::input_double(const char* label, InputValue<double>& value, const double
 
 void UI::calculate_image(App& app)
 {
-    render_stopwatch_.start();
     app.calculate_image(SupervisorImageRequest{max_iterations_.get(), area_size_.get(), {0, 0}, {center_x_.get(), center_y_.get(), fractal_height_.get()}});
 }

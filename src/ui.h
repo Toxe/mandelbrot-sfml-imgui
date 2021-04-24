@@ -3,7 +3,6 @@
 #include <string>
 
 #include "input_value.h"
-#include "stopwatch.h"
 #include "window.h"
 
 class App;
@@ -18,8 +17,6 @@ class UI {
     InputValue<double> fractal_height_;
 
     float font_size_;
-
-    Stopwatch render_stopwatch_;
 
     bool is_visible_ = true;
     bool show_help_ = false;
