@@ -63,7 +63,7 @@ void UI::render_main_window(App& app)
 
     const auto window_size = app.window().size();
 
-    ImGui::Begin("Mandelbrot", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
+    ImGui::Begin(main_window_title_, nullptr, ImGuiWindowFlags_AlwaysAutoResize);
 
     ImGui::PlotLines("", fps.data(), static_cast<int>(fps.size()), static_cast<int>(values_offset), fps_label.c_str(), 0.0f, 1.5f * std::max(65.0f, *std::max_element(fps.begin(), fps.end())), ImVec2(0, 4.0f * font_size_));
 
@@ -139,7 +139,7 @@ void UI::render_main_window(App& app)
 void UI::render_help_window()
 {
     if (show_help_) {
-        ImGui::Begin("Help", &show_help_, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse);
+        ImGui::Begin(help_window_title_, &show_help_, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse);
 
         ImGui::Text("Left/right click: zoom in/out");
         ImGui::Text("Left drag: zoom in area");

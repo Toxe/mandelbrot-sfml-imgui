@@ -9,6 +9,9 @@ class App;
 class CLI;
 
 class UI {
+    const char* main_window_title_ = "Mandelbrot";
+    const char* help_window_title_ = "Help";
+
     InputValue<int> num_threads_;
     InputValue<int> max_iterations_;
     InputValue<int> area_size_;
