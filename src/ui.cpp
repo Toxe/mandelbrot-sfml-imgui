@@ -139,7 +139,7 @@ void UI::render_main_window(App& app)
 void UI::render_help_window()
 {
     if (show_help_) {
-        ImGui::Begin("Help", &show_help_, ImGuiWindowFlags_AlwaysAutoResize);
+        ImGui::Begin("Help", &show_help_, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse);
 
         ImGui::Text("Left/right click: zoom in/out");
         ImGui::Text("Left drag: zoom in area");
