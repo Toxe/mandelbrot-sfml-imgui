@@ -97,7 +97,7 @@ void UI::render_main_window(App& app)
     input_double("center_x", center_x_, 0.1, 1.0, -5.0, 5.0);
     input_double("center_y", center_y_, 0.1, 1.0, -5.0, 5.0);
     input_double("fractal height", fractal_height_, 0.1, 1.0, 1000.0 * std::numeric_limits<double>::min(), 10.0);
-    input_int("iterations", max_iterations_, 100, 1000, 10, 1'000'000);
+    input_int("iterations", max_iterations_, 1000, 10000, 10, 1'000'000);
     input_int("tile size", area_size_, 100, 500, 10, 10'000);
 
     if (phase == Phase::Idle) {
