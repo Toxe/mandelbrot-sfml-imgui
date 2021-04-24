@@ -1,5 +1,6 @@
 #include "supervisor.h"
 
+#include <cassert>
 #include <cmath>
 
 #include <spdlog/spdlog.h>
@@ -112,6 +113,8 @@ void Supervisor::handle_calculation_results_message(SupervisorCalculationResults
             set_phase(Phase::Idle);
         }
     }
+
+    assert(waiting_for_calculation_results_ >= 0);
 }
 
 void Supervisor::handle_colorization_results_message(SupervisorColorizationResults colorization_results)
@@ -123,6 +126,8 @@ void Supervisor::handle_colorization_results_message(SupervisorColorizationResul
     if (--waiting_for_colorization_results_ == 0)
         if (phase_ != Phase::Canceled)
             set_phase(Phase::Idle);
+
+    assert(waiting_for_calculation_results_ >= 0);
 }
 
 void Supervisor::handle_cancel_message(SupervisorCancel)
