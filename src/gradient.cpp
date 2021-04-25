@@ -28,13 +28,13 @@ bool equal_enough(float a, float b) noexcept
     return std::abs(a - b) <= std::max(a, b) * epsilon;
 }
 
-Gradient load_gradient(const std::string& filename)
+Gradient load_gradient(const std::string& name)
 {
-    const auto path = std::filesystem::path{gradients_directory} / filename;
+    auto path = std::filesystem::path{gradients_directory} / (name + ".gradient");
 
     spdlog::debug("loading gradient: {}", path);
 
-    Gradient gradient{filename};
+    Gradient gradient{name};
     gradient.colors.push_back(GradientColor{0.0f, 0.0f, 0.0f, 0.0f});
     gradient.colors.push_back(GradientColor{1.0f, 1.0f, 1.0f, 1.0f});
 

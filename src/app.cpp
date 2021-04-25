@@ -7,7 +7,7 @@
 App::App(const CLI& cli)
     : window_{Window(cli)}, supervisor_{Supervisor(window_)}, ui_{UI(cli)}
 {
-    gradient_ = load_gradient("benchmark.gradient");
+    gradient_ = load_gradient("benchmark");
     supervisor_.run(cli.num_threads(), gradient_);
 }
 

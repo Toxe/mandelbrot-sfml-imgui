@@ -22,6 +22,6 @@ struct Gradient {
     Gradient(std::string name) : name_{name} {}
 };
 
-Gradient load_gradient(const std::string& filename);
+Gradient load_gradient(const std::string& name);
 sf::Color color_from_gradient(const Gradient& gradient, const float pos) noexcept;
 std::vector<std::string> list_available_gradients();
