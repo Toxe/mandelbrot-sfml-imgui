@@ -8,7 +8,7 @@
 #include "mandelbrot.h"
 
 Supervisor::Supervisor(Window& window)
-    : window_{window}
+    : running_{false}, window_{window}
 {
 }
 
@@ -40,8 +40,11 @@ void Supervisor::main()
     start_workers();
     status_.set_phase(Phase::Idle);
 
-    while (handle_message(supervisor_message_queue_.wait_for_message()))
-        ;
+    auto visitor = [&](auto&& msg) { handle_message(std::move(msg)); };
+    running_ = true;
+
+    while (running_)
+        std::visit(visitor, supervisor_message_queue_.wait_for_message());
 
     status_.set_phase(Phase::Shutdown);
 
@@ -74,24 +77,7 @@ void Supervisor::cancel_calculation()
     supervisor_message_queue_.send(SupervisorCancel{});
 }
 
-[[nodiscard]] bool Supervisor::handle_message(SupervisorMessage msg)
-{
-    if (std::holds_alternative<SupervisorQuit>(msg))
-        return false;
-
-    if (std::holds_alternative<SupervisorImageRequest>(msg))
-        handle_image_request_message(std::move(std::get<SupervisorImageRequest>(msg)));
-    else if (std::holds_alternative<SupervisorCalculationResults>(msg))
-        handle_calculation_results_message(std::move(std::get<SupervisorCalculationResults>(msg)));
-    else if (std::holds_alternative<SupervisorColorizationResults>(msg))
-        handle_colorization_results_message(std::move(std::get<SupervisorColorizationResults>(msg)));
-    else if (std::holds_alternative<SupervisorCancel>(msg))
-        handle_cancel_message(std::move(std::get<SupervisorCancel>(msg)));
-
-    return true;
-}
-
-void Supervisor::handle_image_request_message(SupervisorImageRequest image_request)
+void Supervisor::handle_message(SupervisorImageRequest&& image_request)
 {
     status_.start_calculation(Phase::RequestReceived);
     resize_and_reset_buffers_if_needed(image_request);
@@ -99,7 +85,7 @@ void Supervisor::handle_image_request_message(SupervisorImageRequest image_reque
     status_.set_phase(Phase::Calculating);
 }
 
-void Supervisor::handle_calculation_results_message(SupervisorCalculationResults calculation_results)
+void Supervisor::handle_message(SupervisorCalculationResults&& calculation_results)
 {
     window_.update_texture(calculation_results.pixels.get(), calculation_results.area);
 
@@ -117,7 +103,7 @@ void Supervisor::handle_calculation_results_message(SupervisorCalculationResults
     assert(waiting_for_calculation_results_ >= 0);
 }
 
-void Supervisor::handle_colorization_results_message(SupervisorColorizationResults colorization_results)
+void Supervisor::handle_message(SupervisorColorizationResults&& colorization_results)
 {
     auto data = colorization_results.colorization_buffer->data();
     std::size_t p = static_cast<std::size_t>(4 * (colorization_results.start_row * colorization_results.row_width));
@@ -130,7 +116,7 @@ void Supervisor::handle_colorization_results_message(SupervisorColorizationResul
     assert(waiting_for_calculation_results_ >= 0);
 }
 
-void Supervisor::handle_cancel_message(SupervisorCancel)
+void Supervisor::handle_message(SupervisorCancel&&)
 {
     // empty the message queue
     waiting_for_calculation_results_ -= worker_message_queue_.clear();
@@ -139,6 +125,11 @@ void Supervisor::handle_cancel_message(SupervisorCancel)
         status_.set_phase(Phase::Canceled); // wait until all workers have finished
     else
         status_.stop_calculation(Phase::Idle);
+}
+
+void Supervisor::handle_message(SupervisorQuit&&)
+{
+    running_ = false;
 }
 
 void Supervisor::start_workers()

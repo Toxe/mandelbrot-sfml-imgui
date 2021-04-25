@@ -18,6 +18,7 @@ struct SupervisorImageRequest;
 class Supervisor {
     const sf::Color background_color_ = sf::Color{0x00, 0x00, 0x20};
 
+    bool running_;
     SupervisorStatus status_;
 
     int num_threads_;
@@ -43,11 +44,11 @@ class Supervisor {
 
     void main();
 
-    [[nodiscard]] bool handle_message(SupervisorMessage msg);
-    void handle_image_request_message(SupervisorImageRequest image_request);
-    void handle_calculation_results_message(SupervisorCalculationResults calculation_results);
-    void handle_colorization_results_message(SupervisorColorizationResults colorization_results);
-    void handle_cancel_message(SupervisorCancel);
+    void handle_message(SupervisorImageRequest&& image_request);
+    void handle_message(SupervisorCalculationResults&& calculation_results);
+    void handle_message(SupervisorColorizationResults&& colorization_results);
+    void handle_message(SupervisorCancel&&);
+    void handle_message(SupervisorQuit&&);
 
     void start_workers();
     void shutdown_workers();
