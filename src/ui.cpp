@@ -210,11 +210,19 @@ void UI::show_status(const Phase phase)
 
     if (phase == Phase::Idle) {
         phase_color = ImVec4{0.0f, 1.0f, 0.0f, 1.0f};
+    } else if (phase == Phase::Canceled) {
+        phase_color = ImVec4{1.0f, 0.0f, 0.0f, 1.0f};
     } else if (phase == Phase::Calculating) {
         double itgr;
         double rmdr = std::modf(clock.getElapsedTime().asSeconds(), &itgr);
         float f = static_cast<float>((2.0 / 3.0) + std::sin(rmdr * 2.0 * std::numbers::pi) / 3.0);
         phase_color = ImVec4{f, f, f, 1.0f};
+    } else if (phase == Phase::Coloring) {
+        float r, g, b;
+        float itgr;
+        float rmdr = std::modf(clock.getElapsedTime().asSeconds(), &itgr);
+        ImGui::ColorConvertHSVtoRGB(rmdr, 1.0f, 1.0f, r, g, b);
+        phase_color = ImVec4{r, g, b, 1.0f};
     } else {
         phase_color = ImVec4{1.0f, 1.0f, 1.0f, 1.0f};
     }
