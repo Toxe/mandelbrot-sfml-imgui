@@ -54,6 +54,12 @@ void App::calculate_image(SupervisorImageRequest image_request)
     supervisor_.calculate_image(image_request);
 }
 
+void App::colorize(SupervisorColorize colorize)
+{
+    colorize.image_size = window_.size();
+    supervisor_.colorize(colorize);
+}
+
 void App::cancel_calculation()
 {
     supervisor_.cancel_calculation();

@@ -34,7 +34,8 @@ public:
 
     void shutdown();
 
-    void calculate_image(const SupervisorImageRequest image_request);
+    void calculate_image(SupervisorImageRequest image_request);
+    void colorize(SupervisorColorize colorize);
     void cancel_calculation();
     void change_num_threads(const int num_threads);
 };

@@ -47,6 +47,7 @@ class Supervisor {
     void handle_message(SupervisorImageRequest&& image_request);
     void handle_message(SupervisorCalculationResults&& calculation_results);
     void handle_message(SupervisorColorizationResults&& colorization_results);
+    void handle_message(SupervisorColorize&& colorize);
     void handle_message(SupervisorCancel&&);
     void handle_message(SupervisorQuit&&);
 
@@ -70,6 +71,7 @@ public:
     void shutdown();
 
     void calculate_image(const SupervisorImageRequest image_request);
+    void colorize(const SupervisorColorize colorize);
     void cancel_calculation();
 
     [[nodiscard]] SupervisorStatus& status() { return status_; };

@@ -140,7 +140,7 @@ void UI::render_main_window(App& app)
         }
     }
 
-    show_gradient_selection();
+    show_gradient_selection(app);
 
     main_window_size_ = ImGui::GetWindowSize();
     ImGui::End();
@@ -276,7 +276,7 @@ void UI::show_render_time(bool calculation_running, Duration calculation_time)
         ImGui::Text("%.3fs", calculation_time.as_seconds());
 }
 
-void UI::show_gradient_selection()
+void UI::show_gradient_selection(App& app)
 {
     ImGui::NewLine();
     ImGui::Text("Colors");
@@ -286,8 +286,10 @@ void UI::show_gradient_selection()
     for (int i = 0; i < std::ssize(available_gradients_); ++i) {
         const auto& gradient = available_gradients_[static_cast<std::size_t>(i)];
 
-        if (ImGui::Selectable(gradient.name_.c_str(), selected_gradient_ == i))
+        if (ImGui::Selectable(gradient.name_.c_str(), selected_gradient_ == i)) {
             selected_gradient_ = i;
+            app.colorize(SupervisorColorize{max_iterations_.get(), {0, 0}, gradient});
+        }
     }
 
     ImGui::EndChild();

@@ -72,6 +72,12 @@ void Supervisor::calculate_image(const SupervisorImageRequest image_request)
     supervisor_message_queue_.send(image_request);
 }
 
+void Supervisor::colorize(const SupervisorColorize colorize)
+{
+    status_.set_phase(Phase::RequestSent);
+    supervisor_message_queue_.send(colorize);
+}
+
 void Supervisor::cancel_calculation()
 {
     supervisor_message_queue_.send(SupervisorCancel{});
@@ -114,6 +120,13 @@ void Supervisor::handle_message(SupervisorColorizationResults&& colorization_res
             status_.stop_calculation(Phase::Idle);
 
     assert(waiting_for_calculation_results_ >= 0);
+}
+
+void Supervisor::handle_message(SupervisorColorize&& colorize)
+{
+    status_.start_calculation(Phase::Coloring);
+    gradient_ = colorize.gradient;
+    send_colorization_messages(colorize.max_iterations, colorize.image_size);
 }
 
 void Supervisor::handle_message(SupervisorCancel&&)

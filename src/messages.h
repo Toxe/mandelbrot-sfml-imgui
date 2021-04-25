@@ -48,10 +48,16 @@ struct SupervisorColorizationResults {
     std::vector<sf::Uint8>* colorization_buffer;
 };
 
+struct SupervisorColorize {
+    int max_iterations;
+    ImageSize image_size;
+    Gradient gradient;
+};
+
 struct SupervisorQuit {};
 struct SupervisorCancel {};
 
-using SupervisorMessage = std::variant<SupervisorImageRequest, SupervisorCalculationResults, SupervisorColorizationResults, SupervisorQuit, SupervisorCancel>;
+using SupervisorMessage = std::variant<SupervisorImageRequest, SupervisorCalculationResults, SupervisorColorizationResults, SupervisorColorize, SupervisorQuit, SupervisorCancel>;
 
 // ---- Worker messages ---------------
 struct WorkerCalculate {
