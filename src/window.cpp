@@ -80,9 +80,9 @@ Window::Window(const CLI& cli)
     return {static_cast<int>(window_size.x), static_cast<int>(window_size.y)};
 }
 
-void Window::next_frame(const sf::Time elapsed_time)
+void Window::next_frame(const Duration elapsed_time)
 {
-    ImGui::SFML::Update(*window_, elapsed_time);
+    ImGui::SFML::Update(*window_, sf::microseconds(elapsed_time.as_microseconds()));
 }
 
 void Window::render()

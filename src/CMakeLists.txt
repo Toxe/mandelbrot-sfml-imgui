@@ -5,6 +5,8 @@ set(ALL_TARGETS
 add_executable(mandelbrot
     app.cpp app.h
     cli.cpp cli.h
+    clock.h
+    duration.h
     gradient.cpp gradient.h
     input_value.h
     main.cpp

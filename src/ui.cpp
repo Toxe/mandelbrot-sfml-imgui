@@ -55,9 +55,9 @@ void UI::render_main_window(App& app)
 
     const Phase phase = app.supervisor_status().phase();
     const bool calculation_running = app.supervisor_status().calculation_running();
-    const float calculation_time = app.supervisor_status().calculation_time();
+    const Duration calculation_time = app.supervisor_status().calculation_time();
 
-    const float elapsed_time_in_seconds = app.elapsed_time().asSeconds();
+    const float elapsed_time_in_seconds = app.elapsed_time().as_seconds();
     const float current_fps = 1.0f / elapsed_time_in_seconds;
     const auto fps_label = fmt::format("{:.1f} FPS ({:.3f} ms/frame)", current_fps, 1000.0f * elapsed_time_in_seconds);
     fps[values_offset] = current_fps;
@@ -230,7 +230,7 @@ void UI::calculate_image(App& app)
 
 void UI::show_status(const Phase phase)
 {
-    static sf::Clock clock;
+    static Clock clock;
     ImVec4 phase_color;
 
     if (phase == Phase::Idle) {
@@ -239,13 +239,13 @@ void UI::show_status(const Phase phase)
         phase_color = ImVec4{1.0f, 0.0f, 0.0f, 1.0f};
     } else if (phase == Phase::Calculating) {
         double itgr;
-        double rmdr = std::modf(clock.getElapsedTime().asSeconds(), &itgr);
+        double rmdr = std::modf(clock.elapsed_time().as_seconds(), &itgr);
         float f = static_cast<float>((2.0 / 3.0) + std::sin(rmdr * 2.0 * std::numbers::pi) / 3.0);
         phase_color = ImVec4{f, f, f, 1.0f};
     } else if (phase == Phase::Coloring) {
         float r, g, b;
         float itgr;
-        float rmdr = std::modf(clock.getElapsedTime().asSeconds(), &itgr);
+        float rmdr = std::modf(clock.elapsed_time().as_seconds(), &itgr);
         ImGui::ColorConvertHSVtoRGB(rmdr, 1.0f, 1.0f, r, g, b);
         phase_color = ImVec4{r, g, b, 1.0f};
     } else {
@@ -257,13 +257,13 @@ void UI::show_status(const Phase phase)
     ImGui::TextColored(phase_color, "%s", phase_name(phase));
 }
 
-void UI::show_render_time(bool calculation_running, float calculation_time)
+void UI::show_render_time(bool calculation_running, Duration calculation_time)
 {
     ImGui::TextColored(color_light_gray, "render time:");
     ImGui::SameLine();
 
     if (calculation_running)
-        ImGui::TextColored(color_yellow, "%.3fs", calculation_time);
+        ImGui::TextColored(color_yellow, "%.3fs", calculation_time.as_seconds());
     else
-        ImGui::Text("%.3fs", calculation_time);
+        ImGui::Text("%.3fs", calculation_time.as_seconds());
 }

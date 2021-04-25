@@ -20,6 +20,6 @@ public:
 
     void start_calculation(const Phase new_phase);
     void stop_calculation(const Phase new_phase);
-    [[nodiscard]] float calculation_time();
+    [[nodiscard]] Duration calculation_time();
     [[nodiscard]] bool calculation_running();
 };

@@ -1,11 +1,11 @@
 #pragma once
 
-#include <SFML/System/Clock.hpp>
+#include "clock.h"
 
 class Stopwatch {
     bool running_ = false;
-    float elapsed_time_ = 0.0;
-    sf::Clock clock_;
+    Duration elapsed_time_;
+    Clock clock_;
 
 public:
     [[nodiscard]] bool is_running() const { return running_; }
@@ -13,21 +13,21 @@ public:
     void start()
     {
         running_ = true;
-        elapsed_time_ = 0.0;
+        elapsed_time_ = Duration();
         clock_.restart();
     }
 
     void stop()
     {
         running_ = false;
-        elapsed_time_ = clock_.getElapsedTime().asSeconds();
+        elapsed_time_ = clock_.elapsed_time();
     }
 
-    [[nodiscard]] float time()
+    [[nodiscard]] Duration time()
     {
         if (!running_)
             return elapsed_time_;
 
-        return elapsed_time_ = clock_.getElapsedTime().asSeconds();
+        return elapsed_time_ = clock_.elapsed_time();
     }
 };

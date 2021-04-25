@@ -1,5 +1,6 @@
 #pragma once
 
+#include "clock.h"
 #include "gradient.h"
 #include "mandelbrot.h"
 #include "supervisor.h"
@@ -14,8 +15,8 @@ class App {
     Supervisor supervisor_;
     UI ui_;
 
-    sf::Clock frame_time_clock_;
-    sf::Time elapsed_time_;
+    Clock frame_time_clock_;
+    Duration elapsed_time_;
 
 public:
     App(const CLI& cli);
@@ -23,7 +24,7 @@ public:
     [[nodiscard]] Gradient& gradient() { return gradient_; }
     [[nodiscard]] Window& window() { return window_; };
     [[nodiscard]] SupervisorStatus& supervisor_status() { return supervisor_.status(); };
-    [[nodiscard]] sf::Time elapsed_time() const { return elapsed_time_; };
+    [[nodiscard]] Duration elapsed_time() const { return elapsed_time_; };
     [[nodiscard]] bool running() const { return window_.is_open(); };
 
     void next_frame();

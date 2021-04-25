@@ -5,6 +5,7 @@
 
 #include <SFML/Graphics.hpp>
 
+#include "duration.h"
 #include "messages.h"
 
 class CLI;
@@ -37,7 +38,7 @@ public:
 
     [[nodiscard]] bool poll_event(sf::Event& event);
 
-    void next_frame(const sf::Time elapsed_time);
+    void next_frame(const Duration elapsed_time);
     void render();
 
     void toggle_fullscreen();

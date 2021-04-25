@@ -4,6 +4,7 @@
 
 #include <imgui.h>
 
+#include "duration.h"
 #include "input_value.h"
 #include "phase.h"
 #include "window.h"
@@ -40,7 +41,7 @@ class UI {
     [[nodiscard]] bool image_request_input_values_have_changed();
 
     void show_status(const Phase phase);
-    void show_render_time(const bool calculation_running, const float calculation_time);
+    void show_render_time(const bool calculation_running, const Duration calculation_time);
 
 public:
     UI(const CLI& cli);

@@ -16,7 +16,7 @@ void SupervisorStatus::stop_calculation(const Phase new_phase)
     stopwatch_.stop();
 }
 
-[[nodiscard]] float SupervisorStatus::calculation_time()
+[[nodiscard]] Duration SupervisorStatus::calculation_time()
 {
     std::lock_guard<std::mutex> lock(mtx_);
     return stopwatch_.time();
