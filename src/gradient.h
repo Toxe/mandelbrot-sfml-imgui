@@ -15,7 +15,11 @@ struct GradientColor {
 };
 
 struct Gradient {
+    std::string name_;
     std::vector<GradientColor> colors;
+
+    Gradient() : name_{""} {}
+    Gradient(std::string name) : name_{name} {}
 };
 
 Gradient load_gradient(const std::string& filename);

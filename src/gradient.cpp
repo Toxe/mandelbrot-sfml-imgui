@@ -27,7 +27,7 @@ Gradient load_gradient(const std::string& filename)
 {
     spdlog::debug("loading gradient: {}", filename);
 
-    Gradient gradient;
+    Gradient gradient{filename};
     gradient.colors.push_back(GradientColor{0.0f, 0.0f, 0.0f, 0.0f});
     gradient.colors.push_back(GradientColor{1.0f, 1.0f, 1.0f, 1.0f});
 
