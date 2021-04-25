@@ -18,6 +18,7 @@ const int default_area_size = 100;
 const FractalSection default_fractal_section = {-0.8, 0.0, 2.0};
 
 const ImVec4 color_light_gray{0.7f, 0.7f, 0.7f, 1.0f};
+const ImVec4 color_yellow{1.0f, 1.0f, 0.0f, 1.0f};
 
 UI::UI(const CLI& cli)
     : num_threads_{cli.num_threads()},
@@ -74,10 +75,7 @@ void UI::render_main_window(App& app)
     ImGui::Text("%dx%d", window_size.width, window_size.height);
 
     show_status(phase);
-
-    ImGui::TextColored(color_light_gray, "render time:");
-    ImGui::SameLine();
-    ImGui::Text("%.3fs", app.supervisor_status().calculation_time());
+    show_render_time(app);
 
     if (ImGui::Button("Help (F1)"))
         toggle_help();
@@ -230,4 +228,15 @@ void UI::show_status(const Phase phase)
     ImGui::TextColored(color_light_gray, "status:");
     ImGui::SameLine();
     ImGui::TextColored(phase_color, "%s", phase_name(phase));
+}
+
+void UI::show_render_time(App& app)
+{
+    ImGui::TextColored(color_light_gray, "render time:");
+    ImGui::SameLine();
+
+    if (app.supervisor_status().calculation_running())
+        ImGui::TextColored(color_yellow, "%.3fs", app.supervisor_status().calculation_time());
+    else
+        ImGui::Text("%.3fs", app.supervisor_status().calculation_time());
 }

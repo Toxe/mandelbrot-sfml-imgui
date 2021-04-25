@@ -40,6 +40,7 @@ class UI {
     [[nodiscard]] bool image_request_input_values_have_changed();
 
     void show_status(const Phase phase);
+    void show_render_time(App& app);
 
 public:
     UI(const CLI& cli);
