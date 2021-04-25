@@ -5,12 +5,13 @@
 #include "mandelbrot.h"
 
 Worker::Worker(const int id, MessageQueue<WorkerMessage>& worker_message_queue, MessageQueue<SupervisorMessage>& supervisor_message_queue) :
-    id_{id}, worker_message_queue_{worker_message_queue}, supervisor_message_queue_{supervisor_message_queue}
+    id_{id}, running_{false},
+    worker_message_queue_{worker_message_queue}, supervisor_message_queue_{supervisor_message_queue}
 {
 }
 
 Worker::Worker(Worker&& other) :
-    id_{other.id_}, thread_{std::move(other.thread_)},
+    id_{other.id_}, running_{other.running_}, thread_{std::move(other.thread_)},
     worker_message_queue_{other.worker_message_queue_}, supervisor_message_queue_{other.supervisor_message_queue_},
     iterations_histogram_{std::move(other.iterations_histogram_)}
 {
@@ -36,26 +37,16 @@ void Worker::main()
 {
     spdlog::debug("worker {}: started", id_);
 
-    while (handle_message(worker_message_queue_.wait_for_message()))
-        ;
+    auto visitor = [&](auto&& msg) { handle_message(std::move(msg)); };
+    running_ = true;
+
+    while (running_)
+        std::visit(visitor, worker_message_queue_.wait_for_message());
 
     spdlog::debug("worker {}: stopping", id_);
 }
 
-[[nodiscard]] bool Worker::handle_message(WorkerMessage msg)
-{
-    if (std::holds_alternative<WorkerQuit>(msg))
-        return false;
-
-    if (std::holds_alternative<WorkerCalculate>(msg))
-        handle_calculate_message(std::move(std::get<WorkerCalculate>(msg)));
-    else if (std::holds_alternative<WorkerColorize>(msg))
-        handle_colorize_message(std::move(std::get<WorkerColorize>(msg)));
-
-    return true;
-}
-
-void Worker::handle_calculate_message(WorkerCalculate calculate)
+void Worker::handle_message(WorkerCalculate&& calculate)
 {
     resize_iterations_histogram_if_needed(calculate);
     mandelbrot_calc(calculate.image_size, calculate.fractal_section, calculate.max_iterations, iterations_histogram_, *calculate.results_per_point, calculate.area);
@@ -69,10 +60,15 @@ void Worker::handle_calculate_message(WorkerCalculate calculate)
     supervisor_message_queue_.send(SupervisorCalculationResults{calculate.max_iterations, calculate.image_size, calculate.area, calculate.fractal_section, calculate.results_per_point, std::move(calculate.pixels)});
 }
 
-void Worker::handle_colorize_message(WorkerColorize colorize)
+void Worker::handle_message(WorkerColorize&& colorize)
 {
     mandelbrot_colorize(colorize);
     supervisor_message_queue_.send(SupervisorColorizationResults{colorize.start_row, colorize.num_rows, colorize.row_width, colorize.colorization_buffer});
+}
+
+void Worker::handle_message(WorkerQuit&&)
+{
+    running_ = false;
 }
 
 void Worker::resize_iterations_histogram_if_needed(const WorkerCalculate& calculate)

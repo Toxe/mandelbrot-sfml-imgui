@@ -13,6 +13,8 @@ class Worker {
     inline static std::mutex mtx_;
 
     const int id_;
+    bool running_;
+
     std::thread thread_;
 
     MessageQueue<WorkerMessage>& worker_message_queue_;
@@ -22,9 +24,9 @@ class Worker {
 
     void main();
 
-    [[nodiscard]] bool handle_message(WorkerMessage msg);
-    void handle_calculate_message(WorkerCalculate calculate);
-    void handle_colorize_message(WorkerColorize colorize);
+    void handle_message(WorkerCalculate&& calculate);
+    void handle_message(WorkerColorize&& colorize);
+    void handle_message(WorkerQuit&&);
 
     void resize_iterations_histogram_if_needed(const WorkerCalculate& calculate);
     void combine_iterations_histogram(std::vector<int>& combined_iterations_histogram);
