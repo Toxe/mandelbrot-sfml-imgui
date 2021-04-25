@@ -2,7 +2,9 @@
 
 #include <algorithm>
 #include <atomic>
+#include <cmath>
 #include <limits>
+#include <numbers>
 
 #include <fmt/core.h>
 
@@ -71,9 +73,7 @@ void UI::render_main_window(App& app)
     ImGui::SameLine();
     ImGui::Text("%dx%d", window_size.width, window_size.height);
 
-    ImGui::TextColored(color_light_gray, "status:");
-    ImGui::SameLine();
-    ImGui::Text("%s", phase_name(phase));
+    show_status(phase);
 
     ImGui::TextColored(color_light_gray, "render time:");
     ImGui::SameLine();
@@ -201,4 +201,25 @@ void UI::input_double(const char* label, InputValue<double>& value, const double
 void UI::calculate_image(App& app)
 {
     app.calculate_image(SupervisorImageRequest{max_iterations_.get(), area_size_.get(), {0, 0}, {center_x_.get(), center_y_.get(), fractal_height_.get()}});
+}
+
+void UI::show_status(const Phase phase)
+{
+    static sf::Clock clock;
+    ImVec4 phase_color;
+
+    if (phase == Phase::Idle) {
+        phase_color = ImVec4{0.0f, 1.0f, 0.0f, 1.0f};
+    } else if (phase == Phase::Calculating) {
+        double itgr;
+        double rmdr = std::modf(clock.getElapsedTime().asSeconds(), &itgr);
+        float f = static_cast<float>((2.0 / 3.0) + std::sin(rmdr * 2.0 * std::numbers::pi) / 3.0);
+        phase_color = ImVec4{f, f, f, 1.0f};
+    } else {
+        phase_color = ImVec4{1.0f, 1.0f, 1.0f, 1.0f};
+    }
+
+    ImGui::TextColored(color_light_gray, "status:");
+    ImGui::SameLine();
+    ImGui::TextColored(phase_color, "%s", phase_name(phase));
 }

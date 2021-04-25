@@ -5,6 +5,7 @@
 #include <imgui.h>
 
 #include "input_value.h"
+#include "phase.h"
 #include "window.h"
 
 class App;
@@ -37,6 +38,8 @@ class UI {
 
     void reset_image_request_input_values_to_default();
     [[nodiscard]] bool image_request_input_values_have_changed();
+
+    void show_status(const Phase phase);
 
 public:
     UI(const CLI& cli);
