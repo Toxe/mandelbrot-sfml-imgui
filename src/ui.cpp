@@ -27,7 +27,7 @@ UI::UI(const CLI& cli)
     font_size_{static_cast<float>(cli.font_size())}
 {
     reset_image_request_input_values_to_default();
-    available_gradients_ = list_available_gradients();
+    available_gradients_ = load_available_gradients();
 }
 
 void UI::reset_image_request_input_values_to_default()
@@ -284,9 +284,9 @@ void UI::show_gradient_selection()
     ImGui::BeginChild("gradient selection", ImVec2(0, font_size_ * 10), true);
 
     for (int i = 0; i < std::ssize(available_gradients_); ++i) {
-        const auto& name = available_gradients_[static_cast<std::size_t>(i)];
+        const auto& gradient = available_gradients_[static_cast<std::size_t>(i)];
 
-        if (ImGui::Selectable(name.c_str(), selected_gradient_ == i))
+        if (ImGui::Selectable(gradient.name_.c_str(), selected_gradient_ == i))
             selected_gradient_ = i;
     }
 

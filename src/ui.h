@@ -31,7 +31,7 @@ class UI {
     bool is_visible_ = true;
     bool show_help_ = false;
 
-    std::vector<std::string> available_gradients_;
+    std::vector<Gradient> available_gradients_;
     int selected_gradient_ = -1;
 
     void help(const std::string& text);
