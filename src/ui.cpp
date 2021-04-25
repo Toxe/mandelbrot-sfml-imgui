@@ -131,8 +131,12 @@ void UI::render_main_window(App& app)
         if (phase == Phase::Calculating) {
             if (ImGui::Button("Cancel"))
                 app.cancel_calculation();
+        } else if (phase == Phase::Coloring) {
+            ImGui::TextDisabled("waiting for colorization to finish...");
         } else if (phase == Phase::Canceled) {
             ImGui::TextDisabled("waiting for calculation to finish...");
+        } else {
+            ImGui::TextDisabled("waiting...");
         }
     }
 
