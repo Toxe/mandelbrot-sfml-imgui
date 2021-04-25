@@ -17,6 +17,7 @@ const int default_max_iterations = 5000;
 const int default_area_size = 100;
 const FractalSection default_fractal_section = {-0.8, 0.0, 2.0};
 
+const ImVec4 color_light_blue{100.0f / 255.0f, 149.0f / 255.0f, 237.0f / 255.0f, 1.0f};
 const ImVec4 color_light_gray{0.7f, 0.7f, 0.7f, 1.0f};
 const ImVec4 color_yellow{1.0f, 1.0f, 0.0f, 1.0f};
 
@@ -143,15 +144,39 @@ void UI::render_help_window()
         ImGui::SetNextWindowPos(ImVec2(20 + 20 + main_window_size_.x, 20), ImGuiCond_FirstUseEver);
         ImGui::Begin(help_window_title_, &show_help_, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse);
 
-        ImGui::Text("Left/right click: zoom in/out");
-        ImGui::Text("Left drag: zoom in area");
-        ImGui::Text("Right drag: move around");
+        ImGui::Text("Left/right click:");
+        ImGui::SameLine();
+        ImGui::TextColored(color_light_blue, "zoom in/out");
+
+        ImGui::Text("Left drag:");
+        ImGui::SameLine();
+        ImGui::TextColored(color_light_blue, "zoom in area");
+
+        ImGui::Text("Right drag:");
+        ImGui::SameLine();
+        ImGui::TextColored(color_light_blue, "move around");
+
         ImGui::Separator();
-        ImGui::Text("Enter: calculate image");
-        ImGui::Text("Space: show/hide UI");
-        ImGui::Text("   F1: show/hide help");
-        ImGui::Text("  F10: fullscreen");
-        ImGui::Text("  ESC: quit");
+
+        ImGui::Text("Enter:");
+        ImGui::SameLine();
+        ImGui::TextColored(color_light_blue, "calculate image");
+
+        ImGui::Text("Space:");
+        ImGui::SameLine();
+        ImGui::TextColored(color_light_blue, "show/hide UI");
+
+        ImGui::Text("   F1:");
+        ImGui::SameLine();
+        ImGui::TextColored(color_light_blue, "show/hide help");
+
+        ImGui::Text("  F10:");
+        ImGui::SameLine();
+        ImGui::TextColored(color_light_blue, "fullscreen");
+
+        ImGui::Text("  ESC:");
+        ImGui::SameLine();
+        ImGui::TextColored(color_light_blue, "quit");
 
         if (ImGui::Button("Close"))
             toggle_help();
