@@ -53,6 +53,8 @@ void UI::render_main_window(App& app)
     static std::size_t values_offset = 0;
 
     const Phase phase = app.supervisor_status().phase();
+    const bool calculation_running = app.supervisor_status().calculation_running();
+    const float calculation_time = app.supervisor_status().calculation_time();
 
     const float elapsed_time_in_seconds = app.elapsed_time().asSeconds();
     const float current_fps = 1.0f / elapsed_time_in_seconds;
@@ -75,7 +77,7 @@ void UI::render_main_window(App& app)
     ImGui::Text("%dx%d", window_size.width, window_size.height);
 
     show_status(phase);
-    show_render_time(app);
+    show_render_time(calculation_running, calculation_time);
 
     if (ImGui::Button("Help (F1)"))
         toggle_help();
@@ -122,7 +124,7 @@ void UI::render_main_window(App& app)
         }
     }
 
-    if (app.supervisor_status().calculation_running()) {
+    if (calculation_running) {
         if (phase == Phase::Calculating) {
             if (ImGui::Button("Cancel"))
                 app.cancel_calculation();
@@ -230,13 +232,13 @@ void UI::show_status(const Phase phase)
     ImGui::TextColored(phase_color, "%s", phase_name(phase));
 }
 
-void UI::show_render_time(App& app)
+void UI::show_render_time(bool calculation_running, float calculation_time)
 {
     ImGui::TextColored(color_light_gray, "render time:");
     ImGui::SameLine();
 
-    if (app.supervisor_status().calculation_running())
-        ImGui::TextColored(color_yellow, "%.3fs", app.supervisor_status().calculation_time());
+    if (calculation_running)
+        ImGui::TextColored(color_yellow, "%.3fs", calculation_time);
     else
-        ImGui::Text("%.3fs", app.supervisor_status().calculation_time());
+        ImGui::Text("%.3fs", calculation_time);
 }
