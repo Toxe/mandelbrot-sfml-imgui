@@ -2,15 +2,19 @@
 
 #include <algorithm>
 #include <cmath>
+#include <filesystem>
 #include <fstream>
 #include <limits>
 #include <regex>
 #include <stdexcept>
 #include <string>
 
+#include <fmt/ostream.h>
 #include <spdlog/spdlog.h>
 
 #include "mandelbrot.h"
+
+const std::string gradients_directory = "assets/gradients";
 
 // Compare two float values for "enough" equality.
 bool equal_enough(float a, float b) noexcept
@@ -25,13 +29,15 @@ bool equal_enough(float a, float b) noexcept
 
 Gradient load_gradient(const std::string& filename)
 {
-    spdlog::debug("loading gradient: {}", filename);
+    const auto path = std::filesystem::path{gradients_directory} / filename;
+
+    spdlog::debug("loading gradient: {}", path);
 
     Gradient gradient{filename};
     gradient.colors.push_back(GradientColor{0.0f, 0.0f, 0.0f, 0.0f});
     gradient.colors.push_back(GradientColor{1.0f, 1.0f, 1.0f, 1.0f});
 
-    std::ifstream in{filename};
+    std::ifstream in{path};
     std::string line;
 
     if (!in.is_open())
