@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 #include <imgui.h>
 
@@ -30,6 +31,9 @@ class UI {
     bool is_visible_ = true;
     bool show_help_ = false;
 
+    std::vector<std::string> available_gradients_;
+    int selected_gradient_ = -1;
+
     void help(const std::string& text);
     void input_int(const char* label, InputValue<int>& value, const int small_inc, const int big_inc, const int min, const int max);
     void input_double(const char* label, InputValue<double>& value, const double small_inc, const double big_inc, const double min, const double max);
@@ -42,6 +46,7 @@ class UI {
 
     void show_status(const Phase phase);
     void show_render_time(const bool calculation_running, const Duration calculation_time);
+    void show_gradient_selection();
 
 public:
     UI(const CLI& cli);

@@ -8,6 +8,7 @@
 #include <regex>
 #include <stdexcept>
 #include <string>
+#include <vector>
 
 #include <fmt/ostream.h>
 #include <spdlog/spdlog.h>
@@ -81,4 +82,15 @@ sf::Color color_from_gradient(const Gradient& gradient, const float pos) noexcep
         return color_from_gradient_range(*it, *(it + 1), pos);
     else
         return sf::Color::Black;
+}
+
+std::vector<std::string> list_available_gradients()
+{
+    std::vector<std::string> available_gradients;
+
+    for (const auto& p : std::filesystem::directory_iterator(gradients_directory))
+        available_gradients.push_back(p.path().filename().replace_extension(""));
+
+    std::sort(available_gradients.begin(), available_gradients.end());
+    return available_gradients;
 }

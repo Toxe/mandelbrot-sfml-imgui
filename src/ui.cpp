@@ -10,6 +10,7 @@
 
 #include "app.h"
 #include "cli.h"
+#include "gradient.h"
 #include "messages.h"
 #include "supervisor.h"
 
@@ -26,6 +27,7 @@ UI::UI(const CLI& cli)
     font_size_{static_cast<float>(cli.font_size())}
 {
     reset_image_request_input_values_to_default();
+    available_gradients_ = list_available_gradients();
 }
 
 void UI::reset_image_request_input_values_to_default()
@@ -133,6 +135,8 @@ void UI::render_main_window(App& app)
             ImGui::TextDisabled("waiting for calculation to finish...");
         }
     }
+
+    show_gradient_selection();
 
     main_window_size_ = ImGui::GetWindowSize();
     ImGui::End();
@@ -266,4 +270,21 @@ void UI::show_render_time(bool calculation_running, Duration calculation_time)
         ImGui::TextColored(color_yellow, "%.3fs", calculation_time.as_seconds());
     else
         ImGui::Text("%.3fs", calculation_time.as_seconds());
+}
+
+void UI::show_gradient_selection()
+{
+    ImGui::NewLine();
+    ImGui::Text("Colors");
+
+    ImGui::BeginChild("gradient selection", ImVec2(0, font_size_ * 10), true);
+
+    for (int i = 0; i < std::ssize(available_gradients_); ++i) {
+        const auto& name = available_gradients_[static_cast<std::size_t>(i)];
+
+        if (ImGui::Selectable(name.c_str(), selected_gradient_ == i))
+            selected_gradient_ = i;
+    }
+
+    ImGui::EndChild();
 }
