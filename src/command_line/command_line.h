@@ -1,11 +1,11 @@
 #pragma once
 
-#include <string_view>
+#include <optional>
 
-#include <clipp.h>
+#include <CLI/App.hpp>
 #include <SFML/Window/VideoMode.hpp>
 
-class CLI {
+class CommandLine {
     bool fullscreen_;
     int num_threads_;
     int font_size_;
@@ -13,12 +13,12 @@ class CLI {
     sf::VideoMode default_window_video_mode_;
     sf::VideoMode default_fullscreen_video_mode_;
 
-    void show_usage_and_exit(const clipp::group& cli, const std::string_view& argv0, const std::string_view& description) const;
+    void show_usage_and_exit(const CLI::App& app, const char* error_message, const std::optional<CLI::ParseError>& error);
     [[nodiscard]] sf::VideoMode default_video_mode(const int fullscreen) const;
     [[nodiscard]] int default_font_size(const sf::VideoMode& video_mode, const bool fullscreen) const;
 
 public:
-    CLI(int argc, char* argv[]);
+    CommandLine(int argc, char* argv[]);
 
     [[nodiscard]] bool fullscreen() const { return fullscreen_; }
     [[nodiscard]] int num_threads() const { return num_threads_; }

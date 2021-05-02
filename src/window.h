@@ -8,7 +8,7 @@
 #include "duration.h"
 #include "messages.h"
 
-class CLI;
+class CommandLine;
 
 class Window {
     const char* title_ = "Mandelbrot";
@@ -28,7 +28,7 @@ class Window {
     [[nodiscard]] bool handle_internal_event(const sf::Event& event);
 
 public:
-    Window(const CLI& cli);
+    Window(const CommandLine& cli);
 
     [[nodiscard]] sf::Texture& texture() const { return *texture_; };
     [[nodiscard]] sf::Sprite& sprite() const { return *sprite_; };

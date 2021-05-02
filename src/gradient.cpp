@@ -89,7 +89,7 @@ std::vector<Gradient> load_available_gradients()
     std::vector<Gradient> available_gradients;
 
     for (const auto& p : std::filesystem::directory_iterator(gradients_directory))
-        available_gradients.push_back(load_gradient(p.path().filename().replace_extension("")));
+        available_gradients.push_back(load_gradient(p.path().filename().replace_extension("").string()));
 
     std::sort(available_gradients.begin(), available_gradients.end(),
         [](const Gradient& a, const Gradient& b) { return a.name_ < b.name_; });

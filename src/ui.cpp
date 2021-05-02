@@ -9,10 +9,10 @@
 #include <fmt/core.h>
 
 #include "app.h"
-#include "cli.h"
 #include "gradient.h"
 #include "messages.h"
 #include "supervisor.h"
+#include "command_line/command_line.h"
 
 const int default_max_iterations = 5000;
 const int default_area_size = 100;
@@ -22,7 +22,7 @@ const ImVec4 color_light_blue{100.0f / 255.0f, 149.0f / 255.0f, 237.0f / 255.0f,
 const ImVec4 color_light_gray{0.7f, 0.7f, 0.7f, 1.0f};
 const ImVec4 color_yellow{1.0f, 1.0f, 0.0f, 1.0f};
 
-UI::UI(const CLI& cli)
+UI::UI(const CommandLine& cli)
     : num_threads_{cli.num_threads()},
     font_size_{static_cast<float>(cli.font_size())}
 {

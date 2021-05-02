@@ -4,9 +4,9 @@
 #include <imgui-SFML.h>
 #include <imgui.h>
 
-#include "cli.h"
+#include "command_line/command_line.h"
 
-Window::Window(const CLI& cli)
+Window::Window(const CommandLine& cli)
     : is_fullscreen_{cli.fullscreen()}, window_video_mode_{cli.default_window_video_mode()}, fullscreen_video_mode_{cli.default_fullscreen_video_mode()}
 {
     // create window

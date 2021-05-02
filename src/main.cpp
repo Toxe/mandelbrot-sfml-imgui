@@ -1,10 +1,10 @@
 #include "app.h"
-#include "cli.h"
 #include "gradient.h"
+#include "command_line/command_line.h"
 
 int main(int argc, char* argv[])
 {
-    CLI cli(argc, argv);
+    CommandLine cli(argc, argv);
     App app(cli);
 
     while (app.running()) {

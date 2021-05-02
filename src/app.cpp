@@ -2,9 +2,9 @@
 
 #include <spdlog/spdlog.h>
 
-#include "cli.h"
+#include "command_line/command_line.h"
 
-App::App(const CLI& cli)
+App::App(const CommandLine& cli)
     : window_{Window(cli)}, supervisor_{Supervisor(window_)}, ui_{UI(cli)}
 {
     gradient_ = load_gradient("benchmark");

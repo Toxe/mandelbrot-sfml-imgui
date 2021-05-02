@@ -7,7 +7,7 @@
 #include "ui.h"
 #include "window.h"
 
-class CLI;
+class CommandLine;
 
 class App {
     Gradient gradient_;
@@ -19,7 +19,7 @@ class App {
     Duration elapsed_time_;
 
 public:
-    App(const CLI& cli);
+    App(const CommandLine& cli);
 
     [[nodiscard]] Gradient& gradient() { return gradient_; }
     [[nodiscard]] Window& window() { return window_; };

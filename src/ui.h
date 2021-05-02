@@ -11,7 +11,7 @@
 #include "window.h"
 
 class App;
-class CLI;
+class CommandLine;
 
 class UI {
     const char* main_window_title_ = "Mandelbrot";
@@ -49,7 +49,7 @@ class UI {
     void show_gradient_selection(App& app);
 
 public:
-    UI(const CLI& cli);
+    UI(const CommandLine& cli);
 
     void render(App& app);
 

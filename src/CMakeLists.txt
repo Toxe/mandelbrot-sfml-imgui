@@ -4,8 +4,8 @@ set(ALL_TARGETS
 
 add_executable(mandelbrot
     app.cpp app.h
-    cli.cpp cli.h
     clock.h
+    command_line/command_line.cpp command_line/command_line.h
     duration.h
     gradient.cpp gradient.h
     input_value.h
@@ -29,4 +29,4 @@ foreach(target ${ALL_TARGETS})
     target_link_libraries(${target} PRIVATE ${SANITIZER_FLAGS})
 endforeach()
 
-target_link_libraries(mandelbrot PRIVATE clipp::clipp fmt::fmt spdlog::spdlog spdlog::spdlog_header_only sfml-system sfml-network sfml-graphics sfml-window ImGui-SFML::ImGui-SFML)
+target_link_libraries(mandelbrot PRIVATE CLI11::CLI11 fmt::fmt spdlog::spdlog spdlog::spdlog_header_only sfml-system sfml-network sfml-graphics sfml-window ImGui-SFML::ImGui-SFML)

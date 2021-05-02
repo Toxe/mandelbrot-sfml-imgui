@@ -15,7 +15,7 @@ include(cmake/StaticAnalyzers.cmake)
 # sanitizers
 include(cmake/Sanitizers.cmake)
 
-find_package(clipp CONFIG REQUIRED)
+find_package(CLI11 CONFIG REQUIRED)
 find_package(fmt CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
 find_package(imgui CONFIG REQUIRED)
