@@ -201,7 +201,7 @@ void Supervisor::send_calculation_messages(const SupervisorImageRequest& image_r
 
 void Supervisor::send_colorization_messages(const int max_iterations, const ImageSize& image_size)
 {
-    const int min_rows_per_thread = image_size.height / std::ssize(workers_);
+    const int min_rows_per_thread = image_size.height / static_cast<int>(std::ssize(workers_));
     int extra_rows = image_size.height % std::ssize(workers_);
     int next_start_row = 0;
 
