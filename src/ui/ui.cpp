@@ -9,9 +9,9 @@
 #include <fmt/core.h>
 
 #include "app.h"
-#include "messages.h"
 #include "command_line/command_line.h"
 #include "gradient/gradient.h"
+#include "messages/messages.h"
 #include "supervisor/supervisor.h"
 
 const int default_max_iterations = 5000;

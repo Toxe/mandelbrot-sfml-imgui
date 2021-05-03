@@ -4,8 +4,8 @@
 
 #include <SFML/Graphics/Image.hpp>
 
-#include "messages.h"
 #include "gradient/gradient.h"
+#include "messages/messages.h"
 
 void mandelbrot_calc(const ImageSize& image, const FractalSection& section, const int max_iterations,
                      std::vector<int>& iterations_histogram, std::vector<CalculationResult>& results_per_point, const CalculationArea& area) noexcept;

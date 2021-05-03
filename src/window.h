@@ -6,7 +6,7 @@
 #include <SFML/Graphics.hpp>
 
 #include "duration.h"
-#include "messages.h"
+#include "messages/messages.h"
 
 class CommandLine;
 

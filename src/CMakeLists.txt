@@ -6,8 +6,8 @@ add_executable(mandelbrot
     gradient/gradient.cpp gradient/gradient.h
     main.cpp
     mandelbrot/mandelbrot.cpp mandelbrot/mandelbrot.h
-    message_queue.h
-    messages.h
+    messages/message_queue.h
+    messages/messages.h
     stopwatch.h
     supervisor/phase.cpp supervisor/phase.h
     supervisor/supervisor_status.cpp supervisor/supervisor_status.h

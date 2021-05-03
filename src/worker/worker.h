@@ -6,8 +6,8 @@
 
 #include <SFML/Config.hpp>
 
-#include "message_queue.h"
-#include "messages.h"
+#include "messages/message_queue.h"
+#include "messages/messages.h"
 
 class Worker {
     inline static std::mutex mtx_;
