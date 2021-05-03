@@ -5,9 +5,9 @@
 
 #include <imgui.h>
 
-#include "duration.h"
 #include "input_value.h"
 #include "window.h"
+#include "clock/duration.h"
 #include "supervisor/phase.h"
 
 class App;

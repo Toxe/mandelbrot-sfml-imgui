@@ -1,14 +1,14 @@
 add_executable(mandelbrot
     app.cpp app.h
-    clock.h
+    clock/clock.h
+    clock/duration.h
+    clock/stopwatch.h
     command_line/command_line.cpp command_line/command_line.h
-    duration.h
     gradient/gradient.cpp gradient/gradient.h
     main.cpp
     mandelbrot/mandelbrot.cpp mandelbrot/mandelbrot.h
     messages/message_queue.h
     messages/messages.h
-    stopwatch.h
     supervisor/phase.cpp supervisor/phase.h
     supervisor/supervisor_status.cpp supervisor/supervisor_status.h
     supervisor/supervisor.cpp supervisor/supervisor.h

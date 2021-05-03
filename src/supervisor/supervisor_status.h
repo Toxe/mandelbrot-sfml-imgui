@@ -3,7 +3,7 @@
 #include <atomic>
 #include <mutex>
 
-#include "stopwatch.h"
+#include "clock/stopwatch.h"
 #include "supervisor/phase.h"
 
 class SupervisorStatus {

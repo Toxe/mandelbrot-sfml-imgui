@@ -1,7 +1,7 @@
 #pragma once
 
-#include "clock.h"
 #include "window.h"
+#include "clock/clock.h"
 #include "gradient/gradient.h"
 #include "mandelbrot/mandelbrot.h"
 #include "supervisor/supervisor.h"
