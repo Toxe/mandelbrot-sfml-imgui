@@ -60,7 +60,7 @@ void UI::render_main_window(App& app)
     const Duration calculation_time = app.supervisor_status().calculation_time();
 
     const float elapsed_time_in_seconds = app.elapsed_time().as_seconds();
-    const float current_fps = 1.0f / elapsed_time_in_seconds;
+    const float current_fps = app.elapsed_time().fps();
     const auto fps_label = fmt::format("{:.1f} FPS ({:.3f} ms/frame)", current_fps, 1000.0f * elapsed_time_in_seconds);
     fps[values_offset] = current_fps;
     values_offset = (values_offset + 1) % fps.size();

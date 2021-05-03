@@ -11,4 +11,5 @@ public:
 
     long long as_microseconds() const { return std::chrono::duration_cast<std::chrono::microseconds>(ns_).count(); }
     float as_seconds() const { return std::chrono::duration<float>{ns_}.count(); }
+    float fps() const { return 1.0f / as_seconds(); }
 };
