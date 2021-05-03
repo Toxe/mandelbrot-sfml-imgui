@@ -1,7 +1,3 @@
-set(ALL_TARGETS
-    mandelbrot
-)
-
 add_executable(mandelbrot
     app.cpp app.h
     clock.h
@@ -22,12 +18,8 @@ add_executable(mandelbrot
     worker/worker.cpp worker/worker.h
 )
 
-foreach(target ${ALL_TARGETS})
-    set_target_properties(${target} PROPERTIES CXX_EXTENSIONS OFF)
-    target_compile_features(${target} PUBLIC cxx_std_20)
-    target_compile_options(${target} PRIVATE ${SANITIZER_FLAGS} ${DEFAULT_COMPILER_OPTIONS_AND_WARNINGS})
-    target_link_libraries(${target} PRIVATE ${SANITIZER_FLAGS})
-endforeach()
-
+set_target_properties(mandelbrot PROPERTIES CXX_EXTENSIONS OFF)
+target_compile_features(mandelbrot PUBLIC cxx_std_20)
+target_compile_options(mandelbrot PRIVATE ${SANITIZER_FLAGS} ${DEFAULT_COMPILER_OPTIONS_AND_WARNINGS})
 target_include_directories(mandelbrot PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(mandelbrot PRIVATE CLI11::CLI11 fmt::fmt spdlog::spdlog spdlog::spdlog_header_only sfml-system sfml-network sfml-graphics sfml-window ImGui-SFML::ImGui-SFML)
+target_link_libraries(mandelbrot PRIVATE ${SANITIZER_FLAGS} CLI11::CLI11 fmt::fmt spdlog::spdlog spdlog::spdlog_header_only sfml-system sfml-network sfml-graphics sfml-window ImGui-SFML::ImGui-SFML)
