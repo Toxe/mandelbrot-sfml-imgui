@@ -13,8 +13,6 @@
 #include <fmt/ostream.h>
 #include <spdlog/spdlog.h>
 
-#include "mandelbrot/mandelbrot.h"
-
 const std::string gradients_directory = "assets/gradients";
 
 // Compare two float values for "enough" equality.
