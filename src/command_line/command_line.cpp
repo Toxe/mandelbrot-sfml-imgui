@@ -21,7 +21,7 @@ CommandLine::CommandLine(int argc, char* argv[])
     font_size_ = 0;
 
     CLI::App app{description};
-    app.add_flag("-v", log_level_flag, "log level (-v: verbose, -vv: debug)");
+    app.add_flag("-v", log_level_flag, "log level (-v: INFO, -vv: DEBUG, -vvv: TRACE)");
     app.add_flag("-f,--fullscreen", fullscreen_, fmt::format("fullscreen (default: {})", fullscreen_));
     app.add_option("-n,--threads", num_threads_, fmt::format("number of threads (default: number of concurrent threads supported by the system: {})", num_threads_));
     app.add_option("--font-size", font_size_, "UI font size in pixels");
@@ -39,10 +39,14 @@ CommandLine::CommandLine(int argc, char* argv[])
     if (font_size_ == 0)
         font_size_ = default_font_size(video_mode_, fullscreen_);
 
-    auto log_level = (log_level_flag >= 1) ? spdlog::level::info : spdlog::level::warn;
+    spdlog::level::level_enum log_level;
 
-    if (log_level_flag >= 2)
-        log_level = spdlog::level::debug;
+    switch (log_level_flag) {
+        case  1: log_level = spdlog::level::info;   break;
+        case  2: log_level = spdlog::level::debug;  break;
+        case  3: log_level = spdlog::level::trace;  break;
+        default: log_level = spdlog::level::warn;
+    }
 
     spdlog::set_level(log_level);
     spdlog::info("command line option --fullscreen: {}", fullscreen_);

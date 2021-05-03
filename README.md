@@ -6,11 +6,11 @@ A multi-threaded C++ Mandelbrot renderer using SFML + ImGui.
 
 ```
 A multi-threaded C++ Mandelbrot renderer using SFML + ImGui.
-Usage: mandelbrot.exe [OPTIONS]    
+Usage: mandelbrot [OPTIONS]
 
 Options:
   -h,--help                   Print this help message and exit
-  -v                          log level (-v: verbose, -vv: debug)
+  -v                          log level (-v: INFO, -vv: DEBUG, -vvv: TRACE)
   -f,--fullscreen             fullscreen (default: false)
   -n,--threads INT            number of threads (default: number of concurrent threads supported by the system: 24)
   --font-size INT             UI font size in pixels
