@@ -19,7 +19,7 @@ add_executable(mandelbrot
     supervisor_status.cpp supervisor_status.h
     ui.cpp ui.h
     window.cpp window.h
-    worker.cpp worker.h
+    worker/worker.cpp worker/worker.h
 )
 
 foreach(target ${ALL_TARGETS})
@@ -29,4 +29,5 @@ foreach(target ${ALL_TARGETS})
     target_link_libraries(${target} PRIVATE ${SANITIZER_FLAGS})
 endforeach()
 
+target_include_directories(mandelbrot PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(mandelbrot PRIVATE CLI11::CLI11 fmt::fmt spdlog::spdlog spdlog::spdlog_header_only sfml-system sfml-network sfml-graphics sfml-window ImGui-SFML::ImGui-SFML)

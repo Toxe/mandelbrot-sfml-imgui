@@ -10,7 +10,7 @@
 #include "messages.h"
 #include "supervisor_status.h"
 #include "window.h"
-#include "worker.h"
+#include "worker/worker.h"
 
 class App;
 struct SupervisorImageRequest;
