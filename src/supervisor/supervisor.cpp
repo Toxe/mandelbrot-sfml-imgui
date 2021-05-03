@@ -85,6 +85,8 @@ void Supervisor::cancel_calculation()
 
 void Supervisor::handle_message(SupervisorImageRequest&& image_request)
 {
+    spdlog::trace("supervisor: received message ImageRequest size: {}x{}, area_size: {}", image_request.image_size.width, image_request.image_size.height, image_request.area_size);
+
     status_.start_calculation(Phase::RequestReceived);
     resize_and_reset_buffers_if_needed(image_request);
     send_calculation_messages(image_request);
@@ -93,6 +95,8 @@ void Supervisor::handle_message(SupervisorImageRequest&& image_request)
 
 void Supervisor::handle_message(SupervisorCalculationResults&& calculation_results)
 {
+    spdlog::trace("supervisor: received message CalculationResults area: {}/{} {}x{}", calculation_results.area.x, calculation_results.area.y, calculation_results.area.width, calculation_results.area.height);
+
     window_.update_texture(calculation_results.pixels.get(), calculation_results.area);
 
     if (--waiting_for_calculation_results_ == 0) {
@@ -111,6 +115,8 @@ void Supervisor::handle_message(SupervisorCalculationResults&& calculation_resul
 
 void Supervisor::handle_message(SupervisorColorizationResults&& colorization_results)
 {
+    spdlog::trace("supervisor: received message ColorizationResults start_row: {}, num_rows: {}", colorization_results.start_row, colorization_results.num_rows);
+
     auto data = colorization_results.colorization_buffer->data();
     std::size_t p = static_cast<std::size_t>(4 * (colorization_results.start_row * colorization_results.row_width));
     window_.update_texture(&data[p], CalculationArea{0, colorization_results.start_row, colorization_results.row_width, colorization_results.num_rows});
@@ -124,6 +130,8 @@ void Supervisor::handle_message(SupervisorColorizationResults&& colorization_res
 
 void Supervisor::handle_message(SupervisorColorize&& colorize)
 {
+    spdlog::trace("supervisor: received message Colorize");
+
     status_.start_calculation(Phase::Coloring);
     gradient_ = colorize.gradient;
     send_colorization_messages(colorize.max_iterations, colorize.image_size);
@@ -131,6 +139,8 @@ void Supervisor::handle_message(SupervisorColorize&& colorize)
 
 void Supervisor::handle_message(SupervisorCancel&&)
 {
+    spdlog::trace("supervisor: received message Cancel");
+
     // empty the message queue
     waiting_for_calculation_results_ -= worker_message_queue_.clear();
 
@@ -142,6 +152,8 @@ void Supervisor::handle_message(SupervisorCancel&&)
 
 void Supervisor::handle_message(SupervisorQuit&&)
 {
+    spdlog::trace("supervisor: received message Quit");
+
     running_ = false;
 }
 
@@ -197,6 +209,8 @@ void Supervisor::send_calculation_messages(const SupervisorImageRequest& image_r
             ++waiting_for_calculation_results_;
         }
     }
+
+    spdlog::trace("supervisor: sent {} Calculate messages", waiting_for_calculation_results_);
 }
 
 void Supervisor::send_colorization_messages(const int max_iterations, const ImageSize& image_size)
@@ -223,6 +237,8 @@ void Supervisor::send_colorization_messages(const int max_iterations, const Imag
 
         ++waiting_for_colorization_results_;
     }
+
+    spdlog::trace("supervisor: sent {} Colorize messages", waiting_for_colorization_results_);
 }
 
 void Supervisor::resize_and_reset_buffers_if_needed(const SupervisorImageRequest& image_request)

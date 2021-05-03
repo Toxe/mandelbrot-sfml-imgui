@@ -48,6 +48,8 @@ void Worker::main()
 
 void Worker::handle_message(WorkerCalculate&& calculate)
 {
+    spdlog::trace("worker {}: received message Calculate area: {}/{} {}x{}", id_, calculate.area.x, calculate.area.y, calculate.area.width, calculate.area.height);
+
     resize_iterations_histogram_if_needed(calculate);
     mandelbrot_calc(calculate.image_size, calculate.fractal_section, calculate.max_iterations, iterations_histogram_, *calculate.results_per_point, calculate.area);
     draw_pixels(calculate);
@@ -62,12 +64,16 @@ void Worker::handle_message(WorkerCalculate&& calculate)
 
 void Worker::handle_message(WorkerColorize&& colorize)
 {
+    spdlog::trace("worker {}: received message Colorize start_row: {}, num_rows: {}", id_, colorize.start_row, colorize.num_rows);
+
     mandelbrot_colorize(colorize);
     supervisor_message_queue_.send(SupervisorColorizationResults{colorize.start_row, colorize.num_rows, colorize.row_width, colorize.colorization_buffer});
 }
 
 void Worker::handle_message(WorkerQuit&&)
 {
+    spdlog::trace("worker {}: received message Quit", id_);
+
     running_ = false;
 }
 

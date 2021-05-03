@@ -49,9 +49,9 @@ CommandLine::CommandLine(int argc, char* argv[])
     }
 
     spdlog::set_level(log_level);
-    spdlog::info("command line option --fullscreen: {}", fullscreen_);
-    spdlog::info("command line option --threads: {}", num_threads_);
-    spdlog::info("command line option --font-size: {}", font_size_);
+    spdlog::debug("command line option --fullscreen: {}", fullscreen_);
+    spdlog::debug("command line option --threads: {}", num_threads_);
+    spdlog::debug("command line option --font-size: {}", font_size_);
 }
 
 void CommandLine::show_usage_and_exit(const CLI::App& app, const char* error_message = nullptr, const std::optional<CLI::ParseError>& error = {})

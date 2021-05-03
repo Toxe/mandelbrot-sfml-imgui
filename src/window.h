@@ -41,6 +41,7 @@ public:
     void next_frame(const Duration elapsed_time);
     void render();
 
+    void resized_window();
     void toggle_fullscreen();
     void close();
 

@@ -42,7 +42,7 @@ Window::Window(const CommandLine& cli)
         close();
         return true;
     } else if (event.type == sf::Event::Resized) {
-        adjust_view_to_window_size();
+        resized_window();
         return true;
     } else if (event.type == sf::Event::KeyPressed) {
         if (ImGui::GetIO().WantCaptureKeyboard)
@@ -101,18 +101,20 @@ void Window::render()
 void Window::toggle_fullscreen()
 {
     if (is_fullscreen_) {
+        is_fullscreen_ = false;
+        spdlog::info("switching to {} mode {}x{}", is_fullscreen_ ? "fullscreen" : "window", window_video_mode_.width, window_video_mode_.height);
         window_->create(window_video_mode_, title_, sf::Style::Default);
         window_->setVerticalSyncEnabled(true);
-        is_fullscreen_ = false;
     } else {
         // remember the current window position
         const auto size = window_->getSize();
         window_video_mode_.width = size.x;
         window_video_mode_.height = size.y;
 
+        is_fullscreen_ = true;
+        spdlog::info("switching to {} mode {}x{}", is_fullscreen_ ? "fullscreen" : "window", fullscreen_video_mode_.width, fullscreen_video_mode_.height);
         window_->create(fullscreen_video_mode_, title_, sf::Style::Fullscreen);
         window_->setVerticalSyncEnabled(true);
-        is_fullscreen_ = true;
     }
 
     adjust_view_to_window_size();
@@ -124,6 +126,14 @@ void Window::close()
         window_->close();
 
     ImGui::SFML::Shutdown();
+}
+
+void Window::resized_window()
+{
+    const auto size = window_->getSize();
+    adjust_view_to_window_size();
+
+    spdlog::info("resized window to {}x{}", size.x, size.y);
 }
 
 void Window::adjust_view_to_window_size()
