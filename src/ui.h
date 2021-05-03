@@ -7,8 +7,8 @@
 
 #include "duration.h"
 #include "input_value.h"
-#include "phase.h"
 #include "window.h"
+#include "supervisor/phase.h"
 
 class App;
 class CommandLine;

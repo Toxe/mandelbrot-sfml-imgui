@@ -3,8 +3,8 @@
 #include <atomic>
 #include <mutex>
 
-#include "phase.h"
 #include "stopwatch.h"
+#include "supervisor/phase.h"
 
 class SupervisorStatus {
     std::atomic<Phase> phase_;

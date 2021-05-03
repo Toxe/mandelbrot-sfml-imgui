@@ -13,8 +13,8 @@ add_executable(mandelbrot
     mandelbrot.cpp mandelbrot.h
     message_queue.h
     messages.h
-    phase.cpp phase.h
     stopwatch.h
+    supervisor/phase.cpp supervisor/phase.h
     supervisor/supervisor_status.cpp supervisor/supervisor_status.h
     supervisor/supervisor.cpp supervisor/supervisor.h
     ui.cpp ui.h
