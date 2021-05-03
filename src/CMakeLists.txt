@@ -10,7 +10,7 @@ add_executable(mandelbrot
     gradient.cpp gradient.h
     input_value.h
     main.cpp
-    mandelbrot.cpp mandelbrot.h
+    mandelbrot/mandelbrot.cpp mandelbrot/mandelbrot.h
     message_queue.h
     messages.h
     stopwatch.h

@@ -5,7 +5,7 @@
 
 #include <spdlog/spdlog.h>
 
-#include "mandelbrot.h"
+#include "mandelbrot/mandelbrot.h"
 
 Supervisor::Supervisor(Window& window)
     : running_{false}, window_{window}

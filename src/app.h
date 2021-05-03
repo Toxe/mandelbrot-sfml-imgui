@@ -2,9 +2,9 @@
 
 #include "clock.h"
 #include "gradient.h"
-#include "mandelbrot.h"
 #include "ui.h"
 #include "window.h"
+#include "mandelbrot/mandelbrot.h"
 #include "supervisor/supervisor.h"
 
 class CommandLine;

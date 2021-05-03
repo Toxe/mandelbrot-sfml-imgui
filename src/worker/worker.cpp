@@ -2,7 +2,7 @@
 
 #include <spdlog/spdlog.h>
 
-#include "mandelbrot.h"
+#include "mandelbrot/mandelbrot.h"
 
 Worker::Worker(const int id, MessageQueue<WorkerMessage>& worker_message_queue, MessageQueue<SupervisorMessage>& supervisor_message_queue) :
     id_{id}, running_{false},
