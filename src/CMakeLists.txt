@@ -8,7 +8,6 @@ add_executable(mandelbrot
     command_line/command_line.cpp command_line/command_line.h
     duration.h
     gradient/gradient.cpp gradient/gradient.h
-    input_value.h
     main.cpp
     mandelbrot/mandelbrot.cpp mandelbrot/mandelbrot.h
     message_queue.h
@@ -17,7 +16,8 @@ add_executable(mandelbrot
     supervisor/phase.cpp supervisor/phase.h
     supervisor/supervisor_status.cpp supervisor/supervisor_status.h
     supervisor/supervisor.cpp supervisor/supervisor.h
-    ui.cpp ui.h
+    ui/input_value.h
+    ui/ui.cpp ui/ui.h
     window.cpp window.h
     worker/worker.cpp worker/worker.h
 )

@@ -1,11 +1,11 @@
 #pragma once
 
 #include "clock.h"
-#include "ui.h"
 #include "window.h"
 #include "gradient/gradient.h"
 #include "mandelbrot/mandelbrot.h"
 #include "supervisor/supervisor.h"
+#include "ui/ui.h"
 
 class CommandLine;
 
