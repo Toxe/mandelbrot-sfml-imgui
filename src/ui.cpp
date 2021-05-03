@@ -11,8 +11,8 @@
 #include "app.h"
 #include "gradient.h"
 #include "messages.h"
-#include "supervisor.h"
 #include "command_line/command_line.h"
+#include "supervisor/supervisor.h"
 
 const int default_max_iterations = 5000;
 const int default_area_size = 100;

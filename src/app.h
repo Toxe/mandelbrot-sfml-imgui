@@ -3,9 +3,9 @@
 #include "clock.h"
 #include "gradient.h"
 #include "mandelbrot.h"
-#include "supervisor.h"
 #include "ui.h"
 #include "window.h"
+#include "supervisor/supervisor.h"
 
 class CommandLine;
 
