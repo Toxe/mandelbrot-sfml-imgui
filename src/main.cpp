@@ -1,5 +1,4 @@
 #include "app.h"
-#include "gradient.h"
 #include "command_line/command_line.h"
 
 int main(int argc, char* argv[])

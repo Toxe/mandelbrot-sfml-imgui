@@ -5,11 +5,11 @@
 
 #include <SFML/Graphics.hpp>
 
-#include "gradient.h"
 #include "message_queue.h"
 #include "messages.h"
 #include "supervisor_status.h"
 #include "window.h"
+#include "gradient/gradient.h"
 #include "worker/worker.h"
 
 class App;

@@ -7,7 +7,7 @@ add_executable(mandelbrot
     clock.h
     command_line/command_line.cpp command_line/command_line.h
     duration.h
-    gradient.cpp gradient.h
+    gradient/gradient.cpp gradient/gradient.h
     input_value.h
     main.cpp
     mandelbrot/mandelbrot.cpp mandelbrot/mandelbrot.h

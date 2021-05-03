@@ -4,7 +4,7 @@
 #include <variant>
 #include <vector>
 
-#include "gradient.h"
+#include "gradient/gradient.h"
 
 struct CalculationResult {
     int iter;
