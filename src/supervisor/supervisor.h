@@ -58,7 +58,7 @@ class Supervisor {
     void send_calculation_messages(const SupervisorImageRequest& image_request);
     void send_colorization_messages(const int max_iterations, const ImageSize& image_size);
 
-    void resize_and_reset_buffers_if_needed(const SupervisorImageRequest& image_request);
+    void resize_and_reset_buffers_if_needed(const ImageSize& image_size, const int max_iterations);
 
 public:
     Supervisor(Window& window);

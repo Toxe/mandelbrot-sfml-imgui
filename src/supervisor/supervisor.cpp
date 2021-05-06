@@ -241,25 +241,25 @@ void Supervisor::send_colorization_messages(const int max_iterations, const Imag
     spdlog::trace("supervisor: sent {} Colorize messages", waiting_for_colorization_results_);
 }
 
-void Supervisor::resize_and_reset_buffers_if_needed(const SupervisorImageRequest& image_request)
+void Supervisor::resize_and_reset_buffers_if_needed(const ImageSize& image_size, const int max_iterations)
 {
-    if (std::ssize(results_per_point_) != (image_request.image_size.width * image_request.image_size.height))
-        results_per_point_.resize(static_cast<std::size_t>(image_request.image_size.width * image_request.image_size.height));
+    if (std::ssize(results_per_point_) != (image_size.width * image_size.height))
+        results_per_point_.resize(static_cast<std::size_t>(image_size.width * image_size.height));
 
-    if (std::ssize(equalized_iterations_) != image_request.max_iterations + 1)
-        equalized_iterations_.resize(static_cast<std::size_t>(image_request.max_iterations + 1));
+    if (std::ssize(equalized_iterations_) != max_iterations + 1)
+        equalized_iterations_.resize(static_cast<std::size_t>(max_iterations + 1));
 
-    if (std::ssize(colorization_buffer_) != (4 * image_request.image_size.width * image_request.image_size.height))
-        colorization_buffer_.resize(static_cast<std::size_t>(4 * image_request.image_size.width * image_request.image_size.height));
+    if (std::ssize(colorization_buffer_) != (4 * image_size.width * image_size.height))
+        colorization_buffer_.resize(static_cast<std::size_t>(4 * image_size.width * image_size.height));
 
-    if (std::ssize(combined_iterations_histogram_) != image_request.max_iterations + 1)
-        combined_iterations_histogram_.resize(static_cast<std::size_t>(image_request.max_iterations + 1));
+    if (std::ssize(combined_iterations_histogram_) != max_iterations + 1)
+        combined_iterations_histogram_.resize(static_cast<std::size_t>(max_iterations + 1));
 
     // set histogram back to 0
     std::fill(combined_iterations_histogram_.begin(), combined_iterations_histogram_.end(), 0);
 
     // update render buffer and window texture
-    render_buffer_.create(static_cast<unsigned int>(image_request.image_size.width), static_cast<unsigned int>(image_request.image_size.height), background_color_);
+    render_buffer_.create(static_cast<unsigned int>(image_size.width), static_cast<unsigned int>(image_size.height), background_color_);
 
     if (window_.texture().getSize() != render_buffer_.getSize())
         window_.resize_texture(render_buffer_);
