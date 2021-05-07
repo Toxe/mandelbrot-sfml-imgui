@@ -102,10 +102,10 @@ void Worker::draw_pixels(const WorkerCalculate& calculate)
     for (int y = 0; y < calculate.area.height; ++y) {
         for (int x = 0; x < calculate.area.width; ++x) {
             const std::size_t point = static_cast<std::size_t>((y + calculate.area.y) * calculate.image_size.width + (x + calculate.area.x));
-            const auto grey = calculation_result_to_grayscale((*calculate.results_per_point)[point], log_max_iterations);
-            *p++ = grey;
-            *p++ = grey;
-            *p++ = grey;
+            const auto gray = calculation_result_to_grayscale((*calculate.results_per_point)[point], log_max_iterations);
+            *p++ = gray;
+            *p++ = gray;
+            *p++ = gray;
             *p++ = 255;
         }
     }
