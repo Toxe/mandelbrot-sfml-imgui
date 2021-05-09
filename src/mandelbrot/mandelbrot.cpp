@@ -6,7 +6,7 @@
 #include <numeric>
 
 void mandelbrot_calc(const ImageSize& image, const FractalSection& section, const int max_iterations,
-                     std::vector<int>& iterations_histogram, std::vector<CalculationResult>& results_per_point, const CalculationArea& area) noexcept
+                     std::vector<CalculationResult>& results_per_point, const CalculationArea& area) noexcept
 {
     const double width = section.height * (static_cast<double>(image.width) / static_cast<double>(image.height));
 
@@ -21,8 +21,6 @@ void mandelbrot_calc(const ImageSize& image, const FractalSection& section, cons
     const double log_2 = std::log(2.0);
 
     double final_magnitude = 0.0;
-
-    std::fill(iterations_histogram.begin(), iterations_histogram.end(), 0);
 
     for (int pixel_y = area.y; pixel_y < (area.y + area.height); ++pixel_y) {
         const double y0 = std::lerp(y_top, y_bottom, static_cast<double>(pixel_y) / static_cast<double>(image.height));
@@ -54,12 +52,10 @@ void mandelbrot_calc(const ImageSize& image, const FractalSection& section, cons
 
             const std::size_t pixel = static_cast<std::size_t>(pixel_y * image.width + pixel_x);
 
-            if (iter < max_iterations) {
-                ++iterations_histogram[static_cast<std::size_t>(iter)]; // iter: 1 .. max_iterations-1, no need to count iterations_histogram[max_iterations]
+            if (iter < max_iterations)
                 results_per_point[pixel] = CalculationResult{iter, 1.0f - std::min(1.0f, static_cast<float>((std::log(std::log(final_magnitude)) - log_log_bailout) / log_2))};
-            } else {
+            else
                 results_per_point[pixel] = CalculationResult{iter, 0.0};
-            }
         }
     }
 }
