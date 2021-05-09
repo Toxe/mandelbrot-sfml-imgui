@@ -61,6 +61,10 @@ class Supervisor {
     void resize_and_reset_buffers_if_needed(const ImageSize& image_size, const int max_iterations);
     void build_iterations_histogram();
 
+    [[nodiscard]] bool should_scroll(const SupervisorImageRequest& image_request) const;
+    void scroll_results_per_point_array(const SupervisorImageRequest& image_request);
+    void copy_results_per_point_row(const int dx, const int dy, const int image_width, const int image_height, const int y);
+
 public:
     Supervisor(Window& window);
     ~Supervisor();

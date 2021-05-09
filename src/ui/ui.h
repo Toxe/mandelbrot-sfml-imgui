@@ -57,4 +57,5 @@ public:
     void toggle_help() { show_help_ = !show_help_; };
 
     void calculate_image(App& app);
+    void scroll_image(App& app, int delta_x, int delta_y);
 };

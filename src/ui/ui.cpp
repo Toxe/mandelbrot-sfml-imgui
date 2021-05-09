@@ -2,11 +2,13 @@
 
 #include <algorithm>
 #include <atomic>
+#include <cassert>
 #include <cmath>
 #include <limits>
 #include <numbers>
 
 #include <fmt/core.h>
+#include <spdlog/spdlog.h>
 
 #include "app.h"
 #include "command_line/command_line.h"
@@ -90,8 +92,6 @@ void UI::render_main_window(App& app)
     if (ImGui::Button("Fullscreen (F10)"))
         app.window().toggle_fullscreen();
 
-    ImGui::NewLine();
-
     input_int("number of threads", num_threads_, 1, 10, 1, 1'000);
 
     if (num_threads_.changed()) {
@@ -125,6 +125,15 @@ void UI::render_main_window(App& app)
                 calculate_image(app);
             }
         }
+
+        if (ImGui::Button("left")) scroll_image(app, -100, 0); ImGui::SameLine();
+        if (ImGui::Button("right")) scroll_image(app, 100, 0); ImGui::SameLine();
+        if (ImGui::Button("up")) scroll_image(app, 0, -100); ImGui::SameLine();
+        if (ImGui::Button("down")) scroll_image(app, 0, 100);
+        // if (ImGui::Button("left/up")) scroll_image(app, -100, -100); ImGui::SameLine();
+        // if (ImGui::Button("right/up")) scroll_image(app, 100, -100); ImGui::SameLine();
+        // if (ImGui::Button("left/down")) scroll_image(app, -100, 100); ImGui::SameLine();
+        // if (ImGui::Button("right/down")) scroll_image(app, 100, 100);
     }
 
     if (calculation_running) {
@@ -233,7 +242,54 @@ void UI::input_double(const char* label, InputValue<double>& value, const double
 
 void UI::calculate_image(App& app)
 {
-    app.calculate_image(SupervisorImageRequest{max_iterations_.get(), area_size_.get(), {0, 0}, {center_x_.get(), center_y_.get(), fractal_height_.get()}});
+    const auto image_size = app.window().size();
+    const auto calculation_area = CalculationArea{0, 0, image_size.width, image_size.height};
+    app.calculate_image(SupervisorImageRequest{max_iterations_.get(), area_size_.get(), image_size, calculation_area, {0, 0}, {center_x_.get(), center_y_.get(), fractal_height_.get()}});
+}
+
+void UI::scroll_image(App& app, int delta_x, int delta_y)
+{
+    assert((delta_x != 0 && delta_y == 0) || (delta_x == 0 && delta_y != 0));
+
+    spdlog::debug("scroll {}/{}", delta_x, delta_y);
+
+    const ImageSize image_size = app.window().size();
+    CalculationArea calculation_area;
+    FractalSection fractal_section;
+    Scroll scroll{delta_x, delta_y};
+
+    double center_x = center_x_.get();
+    double center_y = center_y_.get();
+    double fractal_height = fractal_height_.get();
+    double fractal_width = fractal_height * (static_cast<double>(image_size.width) / static_cast<double>(image_size.height));
+
+    if (delta_x != 0) {
+        double fractal_delta = fractal_width * static_cast<double>(std::abs(delta_x)) / static_cast<double>(image_size.width);
+
+        if (delta_x < 0) {
+            calculation_area = CalculationArea{0, 0, -delta_x, image_size.height};
+            fractal_section = FractalSection{center_x - fractal_delta, center_y, fractal_height};
+        } else {
+            calculation_area = CalculationArea{image_size.width - delta_x, 0, delta_x, image_size.height};
+            fractal_section = FractalSection{center_x + fractal_delta, center_y, fractal_height};
+        }
+    } else {
+        // be aware that the y axis of the fractal coordinate system runs in the opposite direction of the screen y coordinates
+        double fractal_delta = fractal_height * static_cast<double>(std::abs(delta_y)) / static_cast<double>(image_size.height);
+
+        if (delta_y < 0) {
+            calculation_area = CalculationArea{0, 0, image_size.width, -delta_y};
+            fractal_section = FractalSection{center_x, center_y + fractal_delta, fractal_height};
+        } else {
+            calculation_area = CalculationArea{0, image_size.height - delta_y, image_size.width, delta_y};
+            fractal_section = FractalSection{center_x, center_y - fractal_delta, fractal_height};
+        }
+    }
+
+    center_x_.set(fractal_section.center_x);
+    center_y_.set(fractal_section.center_y);
+
+    app.calculate_image(SupervisorImageRequest{max_iterations_.get(), area_size_.get(), image_size, calculation_area, scroll, fractal_section});
 }
 
 void UI::show_status(const Phase phase)

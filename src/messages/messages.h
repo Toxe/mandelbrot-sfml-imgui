@@ -20,6 +20,10 @@ struct CalculationArea {
     int width, height;
 };
 
+struct Scroll {
+    int x, y;
+};
+
 struct FractalSection {
     double center_x, center_y, height;
 };
@@ -29,6 +33,8 @@ struct SupervisorImageRequest {
     int max_iterations;
     int area_size;
     ImageSize image_size;
+    CalculationArea area;
+    Scroll scroll;
     FractalSection fractal_section;
 };
 

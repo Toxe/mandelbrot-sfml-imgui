@@ -85,11 +85,19 @@ void Supervisor::cancel_calculation()
 
 void Supervisor::handle_message(SupervisorImageRequest&& image_request)
 {
-    spdlog::debug("supervisor: received message ImageRequest size: {}x{}, area_size: {}", image_request.image_size.width, image_request.image_size.height, image_request.area_size);
+    spdlog::debug("supervisor: received message ImageRequest size: {}x{}, area: {}/{} {}x{}, area_size: {}",
+        image_request.image_size.width, image_request.image_size.height,
+        image_request.area.x, image_request.area.y, image_request.area.width, image_request.area.height,
+        image_request.area_size);
 
     status_.start_calculation(Phase::RequestReceived);
     resize_and_reset_buffers_if_needed(image_request.image_size, image_request.max_iterations);
+
+    if (should_scroll(image_request))
+        scroll_results_per_point_array(image_request);
+
     send_calculation_messages(image_request);
+
     status_.set_phase(Phase::Calculating);
 }
 
@@ -196,11 +204,11 @@ void Supervisor::clear_message_queues()
 
 void Supervisor::send_calculation_messages(const SupervisorImageRequest& image_request)
 {
-    for (int y = 0; y < image_request.image_size.height; y += image_request.area_size) {
-        const int height = std::min(image_request.image_size.height - y, image_request.area_size);
+    for (int y = image_request.area.y; y < (image_request.area.y + image_request.area.height); y += image_request.area_size) {
+        const int height = std::min(image_request.area.y + image_request.area.height - y, image_request.area_size);
 
-        for (int x = 0; x < image_request.image_size.width; x += image_request.area_size) {
-            const int width = std::min(image_request.image_size.width - x, image_request.area_size);
+        for (int x = image_request.area.x; x < (image_request.area.x + image_request.area.width); x += image_request.area_size) {
+            const int width = std::min(image_request.area.x + image_request.area.width - x, image_request.area_size);
             worker_message_queue_.send(WorkerCalculate{
                 image_request.max_iterations, image_request.image_size, {x, y, width, height},
                 image_request.fractal_section, &results_per_point_,
@@ -257,12 +265,65 @@ void Supervisor::resize_and_reset_buffers_if_needed(const ImageSize& image_size,
         iterations_histogram_.resize(static_cast<std::size_t>(max_iterations + 1));
 
     // update render buffer and window texture
-    render_buffer_.create(static_cast<unsigned int>(image_size.width), static_cast<unsigned int>(image_size.height), background_color_);
+    // render_buffer_.create(static_cast<unsigned int>(image_size.width), static_cast<unsigned int>(image_size.height), background_color_);
 
-    if (window_.texture().getSize() != render_buffer_.getSize())
+    // if (window_.texture().getSize() != render_buffer_.getSize())
+    //     window_.resize_texture(render_buffer_);
+    // else
+    //     window_.update_texture(render_buffer_);
+
+    if (window_.texture().getSize() != render_buffer_.getSize()) {
+        render_buffer_.create(static_cast<unsigned int>(image_size.width), static_cast<unsigned int>(image_size.height), background_color_);
         window_.resize_texture(render_buffer_);
-    else
-        window_.update_texture(render_buffer_);
+    }
+}
+
+[[nodiscard]] bool Supervisor::should_scroll(const SupervisorImageRequest& image_request) const
+{
+    return image_request.scroll.x != 0 || image_request.scroll.y;
+}
+
+void Supervisor::scroll_results_per_point_array(const SupervisorImageRequest& image_request)
+{
+    assert(image_request.scroll.x != 0 || image_request.scroll.y != 0);
+
+    const int dx = image_request.scroll.x;
+    const int dy = image_request.scroll.y;
+
+    if (dy < 0) {
+        for (int y = image_request.image_size.height - 1; y >= 0; --y)
+            copy_results_per_point_row(dx, dy, image_request.image_size.width, image_request.image_size.height, y);
+    } else {
+        for (int y = 0; y < image_request.image_size.height; ++y)
+            copy_results_per_point_row(dx, dy, image_request.image_size.width, image_request.image_size.height, y);
+    }
+}
+
+void Supervisor::copy_results_per_point_row(const int dx, const int dy, const int image_width, const int image_height, const int y)
+{
+    if (dx < 0) {
+        for (int x = image_width - 1; x >= 0; --x) {
+            const int dstx = x - dx;
+            const int dsty = y - dy;
+
+            if (dstx >= 0 && dstx < image_width && dsty >= 0 && dsty < image_height) {
+                auto src = results_per_point_.begin() + (y * image_width + x);
+                auto dst = results_per_point_.begin() + (dsty * image_width + dstx);
+                *dst = *src;
+            }
+        }
+    } else {
+        for (int x = 0; x < image_width; ++x) {
+            const int dstx = x - dx;
+            const int dsty = y - dy;
+
+            if (dstx >= 0 && dstx < image_width && dsty >= 0 && dsty < image_height) {
+                auto src = results_per_point_.begin() + (y * image_width + x);
+                auto dst = results_per_point_.begin() + (dsty * image_width + dstx);
+                *dst = *src;
+            }
+        }
+    }
 }
 
 void Supervisor::build_iterations_histogram()
