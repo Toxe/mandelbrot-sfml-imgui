@@ -36,7 +36,7 @@ class Supervisor {
     int waiting_for_calculation_results_ = 0;
     int waiting_for_colorization_results_ = 0;
 
-    std::vector<int> combined_iterations_histogram_;
+    std::vector<int> iterations_histogram_;
     std::vector<CalculationResult> results_per_point_;
     std::vector<float> equalized_iterations_;
     std::vector<sf::Uint8> colorization_buffer_;
@@ -59,6 +59,7 @@ class Supervisor {
     void send_colorization_messages(const int max_iterations, const ImageSize& image_size);
 
     void resize_and_reset_buffers_if_needed(const ImageSize& image_size, const int max_iterations);
+    void build_iterations_histogram();
 
 public:
     Supervisor(Window& window);

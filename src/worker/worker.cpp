@@ -12,8 +12,7 @@ Worker::Worker(const int id, MessageQueue<WorkerMessage>& worker_message_queue, 
 
 Worker::Worker(Worker&& other) :
     id_{other.id_}, running_{other.running_}, thread_{std::move(other.thread_)},
-    worker_message_queue_{other.worker_message_queue_}, supervisor_message_queue_{other.supervisor_message_queue_},
-    iterations_histogram_{std::move(other.iterations_histogram_)}
+    worker_message_queue_{other.worker_message_queue_}, supervisor_message_queue_{other.supervisor_message_queue_}
 {
 }
 
@@ -50,15 +49,8 @@ void Worker::handle_message(WorkerCalculate&& calculate)
 {
     spdlog::debug("worker {}: received message Calculate area: {}/{} {}x{}", id_, calculate.area.x, calculate.area.y, calculate.area.width, calculate.area.height);
 
-    resize_iterations_histogram_if_needed(calculate);
-    mandelbrot_calc(calculate.image_size, calculate.fractal_section, calculate.max_iterations, iterations_histogram_, *calculate.results_per_point, calculate.area);
+    mandelbrot_calc(calculate.image_size, calculate.fractal_section, calculate.max_iterations, *calculate.results_per_point, calculate.area);
     draw_pixels(calculate);
-
-    {
-        std::lock_guard<std::mutex> lock(mtx_);
-        combine_iterations_histogram(*calculate.combined_iterations_histogram);
-    }
-
     supervisor_message_queue_.send(SupervisorCalculationResults{calculate.max_iterations, calculate.image_size, calculate.area, calculate.fractal_section, calculate.results_per_point, std::move(calculate.pixels)});
 }
 
@@ -75,18 +67,6 @@ void Worker::handle_message(WorkerQuit&&)
     spdlog::debug("worker {}: received message Quit", id_);
 
     running_ = false;
-}
-
-void Worker::resize_iterations_histogram_if_needed(const WorkerCalculate& calculate)
-{
-    if (std::ssize(iterations_histogram_) != calculate.max_iterations + 1)
-        iterations_histogram_.resize(static_cast<std::size_t>(calculate.max_iterations + 1));
-}
-
-void Worker::combine_iterations_histogram(std::vector<int>& combined_iterations_histogram)
-{
-    std::transform(iterations_histogram_.cbegin(), iterations_histogram_.cend(),
-        combined_iterations_histogram.cbegin(), combined_iterations_histogram.begin(), std::plus<>{});
 }
 
 [[nodiscard]] sf::Uint8 Worker::calculation_result_to_grayscale(const CalculationResult& point, const float log_max_iterations)

@@ -66,7 +66,6 @@ struct WorkerCalculate {
     CalculationArea area;
     FractalSection fractal_section;
     std::vector<CalculationResult>* results_per_point;
-    std::vector<int>* combined_iterations_histogram;
     std::unique_ptr<sf::Uint8[]> pixels;
 };
 
@@ -76,7 +75,6 @@ struct WorkerColorize {
     int num_rows;
     int row_width;
     Gradient* gradient;
-    std::vector<int>* combined_iterations_histogram;
     std::vector<CalculationResult>* results_per_point;
     std::vector<float>* equalized_iterations;
     std::vector<sf::Uint8>* colorization_buffer;

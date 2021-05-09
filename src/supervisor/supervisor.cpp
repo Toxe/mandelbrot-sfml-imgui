@@ -88,7 +88,7 @@ void Supervisor::handle_message(SupervisorImageRequest&& image_request)
     spdlog::debug("supervisor: received message ImageRequest size: {}x{}, area_size: {}", image_request.image_size.width, image_request.image_size.height, image_request.area_size);
 
     status_.start_calculation(Phase::RequestReceived);
-    resize_and_reset_buffers_if_needed(image_request);
+    resize_and_reset_buffers_if_needed(image_request.image_size, image_request.max_iterations);
     send_calculation_messages(image_request);
     status_.set_phase(Phase::Calculating);
 }
@@ -103,7 +103,8 @@ void Supervisor::handle_message(SupervisorCalculationResults&& calculation_resul
         if (status_.phase() != Phase::Canceled) {
             // if canceled there is no need to colorize the partial image
             status_.set_phase(Phase::Coloring);
-            equalize_histogram(combined_iterations_histogram_, calculation_results.max_iterations, equalized_iterations_);
+            build_iterations_histogram();
+            equalize_histogram(iterations_histogram_, calculation_results.max_iterations, equalized_iterations_);
             send_colorization_messages(calculation_results.max_iterations, calculation_results.image_size);
         } else {
             status_.stop_calculation(Phase::Idle);
@@ -202,7 +203,7 @@ void Supervisor::send_calculation_messages(const SupervisorImageRequest& image_r
             const int width = std::min(image_request.image_size.width - x, image_request.area_size);
             worker_message_queue_.send(WorkerCalculate{
                 image_request.max_iterations, image_request.image_size, {x, y, width, height},
-                image_request.fractal_section, &results_per_point_, &combined_iterations_histogram_,
+                image_request.fractal_section, &results_per_point_,
                 std::make_unique<sf::Uint8[]>(static_cast<std::size_t>(4 * width * height))
             });
 
@@ -232,7 +233,7 @@ void Supervisor::send_colorization_messages(const int max_iterations, const Imag
 
         worker_message_queue_.send(WorkerColorize{
             max_iterations, start_row, num_rows, image_size.width, &gradient_,
-            &combined_iterations_histogram_, &results_per_point_, &equalized_iterations_, &colorization_buffer_
+            &results_per_point_, &equalized_iterations_, &colorization_buffer_
         });
 
         ++waiting_for_colorization_results_;
@@ -252,11 +253,8 @@ void Supervisor::resize_and_reset_buffers_if_needed(const ImageSize& image_size,
     if (std::ssize(colorization_buffer_) != (4 * image_size.width * image_size.height))
         colorization_buffer_.resize(static_cast<std::size_t>(4 * image_size.width * image_size.height));
 
-    if (std::ssize(combined_iterations_histogram_) != max_iterations + 1)
-        combined_iterations_histogram_.resize(static_cast<std::size_t>(max_iterations + 1));
-
-    // set histogram back to 0
-    std::fill(combined_iterations_histogram_.begin(), combined_iterations_histogram_.end(), 0);
+    if (std::ssize(iterations_histogram_) != max_iterations + 1)
+        iterations_histogram_.resize(static_cast<std::size_t>(max_iterations + 1));
 
     // update render buffer and window texture
     render_buffer_.create(static_cast<unsigned int>(image_size.width), static_cast<unsigned int>(image_size.height), background_color_);
@@ -265,4 +263,16 @@ void Supervisor::resize_and_reset_buffers_if_needed(const ImageSize& image_size,
         window_.resize_texture(render_buffer_);
     else
         window_.update_texture(render_buffer_);
+}
+
+void Supervisor::build_iterations_histogram()
+{
+    // set histogram back to 0
+    std::fill(iterations_histogram_.begin(), iterations_histogram_.end(), 0);
+
+    for (const auto& point : results_per_point_)
+        ++iterations_histogram_[point.iter];
+
+    // [max_iterations] must be zero (as we do not count the iterations of the points inside the Mandelbrot Set)
+    iterations_histogram_.back() = 0;
 }

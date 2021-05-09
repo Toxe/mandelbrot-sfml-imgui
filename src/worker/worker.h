@@ -20,16 +20,11 @@ class Worker {
     MessageQueue<WorkerMessage>& worker_message_queue_;
     MessageQueue<SupervisorMessage>& supervisor_message_queue_;
 
-    std::vector<int> iterations_histogram_;
-
     void main();
 
     void handle_message(WorkerCalculate&& calculate);
     void handle_message(WorkerColorize&& colorize);
     void handle_message(WorkerQuit&&);
-
-    void resize_iterations_histogram_if_needed(const WorkerCalculate& calculate);
-    void combine_iterations_histogram(std::vector<int>& combined_iterations_histogram);
 
     [[nodiscard]] sf::Uint8 calculation_result_to_grayscale(const CalculationResult& point, const float log_max_iterations);
     void draw_pixels(const WorkerCalculate& calculate);
