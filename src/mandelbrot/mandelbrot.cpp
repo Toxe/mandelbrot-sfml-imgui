@@ -77,7 +77,7 @@ void equalize_histogram(const std::vector<int>& iterations_histogram, const int 
     // Get the minimum value in the CDF that is bigger than zero and the sum of all iteration counts
     // from iterations_histogram (which is the last value of the CDF).
     const auto cdf_min = std::find_if(cdf.cbegin(), cdf.cend(), [](auto n) { return n > 0; });
-    const auto total_iterations = cdf[cdf.size() - 1];
+    const auto total_iterations = cdf.back();
 
     // normalize all values from the CDF that are bigger than zero to a range of 0.0 .. max_iterations
     const auto f = static_cast<float>(max_iterations) / static_cast<float>(total_iterations - *cdf_min);
