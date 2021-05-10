@@ -11,6 +11,7 @@
 #include <spdlog/spdlog.h>
 
 #include "app.h"
+#include "colors.h"
 #include "command_line/command_line.h"
 #include "gradient/gradient.h"
 #include "messages/messages.h"
@@ -19,10 +20,6 @@
 const int default_max_iterations = 5000;
 const int default_area_size = 100;
 const FractalSection default_fractal_section = {-0.8, 0.0, 2.0};
-
-const ImVec4 color_light_blue{100.0f / 255.0f, 149.0f / 255.0f, 237.0f / 255.0f, 1.0f};
-const ImVec4 color_light_gray{0.7f, 0.7f, 0.7f, 1.0f};
-const ImVec4 color_yellow{1.0f, 1.0f, 0.0f, 1.0f};
 
 UI::UI(const CommandLine& cli)
     : num_threads_{cli.num_threads()},
@@ -78,7 +75,7 @@ void UI::render_main_window(App& app)
 
     ImGui::PlotLines("", fps.data(), static_cast<int>(fps.size()), static_cast<int>(values_offset), fps_label.c_str(), 0.0f, 1.5f * std::max(65.0f, *std::max_element(fps.begin(), fps.end())), ImVec2(0, 4.0f * font_size_));
 
-    ImGui::TextColored(color_light_gray, "image size:");
+    ImGui::TextColored(UserInterface::Colors::light_gray, "image size:");
     ImGui::SameLine();
     ImGui::Text("%dx%d", window_size.width, window_size.height);
 
@@ -164,37 +161,37 @@ void UI::render_help_window()
 
         ImGui::Text("Left/right click:");
         ImGui::SameLine();
-        ImGui::TextColored(color_light_blue, "zoom in/out");
+        ImGui::TextColored(UserInterface::Colors::light_blue, "zoom in/out");
 
         ImGui::Text("Left drag:");
         ImGui::SameLine();
-        ImGui::TextColored(color_light_blue, "zoom in area");
+        ImGui::TextColored(UserInterface::Colors::light_blue, "zoom in area");
 
         ImGui::Text("Right drag:");
         ImGui::SameLine();
-        ImGui::TextColored(color_light_blue, "move around");
+        ImGui::TextColored(UserInterface::Colors::light_blue, "move around");
 
         ImGui::Separator();
 
         ImGui::Text("Enter:");
         ImGui::SameLine();
-        ImGui::TextColored(color_light_blue, "calculate image");
+        ImGui::TextColored(UserInterface::Colors::light_blue, "calculate image");
 
         ImGui::Text("Space:");
         ImGui::SameLine();
-        ImGui::TextColored(color_light_blue, "show/hide UI");
+        ImGui::TextColored(UserInterface::Colors::light_blue, "show/hide UI");
 
         ImGui::Text("   F1:");
         ImGui::SameLine();
-        ImGui::TextColored(color_light_blue, "show/hide help");
+        ImGui::TextColored(UserInterface::Colors::light_blue, "show/hide help");
 
         ImGui::Text("  F10:");
         ImGui::SameLine();
-        ImGui::TextColored(color_light_blue, "fullscreen");
+        ImGui::TextColored(UserInterface::Colors::light_blue, "fullscreen");
 
         ImGui::Text("  ESC:");
         ImGui::SameLine();
-        ImGui::TextColored(color_light_blue, "quit");
+        ImGui::TextColored(UserInterface::Colors::light_blue, "quit");
 
         if (ImGui::Button("Close"))
             toggle_help();
@@ -305,9 +302,9 @@ void UI::show_status(const Phase phase)
     ImVec4 phase_color;
 
     if (phase == Phase::Idle) {
-        phase_color = ImVec4{0.0f, 1.0f, 0.0f, 1.0f};
+        phase_color = UserInterface::Colors::phase_idle;
     } else if (phase == Phase::Canceled) {
-        phase_color = ImVec4{1.0f, 0.0f, 0.0f, 1.0f};
+        phase_color = UserInterface::Colors::phase_canceled;
     } else if (phase == Phase::Calculating) {
         double itgr;
         double rmdr = std::modf(clock.elapsed_time().as_seconds(), &itgr);
@@ -320,21 +317,21 @@ void UI::show_status(const Phase phase)
         ImGui::ColorConvertHSVtoRGB(rmdr, 1.0f, 1.0f, r, g, b);
         phase_color = ImVec4{r, g, b, 1.0f};
     } else {
-        phase_color = ImVec4{1.0f, 1.0f, 1.0f, 1.0f};
+        phase_color = UserInterface::Colors::phase_default;
     }
 
-    ImGui::TextColored(color_light_gray, "status:");
+    ImGui::TextColored(UserInterface::Colors::light_gray, "status:");
     ImGui::SameLine();
     ImGui::TextColored(phase_color, "%s", phase_name(phase));
 }
 
 void UI::show_render_time(bool calculation_running, Duration calculation_time)
 {
-    ImGui::TextColored(color_light_gray, "render time:");
+    ImGui::TextColored(UserInterface::Colors::light_gray, "render time:");
     ImGui::SameLine();
 
     if (calculation_running)
-        ImGui::TextColored(color_yellow, "%.3fs", calculation_time.as_seconds());
+        ImGui::TextColored(UserInterface::Colors::yellow, "%.3fs", calculation_time.as_seconds());
     else
         ImGui::Text("%.3fs", calculation_time.as_seconds());
 }

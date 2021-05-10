@@ -2,7 +2,8 @@
 
 #include <imgui.h>
 
-const ImVec4 color_light_blue{100.0f / 255.0f, 149.0f / 255.0f, 237.0f / 255.0f, 1.0f};
+#include "colors.h"
+
 const std::chrono::milliseconds fade_out_delay = 5000ms;
 
 void InterfaceHiddenHintWindow::show()
@@ -36,7 +37,7 @@ void InterfaceHiddenHintWindow::render()
         ImGui::Text("interface hidden");
         ImGui::Text("press");
         ImGui::SameLine();
-        ImGui::TextColored(color_light_blue, "Space");
+        ImGui::TextColored(UserInterface::Colors::light_blue, "Space");
         ImGui::SameLine();
         ImGui::Text("to show again");
 
