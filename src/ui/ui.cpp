@@ -50,6 +50,7 @@ void UI::render(App& app)
 {
     render_main_window(app);
     render_help_window();
+    render_interface_hidden_hint_window();
 }
 
 void UI::render_main_window(App& app)
@@ -202,6 +203,12 @@ void UI::render_help_window()
     }
 }
 
+void UI::render_interface_hidden_hint_window()
+{
+    if (interface_hidden_hint_window_.visible())
+        interface_hidden_hint_window_.render();
+}
+
 void UI::help(const std::string& text)
 {
     ImGui::TextDisabled("(?)");
@@ -350,3 +357,13 @@ void UI::show_gradient_selection(App& app)
 
     ImGui::EndChild();
 }
+
+void UI::toggle_visibility()
+{
+    is_visible_ = !is_visible_;
+
+    if (!is_visible_)
+        interface_hidden_hint_window_.show();
+    else
+        interface_hidden_hint_window_.hide();
+};

@@ -13,6 +13,7 @@ add_executable(mandelbrot
     supervisor/supervisor_status.cpp supervisor/supervisor_status.h
     supervisor/supervisor.cpp supervisor/supervisor.h
     ui/input_value.h
+    ui/interface_hidden_hint_window.cpp ui/interface_hidden_hint_window.h
     ui/ui.cpp ui/ui.h
     window.cpp window.h
     worker/worker.cpp worker/worker.h
