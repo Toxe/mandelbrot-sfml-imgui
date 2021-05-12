@@ -123,15 +123,6 @@ void UI::render_main_window(App& app)
                 calculate_image(app);
             }
         }
-
-        if (ImGui::Button("left")) scroll_image(app, -100, 0); ImGui::SameLine();
-        if (ImGui::Button("right")) scroll_image(app, 100, 0); ImGui::SameLine();
-        if (ImGui::Button("up")) scroll_image(app, 0, -100); ImGui::SameLine();
-        if (ImGui::Button("down")) scroll_image(app, 0, 100);
-        // if (ImGui::Button("left/up")) scroll_image(app, -100, -100); ImGui::SameLine();
-        // if (ImGui::Button("right/up")) scroll_image(app, 100, -100); ImGui::SameLine();
-        // if (ImGui::Button("left/down")) scroll_image(app, -100, 100); ImGui::SameLine();
-        // if (ImGui::Button("right/down")) scroll_image(app, 100, 100);
     }
 
     if (calculation_running) {
