@@ -1,8 +1,8 @@
 # Multi-threaded SFML + ImGui Mandelbrot
 
-A non-blocking, multi-threaded C++ Mandelbrot renderer using SFML + ImGui running at a constant 60 FPS.
+A multi-threaded C++ Mandelbrot renderer using SFML + ImGui running at a constant 60 FPS for Windows, Mac and Linux.
 
-This is a graphical, interactive version of my [Mandelbrot Comparison project](https://github.com/Toxe/mandelbrot-comparison) which implements the same Mandelbrot algorithm in 5 different languages (C, C++, Python2/3, PHP and Swift).
+This is a graphical, interactive version of my [Mandelbrot Comparison project](https://github.com/Toxe/mandelbrot-comparison) which implements the same Mandelbrot algorithm in 5 different languages (C, C++, Python2/3, PHP and Swift). The colorization of the images is done by using a histogram based smooth coloring method.
 
 ## Build
 
