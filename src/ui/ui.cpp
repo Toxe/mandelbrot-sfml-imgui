@@ -164,11 +164,11 @@ void UI::render_help_window()
 
         ImGui::Separator();
 
-        ImGui::TextColored(UserInterface::Colors::light_blue, "Arrow keys");
+        ImGui::TextColored(UserInterface::Colors::light_blue, "  Arrow keys");
         ImGui::SameLine();
         ImGui::Text("move around");
 
-        ImGui::TextColored(UserInterface::Colors::light_blue, "       +/-");
+        ImGui::TextColored(UserInterface::Colors::light_blue, "+/- (numpad)");
         ImGui::SameLine();
         ImGui::Text("zoom in/out");
 
