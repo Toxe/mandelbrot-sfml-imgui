@@ -34,16 +34,16 @@ void App::poll_events()
                 ui_.toggle_help();
             } else if (event.key.code == sf::Keyboard::Left) {
                 if (supervisor_.status().phase() == Phase::Idle)
-                    ui_.scroll_image(*this, -100, 0);
+                    ui_.scroll_image(*this, -window_.size().height / 8, 0);
             } else if (event.key.code == sf::Keyboard::Right) {
                 if (supervisor_.status().phase() == Phase::Idle)
-                    ui_.scroll_image(*this, 100, 0);
+                    ui_.scroll_image(*this, window_.size().height / 8, 0);
             } else if (event.key.code == sf::Keyboard::Up) {
                 if (supervisor_.status().phase() == Phase::Idle)
-                    ui_.scroll_image(*this, 0, -100);
+                    ui_.scroll_image(*this, 0, -window_.size().height / 8);
             } else if (event.key.code == sf::Keyboard::Down) {
                 if (supervisor_.status().phase() == Phase::Idle)
-                    ui_.scroll_image(*this, 0, 100);
+                    ui_.scroll_image(*this, 0, window_.size().height / 8);
             } else if (event.key.code == sf::Keyboard::Add) {
                 if (supervisor_.status().phase() == Phase::Idle)
                     ui_.zoom_image(*this, 2.0);
