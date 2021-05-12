@@ -168,6 +168,10 @@ void UI::render_help_window()
         ImGui::SameLine();
         ImGui::Text("move around");
 
+        ImGui::TextColored(UserInterface::Colors::light_blue, "       +/-");
+        ImGui::SameLine();
+        ImGui::Text("zoom in/out");
+
         ImGui::Separator();
 
         ImGui::TextColored(UserInterface::Colors::light_blue, "Enter");
@@ -291,6 +295,19 @@ void UI::scroll_image(App& app, int delta_x, int delta_y)
     center_y_.set(fractal_section.center_y);
 
     app.calculate_image(SupervisorImageRequest{max_iterations_.get(), area_size_.get(), image_size, calculation_area, scroll, fractal_section});
+}
+
+void UI::zoom_image(App& app, double factor)
+{
+    spdlog::debug("zoom {}", factor);
+
+    fractal_height_.set(fractal_height_.get() / factor);
+
+    const ImageSize image_size = app.window().size();
+    const CalculationArea calculation_area{0, 0, image_size.width, image_size.height};
+    const FractalSection fractal_section{center_x_.get(), center_y_.get(), fractal_height_.get()};
+
+    app.calculate_image(SupervisorImageRequest{max_iterations_.get(), area_size_.get(), image_size, calculation_area, {0, 0}, fractal_section});
 }
 
 void UI::show_status(const Phase phase)

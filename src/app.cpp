@@ -44,6 +44,12 @@ void App::poll_events()
             } else if (event.key.code == sf::Keyboard::Down) {
                 if (supervisor_.status().phase() == Phase::Idle)
                     ui_.scroll_image(*this, 0, 100);
+            } else if (event.key.code == sf::Keyboard::Add) {
+                if (supervisor_.status().phase() == Phase::Idle)
+                    ui_.zoom_image(*this, 2.0);
+            } else if (event.key.code == sf::Keyboard::Subtract) {
+                if (supervisor_.status().phase() == Phase::Idle)
+                    ui_.zoom_image(*this, 0.5);
             }
         }
     }
