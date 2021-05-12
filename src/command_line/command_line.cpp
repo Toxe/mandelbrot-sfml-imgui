@@ -67,9 +67,9 @@ sf::VideoMode CommandLine::default_video_mode(const int fullscreen) const
     if (fullscreen) {
         return sf::VideoMode::getFullscreenModes().front();
     } else {
-        // init window at half desktop height and 4:3 aspect ratio
+        // init window at 75% desktop height and 4:3 aspect ratio
         const auto desktop = sf::VideoMode::getDesktopMode();
-        const unsigned int height = desktop.height / 2;
+        const unsigned int height = (desktop.height * 3) / 4;
         const unsigned int width = 4 * height / 3;
         return sf::VideoMode{width, height};
     }
@@ -77,5 +77,5 @@ sf::VideoMode CommandLine::default_video_mode(const int fullscreen) const
 
 int CommandLine::default_font_size(const sf::VideoMode& video_mode, const bool fullscreen) const
 {
-    return static_cast<int>(video_mode.height) / (fullscreen ? 96 : 48);
+    return static_cast<int>(video_mode.height) / (fullscreen ? 96 : 72);
 }
