@@ -85,10 +85,10 @@ void Supervisor::cancel_calculation()
 
 void Supervisor::handle_message(SupervisorImageRequest&& image_request)
 {
-    spdlog::debug("supervisor: received message ImageRequest size: {}x{}, area: {}/{} {}x{}, area_size: {}",
+    spdlog::debug("supervisor: received message ImageRequest size: {}x{}, area: {}/{} {}x{}, tile_size: {}",
         image_request.image_size.width, image_request.image_size.height,
         image_request.area.x, image_request.area.y, image_request.area.width, image_request.area.height,
-        image_request.area_size);
+        image_request.tile_size);
 
     status_.start_calculation(Phase::RequestReceived);
     resize_and_reset_buffers_if_needed(image_request.image_size, image_request.max_iterations);
@@ -204,11 +204,11 @@ void Supervisor::clear_message_queues()
 
 void Supervisor::send_calculation_messages(const SupervisorImageRequest& image_request)
 {
-    for (int y = image_request.area.y; y < (image_request.area.y + image_request.area.height); y += image_request.area_size) {
-        const int height = std::min(image_request.area.y + image_request.area.height - y, image_request.area_size);
+    for (int y = image_request.area.y; y < (image_request.area.y + image_request.area.height); y += image_request.tile_size) {
+        const int height = std::min(image_request.area.y + image_request.area.height - y, image_request.tile_size);
 
-        for (int x = image_request.area.x; x < (image_request.area.x + image_request.area.width); x += image_request.area_size) {
-            const int width = std::min(image_request.area.x + image_request.area.width - x, image_request.area_size);
+        for (int x = image_request.area.x; x < (image_request.area.x + image_request.area.width); x += image_request.tile_size) {
+            const int width = std::min(image_request.area.x + image_request.area.width - x, image_request.tile_size);
             worker_message_queue_.send(WorkerCalculate{
                 image_request.max_iterations, image_request.image_size, {x, y, width, height},
                 image_request.fractal_section, &results_per_point_,

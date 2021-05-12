@@ -31,7 +31,7 @@ struct FractalSection {
 // ---- Supervisor messages -----------
 struct SupervisorImageRequest {
     int max_iterations;
-    int area_size;
+    int tile_size;
     ImageSize image_size;
     CalculationArea area;
     Scroll scroll;

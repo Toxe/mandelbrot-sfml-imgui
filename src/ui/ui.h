@@ -22,7 +22,7 @@ class UI {
 
     InputValue<int> num_threads_;
     InputValue<int> max_iterations_;
-    InputValue<int> area_size_;
+    InputValue<int> tile_size_;
     InputValue<double> center_x_;
     InputValue<double> center_y_;
     InputValue<double> fractal_height_;

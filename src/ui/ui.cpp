@@ -18,7 +18,7 @@
 #include "supervisor/supervisor.h"
 
 const int default_max_iterations = 5000;
-const int default_area_size = 100;
+const int default_tile_size = 100;
 const FractalSection default_fractal_section = {-0.8, 0.0, 2.0};
 
 UI::UI(const CommandLine& cli)
@@ -32,7 +32,7 @@ UI::UI(const CommandLine& cli)
 void UI::reset_image_request_input_values_to_default()
 {
     max_iterations_.reset(default_max_iterations);
-    area_size_.reset(default_area_size);
+    tile_size_.reset(default_tile_size);
     center_x_.reset(default_fractal_section.center_x);
     center_y_.reset(default_fractal_section.center_y);
     fractal_height_.reset(default_fractal_section.height);
@@ -40,7 +40,7 @@ void UI::reset_image_request_input_values_to_default()
 
 [[nodiscard]] bool UI::image_request_input_values_have_changed()
 {
-    return max_iterations_.changed() || area_size_.changed() || center_x_.changed() || center_y_.changed() || fractal_height_.changed();
+    return max_iterations_.changed() || tile_size_.changed() || center_x_.changed() || center_y_.changed() || fractal_height_.changed();
 }
 
 void UI::render(App& app)
@@ -109,7 +109,7 @@ void UI::render_main_window(App& app)
     input_double("center_y", center_y_, 0.1, 1.0, -5.0, 5.0);
     input_double("fractal height", fractal_height_, 0.1, 1.0, 1000.0 * std::numeric_limits<double>::min(), 10.0);
     input_int("iterations", max_iterations_, 1000, 10000, 10, 1'000'000);
-    input_int("tile size", area_size_, 100, 500, 10, 10'000);
+    input_int("tile size", tile_size_, 100, 500, 10, 10'000);
 
     if (phase == Phase::Idle) {
         if (ImGui::Button("Calculate"))
@@ -249,7 +249,7 @@ void UI::calculate_image(App& app)
 {
     const auto image_size = app.window().size();
     const auto calculation_area = CalculationArea{0, 0, image_size.width, image_size.height};
-    app.calculate_image(SupervisorImageRequest{max_iterations_.get(), area_size_.get(), image_size, calculation_area, {0, 0}, {center_x_.get(), center_y_.get(), fractal_height_.get()}});
+    app.calculate_image(SupervisorImageRequest{max_iterations_.get(), tile_size_.get(), image_size, calculation_area, {0, 0}, {center_x_.get(), center_y_.get(), fractal_height_.get()}});
 }
 
 void UI::scroll_image(App& app, int delta_x, int delta_y)
@@ -294,7 +294,7 @@ void UI::scroll_image(App& app, int delta_x, int delta_y)
     center_x_.set(fractal_section.center_x);
     center_y_.set(fractal_section.center_y);
 
-    app.calculate_image(SupervisorImageRequest{max_iterations_.get(), area_size_.get(), image_size, calculation_area, scroll, fractal_section});
+    app.calculate_image(SupervisorImageRequest{max_iterations_.get(), tile_size_.get(), image_size, calculation_area, scroll, fractal_section});
 }
 
 void UI::zoom_image(App& app, double factor)
@@ -307,7 +307,7 @@ void UI::zoom_image(App& app, double factor)
     const CalculationArea calculation_area{0, 0, image_size.width, image_size.height};
     const FractalSection fractal_section{center_x_.get(), center_y_.get(), fractal_height_.get()};
 
-    app.calculate_image(SupervisorImageRequest{max_iterations_.get(), area_size_.get(), image_size, calculation_area, {0, 0}, fractal_section});
+    app.calculate_image(SupervisorImageRequest{max_iterations_.get(), tile_size_.get(), image_size, calculation_area, {0, 0}, fractal_section});
 }
 
 void UI::show_status(const Phase phase)
