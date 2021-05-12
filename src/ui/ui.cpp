@@ -159,39 +159,39 @@ void UI::render_help_window()
         ImGui::SetNextWindowPos(ImVec2(20 + 20 + main_window_size_.x, 20), ImGuiCond_FirstUseEver);
         ImGui::Begin(help_window_title_, &show_help_, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse);
 
-        ImGui::Text("Left/right click:");
+        ImGui::TextColored(UserInterface::Colors::light_blue, "Left/right click");
         ImGui::SameLine();
-        ImGui::TextColored(UserInterface::Colors::light_blue, "zoom in/out");
+        ImGui::Text("zoom in/out");
 
-        ImGui::Text("Left drag:");
+        ImGui::TextColored(UserInterface::Colors::light_blue, "       Left drag");
         ImGui::SameLine();
-        ImGui::TextColored(UserInterface::Colors::light_blue, "zoom in area");
+        ImGui::Text("zoom in area");
 
-        ImGui::Text("Right drag:");
+        ImGui::TextColored(UserInterface::Colors::light_blue, "      Right drag");
         ImGui::SameLine();
-        ImGui::TextColored(UserInterface::Colors::light_blue, "move around");
+        ImGui::Text("move around");
 
         ImGui::Separator();
 
-        ImGui::Text("Enter:");
+        ImGui::TextColored(UserInterface::Colors::light_blue, "Enter");
         ImGui::SameLine();
-        ImGui::TextColored(UserInterface::Colors::light_blue, "calculate image");
+        ImGui::Text("calculate image");
 
-        ImGui::Text("Space:");
+        ImGui::TextColored(UserInterface::Colors::light_blue, "Space");
         ImGui::SameLine();
-        ImGui::TextColored(UserInterface::Colors::light_blue, "show/hide UI");
+        ImGui::Text("show/hide UI");
 
-        ImGui::Text("   F1:");
+        ImGui::TextColored(UserInterface::Colors::light_blue, "   F1");
         ImGui::SameLine();
-        ImGui::TextColored(UserInterface::Colors::light_blue, "show/hide help");
+        ImGui::Text("show/hide help");
 
-        ImGui::Text("  F10:");
+        ImGui::TextColored(UserInterface::Colors::light_blue, "  F10");
         ImGui::SameLine();
-        ImGui::TextColored(UserInterface::Colors::light_blue, "fullscreen");
+        ImGui::Text("fullscreen");
 
-        ImGui::Text("  ESC:");
+        ImGui::TextColored(UserInterface::Colors::light_blue, "  ESC");
         ImGui::SameLine();
-        ImGui::TextColored(UserInterface::Colors::light_blue, "quit");
+        ImGui::Text("quit");
 
         if (ImGui::Button("Close"))
             toggle_help();
