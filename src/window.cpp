@@ -51,7 +51,7 @@ Window::Window(const CommandLine& cli)
         if (event.key.code == sf::Keyboard::Escape) {
             close();
             return true;
-        } else if (event.key.code == sf::Keyboard::F10) {
+        } else if (event.key.code == sf::Keyboard::F11) {
             toggle_fullscreen();
             return true;
         }

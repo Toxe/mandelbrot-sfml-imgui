@@ -87,7 +87,7 @@ void UI::render_main_window(App& app)
 
     ImGui::SameLine();
 
-    if (ImGui::Button("Fullscreen (F10)"))
+    if (ImGui::Button("Fullscreen (F11)"))
         app.window().toggle_fullscreen();
 
     input_int("number of threads", num_threads_, 1, 10, 1, 1'000);
@@ -185,7 +185,7 @@ void UI::render_help_window()
         ImGui::SameLine();
         ImGui::Text("show/hide help");
 
-        ImGui::TextColored(UserInterface::Colors::light_blue, "  F10");
+        ImGui::TextColored(UserInterface::Colors::light_blue, "  F11");
         ImGui::SameLine();
         ImGui::Text("fullscreen");
 
