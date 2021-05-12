@@ -32,6 +32,18 @@ void App::poll_events()
                 ui_.toggle_visibility();
             } else if (event.key.code == sf::Keyboard::F1) {
                 ui_.toggle_help();
+            } else if (event.key.code == sf::Keyboard::Left) {
+                if (supervisor_.status().phase() == Phase::Idle)
+                    ui_.scroll_image(*this, -100, 0);
+            } else if (event.key.code == sf::Keyboard::Right) {
+                if (supervisor_.status().phase() == Phase::Idle)
+                    ui_.scroll_image(*this, 100, 0);
+            } else if (event.key.code == sf::Keyboard::Up) {
+                if (supervisor_.status().phase() == Phase::Idle)
+                    ui_.scroll_image(*this, 0, -100);
+            } else if (event.key.code == sf::Keyboard::Down) {
+                if (supervisor_.status().phase() == Phase::Idle)
+                    ui_.scroll_image(*this, 0, 100);
             }
         }
     }

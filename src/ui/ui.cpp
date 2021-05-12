@@ -164,6 +164,12 @@ void UI::render_help_window()
 
         ImGui::Separator();
 
+        ImGui::TextColored(UserInterface::Colors::light_blue, "Arrow keys");
+        ImGui::SameLine();
+        ImGui::Text("move around");
+
+        ImGui::Separator();
+
         ImGui::TextColored(UserInterface::Colors::light_blue, "Enter");
         ImGui::SameLine();
         ImGui::Text("calculate image");
