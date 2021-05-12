@@ -8,8 +8,11 @@ This is a graphical, interactive version of my [Mandelbrot Comparison project](h
 
 Default build instructions for CMake and Vcpkg.
 
-Pass your Vcpkg toolchain file via `CMAKE_TOOLCHAIN_FILE`, for example `-DCMAKE_TOOLCHAIN_FILE=%HOMEPATH%\vcpkg\scripts\buildsystems\vcpkg.cmake`
-or `-DCMAKE_TOOLCHAIN_FILE=$HOME/vcpkg/scripts/buildsystems/vcpkg.cmake`.
+Pass your Vcpkg toolchain file via `CMAKE_TOOLCHAIN_FILE`, for example on Windows:  
+`-DCMAKE_TOOLCHAIN_FILE=%HOMEPATH%\vcpkg\scripts\buildsystems\vcpkg.cmake`
+
+Or on Unix systems:  
+`-DCMAKE_TOOLCHAIN_FILE=$HOME/vcpkg/scripts/buildsystems/vcpkg.cmake`
 
 ### Linux + Mac
 
