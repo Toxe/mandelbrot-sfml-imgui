@@ -58,8 +58,10 @@ class Supervisor {
     void send_calculation_messages(const SupervisorImageRequest& image_request);
     void send_colorization_messages(const int max_iterations, const ImageSize& image_size);
 
-    void resize_and_reset_buffers_if_needed(const ImageSize& image_size, const int max_iterations);
+    bool resize_and_reset_buffers_if_needed(const ImageSize& image_size, const int max_iterations);
     void build_iterations_histogram();
+
+    void modify_image_request_for_recalculation(SupervisorImageRequest& image_request) const;
 
     [[nodiscard]] bool should_scroll(const SupervisorImageRequest& image_request) const;
     void scroll_results_per_point_array(const SupervisorImageRequest& image_request);

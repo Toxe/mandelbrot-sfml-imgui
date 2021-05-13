@@ -91,7 +91,11 @@ void Supervisor::handle_message(SupervisorImageRequest&& image_request)
         image_request.tile_size);
 
     status_.start_calculation(Phase::RequestReceived);
-    resize_and_reset_buffers_if_needed(image_request.image_size, image_request.max_iterations);
+
+    bool recalculation_needed = resize_and_reset_buffers_if_needed(image_request.image_size, image_request.max_iterations);
+
+    if (recalculation_needed)
+        modify_image_request_for_recalculation(image_request);
 
     if (should_scroll(image_request))
         scroll_results_per_point_array(image_request);
@@ -250,26 +254,37 @@ void Supervisor::send_colorization_messages(const int max_iterations, const Imag
     spdlog::trace("supervisor: sent {} Colorize messages", waiting_for_colorization_results_);
 }
 
-void Supervisor::resize_and_reset_buffers_if_needed(const ImageSize& image_size, const int max_iterations)
+bool Supervisor::resize_and_reset_buffers_if_needed(const ImageSize& image_size, const int max_iterations)
 {
-    if (std::ssize(results_per_point_) != (image_size.width * image_size.height))
+    bool recalculation_needed = false;
+
+    if (std::ssize(results_per_point_) != (image_size.width * image_size.height) || std::ssize(colorization_buffer_) != (4 * image_size.width * image_size.height)) {
         results_per_point_.resize(static_cast<std::size_t>(image_size.width * image_size.height));
-
-    if (std::ssize(equalized_iterations_) != max_iterations + 1)
-        equalized_iterations_.resize(static_cast<std::size_t>(max_iterations + 1));
-
-    if (std::ssize(colorization_buffer_) != (4 * image_size.width * image_size.height))
         colorization_buffer_.resize(static_cast<std::size_t>(4 * image_size.width * image_size.height));
+        recalculation_needed = true;
+    }
 
-    if (std::ssize(iterations_histogram_) != max_iterations + 1)
+    if (std::ssize(iterations_histogram_) != max_iterations + 1 || std::ssize(equalized_iterations_) != max_iterations + 1) {
         iterations_histogram_.resize(static_cast<std::size_t>(max_iterations + 1));
+        equalized_iterations_.resize(static_cast<std::size_t>(max_iterations + 1));
+        recalculation_needed = true;
+    }
 
     const auto render_buffer_size = render_buffer_.getSize();
 
     if (static_cast<int>(render_buffer_size.x) != image_size.width || static_cast<int>(render_buffer_size.y) != image_size.height) {
         render_buffer_.create(static_cast<unsigned int>(image_size.width), static_cast<unsigned int>(image_size.height), background_color_);
         window_.resize_texture(render_buffer_);
+        recalculation_needed = true;
     }
+
+    return recalculation_needed;
+}
+
+void Supervisor::modify_image_request_for_recalculation(SupervisorImageRequest& image_request) const
+{
+    image_request.scroll = Scroll{0, 0};
+    image_request.area = CalculationArea{0, 0, image_request.image_size.width, image_request.image_size.height};
 }
 
 [[nodiscard]] bool Supervisor::should_scroll(const SupervisorImageRequest& image_request) const
