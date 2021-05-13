@@ -32,7 +32,7 @@ class UI {
     bool is_visible_ = true;
     bool show_help_ = false;
 
-    bool needs_to_recalculate_image_ = false;
+    bool needs_to_recalculate_image_ = true;
 
     InterfaceHiddenHintWindow interface_hidden_hint_window_;
 
