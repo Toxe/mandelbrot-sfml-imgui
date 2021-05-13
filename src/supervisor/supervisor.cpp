@@ -274,7 +274,7 @@ void Supervisor::resize_and_reset_buffers_if_needed(const ImageSize& image_size,
 
 [[nodiscard]] bool Supervisor::should_scroll(const SupervisorImageRequest& image_request) const
 {
-    return image_request.scroll.x != 0 || image_request.scroll.y;
+    return image_request.scroll.x != 0 || image_request.scroll.y != 0;
 }
 
 void Supervisor::scroll_results_per_point_array(const SupervisorImageRequest& image_request)
