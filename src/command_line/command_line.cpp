@@ -27,8 +27,8 @@ CommandLine::CommandLine(int argc, char* argv[])
 
     CLI::App app{description};
     app.add_flag("-v", log_level_flag, "log level (-v: INFO, -vv: DEBUG, -vvv: TRACE)");
-    app.add_option("-n,--threads", num_threads_, fmt::format("number of threads (default: number of concurrent threads supported by the system: {})", num_threads_));
-    app.add_option("--font-size", font_size_, fmt::format("UI font size in pixels (default: {})", font_size_));
+    app.add_option("-n,--threads", num_threads_, fmt::format("number of threads (default: number of concurrent threads supported by the system: {})", num_threads_))->check(CLI::PositiveNumber);
+    app.add_option("--font-size", font_size_, fmt::format("UI font size in pixels (default: {})", font_size_))->check(CLI::PositiveNumber);
     auto opt_fullscreen = app.add_flag("-f,--fullscreen", fullscreen_, fmt::format("fullscreen (default: {})", fullscreen_));
     auto opt_width = app.add_option("--width", window_width_, fmt::format("window width (windowed mode only, default: {})", window_width_));
     auto opt_height = app.add_option("--height", window_height_, fmt::format("window height (windowed mode only, default: {})", window_height_));
