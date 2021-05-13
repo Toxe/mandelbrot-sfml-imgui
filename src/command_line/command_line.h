@@ -9,6 +9,8 @@ class CommandLine {
     bool fullscreen_;
     int num_threads_;
     int font_size_;
+    int window_width_;
+    int window_height_;
     sf::VideoMode video_mode_;
     sf::VideoMode default_window_video_mode_;
     sf::VideoMode default_fullscreen_video_mode_;
