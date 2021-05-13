@@ -264,15 +264,9 @@ void Supervisor::resize_and_reset_buffers_if_needed(const ImageSize& image_size,
     if (std::ssize(iterations_histogram_) != max_iterations + 1)
         iterations_histogram_.resize(static_cast<std::size_t>(max_iterations + 1));
 
-    // update render buffer and window texture
-    // render_buffer_.create(static_cast<unsigned int>(image_size.width), static_cast<unsigned int>(image_size.height), background_color_);
+    const auto render_buffer_size = render_buffer_.getSize();
 
-    // if (window_.texture().getSize() != render_buffer_.getSize())
-    //     window_.resize_texture(render_buffer_);
-    // else
-    //     window_.update_texture(render_buffer_);
-
-    if (window_.texture().getSize() != render_buffer_.getSize()) {
+    if (static_cast<int>(render_buffer_size.x) != image_size.width || static_cast<int>(render_buffer_size.y) != image_size.height) {
         render_buffer_.create(static_cast<unsigned int>(image_size.width), static_cast<unsigned int>(image_size.height), background_color_);
         window_.resize_texture(render_buffer_);
     }
