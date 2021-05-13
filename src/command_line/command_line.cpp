@@ -21,14 +21,14 @@ CommandLine::CommandLine(int argc, char* argv[])
 
     fullscreen_ = false;
     num_threads_ = static_cast<int>(std::thread::hardware_concurrency());
-    font_size_ = 0;
+    font_size_ = default_font_size();
     window_width_ = default_window_video_mode_.width;
     window_height_ = default_window_video_mode_.height;
 
     CLI::App app{description};
     app.add_flag("-v", log_level_flag, "log level (-v: INFO, -vv: DEBUG, -vvv: TRACE)");
     app.add_option("-n,--threads", num_threads_, fmt::format("number of threads (default: number of concurrent threads supported by the system: {})", num_threads_));
-    app.add_option("--font-size", font_size_, "UI font size in pixels");
+    app.add_option("--font-size", font_size_, fmt::format("UI font size in pixels (default: {})", font_size_));
     auto opt_fullscreen = app.add_flag("-f,--fullscreen", fullscreen_, fmt::format("fullscreen (default: {})", fullscreen_));
     auto opt_width = app.add_option("--width", window_width_, fmt::format("window width (windowed mode only, default: {})", window_width_));
     auto opt_height = app.add_option("--height", window_height_, fmt::format("window height (windowed mode only, default: {})", window_height_));
@@ -46,9 +46,6 @@ CommandLine::CommandLine(int argc, char* argv[])
     default_window_video_mode_.width = window_width_;
     default_window_video_mode_.height = window_height_;
     video_mode_ = fullscreen_ ? default_fullscreen_video_mode_ : default_window_video_mode_;
-
-    if (font_size_ == 0)
-        font_size_ = default_font_size(video_mode_, fullscreen_);
 
     spdlog::level::level_enum log_level;
 
@@ -88,7 +85,7 @@ sf::VideoMode CommandLine::default_video_mode(const int fullscreen) const
     }
 }
 
-int CommandLine::default_font_size(const sf::VideoMode& video_mode, const bool fullscreen) const
+int CommandLine::default_font_size() const
 {
-    return static_cast<int>(video_mode.height) / (fullscreen ? 96 : 72);
+    return static_cast<int>(sf::VideoMode::getDesktopMode().height) / 96;
 }

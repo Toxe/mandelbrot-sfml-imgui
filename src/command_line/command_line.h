@@ -17,7 +17,7 @@ class CommandLine {
 
     void show_usage_and_exit(const CLI::App& app, const char* error_message, const std::optional<CLI::ParseError>& error);
     [[nodiscard]] sf::VideoMode default_video_mode(const int fullscreen) const;
-    [[nodiscard]] int default_font_size(const sf::VideoMode& video_mode, const bool fullscreen) const;
+    [[nodiscard]] int default_font_size() const;
 
 public:
     CommandLine(int argc, char* argv[]);
