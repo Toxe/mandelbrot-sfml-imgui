@@ -105,10 +105,18 @@ void UI::render_main_window(App& app)
 
     ImGui::NewLine();
 
-    input_double("center_x", center_x_, 0.1, 1.0, -5.0, 5.0);
-    input_double("center_y", center_y_, 0.1, 1.0, -5.0, 5.0);
-    input_double("fractal height", fractal_height_, 0.1, 1.0, 1000.0 * std::numeric_limits<double>::min(), 10.0);
-    input_int("iterations", max_iterations_, 1000, 10000, 10, 1'000'000);
+    if (input_double("center_x", center_x_, 0.1, 1.0, -5.0, 5.0))
+        needs_to_recalculate_image_ = true;
+
+    if (input_double("center_y", center_y_, 0.1, 1.0, -5.0, 5.0))
+        needs_to_recalculate_image_ = true;
+
+    if (input_double("fractal height", fractal_height_, 0.1, 1.0, 1000.0 * std::numeric_limits<double>::min(), 10.0))
+        needs_to_recalculate_image_ = true;
+
+    if (input_int("iterations", max_iterations_, 1000, 10000, 10, 1'000'000))
+        needs_to_recalculate_image_ = true;
+
     input_int("tile size", tile_size_, 100, 500, 10, 10'000);
 
     if (phase == Phase::Idle) {
@@ -219,30 +227,40 @@ void UI::help(const std::string& text)
     }
 }
 
-void UI::input_int(const char* label, InputValue<int>& value, const int small_inc, const int big_inc, const int min, const int max)
+bool UI::input_int(const char* label, InputValue<int>& value, const int small_inc, const int big_inc, const int min, const int max)
 {
+    bool changed_now = false;
     int val = value.get();
 
     ImGui::SetNextItemWidth(ImGui::GetFontSize() * 15);
 
-    if (ImGui::InputInt(label, &val, small_inc, big_inc))
+    if (ImGui::InputInt(label, &val, small_inc, big_inc)) {
         value.set(std::clamp(val, min, max));
+        changed_now = true;
+    }
 
     ImGui::SameLine();
     help(fmt::format("{} to {}\n\n     -/+ to change by {}\nCTRL -/+ to change by {}", min, max, small_inc, big_inc));
+
+    return changed_now;
 }
 
-void UI::input_double(const char* label, InputValue<double>& value, const double small_inc, const double big_inc, const double min, const double max)
+bool UI::input_double(const char* label, InputValue<double>& value, const double small_inc, const double big_inc, const double min, const double max)
 {
+    bool changed_now = false;
     double val = value.get();
 
     ImGui::SetNextItemWidth(ImGui::GetFontSize() * 15);
 
-    if (ImGui::InputDouble(label, &val, small_inc, big_inc, "%.16lf"))
+    if (ImGui::InputDouble(label, &val, small_inc, big_inc, "%.16lf")) {
         value.set(std::clamp(val, min, max));
+        changed_now = true;
+    }
 
     ImGui::SameLine();
     help(fmt::format("{} to {}\n\n     -/+ to change by {}\nCTRL -/+ to change by {}", min, max, small_inc, big_inc));
+
+    return changed_now;
 }
 
 void UI::calculate_image(App& app)
@@ -250,6 +268,8 @@ void UI::calculate_image(App& app)
     const auto image_size = app.window().size();
     const auto calculation_area = CalculationArea{0, 0, image_size.width, image_size.height};
     app.calculate_image(SupervisorImageRequest{max_iterations_.get(), tile_size_.get(), image_size, calculation_area, {0, 0}, {center_x_.get(), center_y_.get(), fractal_height_.get()}});
+
+    needs_to_recalculate_image_ = false;
 }
 
 void UI::scroll_image(App& app, int delta_x, int delta_y)
@@ -291,10 +311,18 @@ void UI::scroll_image(App& app, int delta_x, int delta_y)
         }
     }
 
+    if (needs_to_recalculate_image_) {
+        // we need to recalculate the image so ignore the scrolling and redraw the whole image
+        scroll = Scroll{0, 0};
+        calculation_area = CalculationArea{0, 0, image_size.width, image_size.height};
+    }
+
     center_x_.set(fractal_section.center_x);
     center_y_.set(fractal_section.center_y);
 
     app.calculate_image(SupervisorImageRequest{max_iterations_.get(), tile_size_.get(), image_size, calculation_area, scroll, fractal_section});
+
+    needs_to_recalculate_image_ = false;
 }
 
 void UI::zoom_image(App& app, double factor)
@@ -308,6 +336,8 @@ void UI::zoom_image(App& app, double factor)
     const FractalSection fractal_section{center_x_.get(), center_y_.get(), fractal_height_.get()};
 
     app.calculate_image(SupervisorImageRequest{max_iterations_.get(), tile_size_.get(), image_size, calculation_area, {0, 0}, fractal_section});
+
+    needs_to_recalculate_image_ = false;
 }
 
 void UI::show_status(const Phase phase)

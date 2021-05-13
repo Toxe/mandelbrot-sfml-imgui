@@ -32,14 +32,16 @@ class UI {
     bool is_visible_ = true;
     bool show_help_ = false;
 
+    bool needs_to_recalculate_image_ = false;
+
     InterfaceHiddenHintWindow interface_hidden_hint_window_;
 
     std::vector<Gradient> available_gradients_;
     int selected_gradient_ = -1;
 
     void help(const std::string& text);
-    void input_int(const char* label, InputValue<int>& value, const int small_inc, const int big_inc, const int min, const int max);
-    void input_double(const char* label, InputValue<double>& value, const double small_inc, const double big_inc, const double min, const double max);
+    bool input_int(const char* label, InputValue<int>& value, const int small_inc, const int big_inc, const int min, const int max);
+    bool input_double(const char* label, InputValue<double>& value, const double small_inc, const double big_inc, const double min, const double max);
 
     void render_main_window(App& app);
     void render_help_window();
