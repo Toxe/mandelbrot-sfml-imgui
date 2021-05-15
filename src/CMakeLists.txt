@@ -16,7 +16,7 @@ add_executable(mandelbrot
     ui/input_value.h
     ui/interface_hidden_hint_window.cpp ui/interface_hidden_hint_window.h
     ui/ui.cpp ui/ui.h
-    window.cpp window.h
+    window/window.cpp window/window.h
     worker/worker.cpp worker/worker.h
 )
 

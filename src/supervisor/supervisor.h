@@ -6,10 +6,10 @@
 #include <SFML/Graphics.hpp>
 
 #include "supervisor_status.h"
-#include "window.h"
 #include "gradient/gradient.h"
 #include "messages/message_queue.h"
 #include "messages/messages.h"
+#include "window/window.h"
 #include "worker/worker.h"
 
 class App;

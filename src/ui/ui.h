@@ -6,10 +6,10 @@
 #include <imgui.h>
 
 #include "input_value.h"
-#include "interface_hidden_hint_window.h"
-#include "window.h"
 #include "clock/duration.h"
+#include "interface_hidden_hint_window.h"
 #include "supervisor/phase.h"
+#include "window/window.h"
 
 class App;
 class CommandLine;
