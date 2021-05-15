@@ -10,8 +10,8 @@
 #include <fmt/core.h>
 #include <spdlog/spdlog.h>
 
-#include "app.h"
 #include "colors.h"
+#include "app/app.h"
 #include "command_line/command_line.h"
 #include "gradient/gradient.h"
 #include "messages/messages.h"
