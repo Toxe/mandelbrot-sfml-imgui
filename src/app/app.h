@@ -4,7 +4,6 @@
 #include "gradient/gradient.h"
 #include "mandelbrot/mandelbrot.h"
 #include "supervisor/supervisor.h"
-#include "ui/ui.h"
 #include "window/window.h"
 
 class CommandLine;
@@ -13,7 +12,6 @@ class App {
     Gradient gradient_;
     Window window_;
     Supervisor supervisor_;
-    UI ui_;
 
     Clock frame_time_clock_;
     Duration elapsed_time_;
@@ -23,7 +21,6 @@ public:
 
     [[nodiscard]] Gradient& gradient() { return gradient_; }
     [[nodiscard]] Window& window() { return window_; };
-    [[nodiscard]] UI& ui() { return ui_; };
     [[nodiscard]] Supervisor& supervisor() { return supervisor_; };
     [[nodiscard]] SupervisorStatus& supervisor_status() { return supervisor_.status(); };
     [[nodiscard]] Duration elapsed_time() const { return elapsed_time_; };
