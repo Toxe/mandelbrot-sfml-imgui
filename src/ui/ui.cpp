@@ -43,21 +43,21 @@ void UI::reset_image_request_input_values_to_default()
     return max_iterations_.changed() || tile_size_.changed() || center_x_.changed() || center_y_.changed() || fractal_height_.changed();
 }
 
-void UI::render(App& app)
+void UI::render(App& app, Supervisor& supervisor)
 {
-    render_main_window(app);
+    render_main_window(app, supervisor);
     render_help_window();
     render_interface_hidden_hint_window();
 }
 
-void UI::render_main_window(App& app)
+void UI::render_main_window(App& app, Supervisor& supervisor)
 {
     static std::vector<float> fps(120);
     static std::size_t values_offset = 0;
 
-    const Phase phase = app.supervisor_status().phase();
-    const bool calculation_running = app.supervisor_status().calculation_running();
-    const Duration calculation_time = app.supervisor_status().calculation_time();
+    const Phase phase = supervisor.status().phase();
+    const bool calculation_running = supervisor.status().calculation_running();
+    const Duration calculation_time = supervisor.status().calculation_time();
 
     const float elapsed_time_in_seconds = app.elapsed_time().as_seconds();
     const float current_fps = app.elapsed_time().fps();

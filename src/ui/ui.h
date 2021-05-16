@@ -14,6 +14,7 @@
 
 class App;
 class CommandLine;
+class Supervisor;
 
 class UI {
     const char* main_window_title_ = "Mandelbrot";
@@ -46,7 +47,7 @@ class UI {
     bool input_int(const char* label, InputValue<int>& value, const int small_inc, const int big_inc, const int min, const int max);
     bool input_double(const char* label, InputValue<double>& value, const double small_inc, const double big_inc, const double min, const double max);
 
-    void render_main_window(App& app);
+    void render_main_window(App& app, Supervisor& supervisor);
     void render_help_window();
     void render_interface_hidden_hint_window();
 
@@ -60,7 +61,7 @@ class UI {
 public:
     UI(const CommandLine& cli);
 
-    void render(App& app);
+    void render(App& app, Supervisor& supervisor);
 
     void toggle_visibility();
     void toggle_help() { show_help_ = !show_help_; };
