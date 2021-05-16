@@ -55,7 +55,7 @@ class UI {
 
     void show_status(const Phase phase);
     void show_render_time(const bool calculation_running, const Duration calculation_time);
-    void show_gradient_selection(App& app);
+    void show_gradient_selection();
 
 public:
     UI(const CommandLine& cli);

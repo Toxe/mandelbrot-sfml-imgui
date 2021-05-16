@@ -145,7 +145,7 @@ void UI::render_main_window(App& app)
         }
     }
 
-    show_gradient_selection(app);
+    show_gradient_selection();
 
     main_window_size_ = ImGui::GetWindowSize();
     ImGui::End();
@@ -377,7 +377,7 @@ void UI::show_render_time(bool calculation_running, Duration calculation_time)
         ImGui::Text("%.3fs", calculation_time.as_seconds());
 }
 
-void UI::show_gradient_selection(App& app)
+void UI::show_gradient_selection()
 {
     ImGui::NewLine();
     ImGui::Text("Colors");
