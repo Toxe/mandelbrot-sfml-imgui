@@ -2,8 +2,6 @@
 
 #include "clock/clock.h"
 
-class CommandLine;
-
 class App {
     Clock frame_time_clock_;
     Duration elapsed_time_;
