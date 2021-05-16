@@ -83,20 +83,19 @@ void UI::render_main_window(App& app)
     show_render_time(calculation_running, calculation_time);
 
     if (ImGui::Button("Help (F1)"))
-        toggle_help();
+        event_handler_->handle_event(Event::ToggleHelp);
 
     ImGui::SameLine();
 
     if (ImGui::Button("Fullscreen (F11)"))
-        app.window().toggle_fullscreen();
+        event_handler_->handle_event(Event::ToggleFullscreen);
 
     input_int("number of threads", num_threads_, 1, 10, 1, 1'000);
 
     if (num_threads_.changed()) {
         if (phase == Phase::Idle) {
-            if (ImGui::Button("change")) {
+            if (ImGui::Button("change"))
                 event_handler_->handle_event(Event::ChangeNumberOfThreads);
-            }
         } else {
             ImGui::TextDisabled("waiting for calculation to finish...");
         }
@@ -202,7 +201,7 @@ void UI::render_help_window()
         ImGui::Text("quit");
 
         if (ImGui::Button("Close"))
-            toggle_help();
+            event_handler_->handle_event(Event::ToggleHelp);
 
         ImGui::End();
     }
