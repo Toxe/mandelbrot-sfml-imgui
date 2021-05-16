@@ -11,7 +11,7 @@
 #include <spdlog/spdlog.h>
 
 #include "colors.h"
-#include "app/app.h"
+#include "clock/duration.h"
 #include "command_line/command_line.h"
 #include "gradient/gradient.h"
 #include "messages/messages.h"
@@ -43,14 +43,14 @@ void UI::reset_image_request_input_values_to_default()
     return max_iterations_.changed() || tile_size_.changed() || center_x_.changed() || center_y_.changed() || fractal_height_.changed();
 }
 
-void UI::render(App& app, SupervisorStatus& supervisor_status, const ImageSize& window_size)
+void UI::render(const Duration elapsed_time, SupervisorStatus& supervisor_status, const ImageSize& window_size)
 {
-    render_main_window(app, supervisor_status, window_size);
+    render_main_window(elapsed_time, supervisor_status, window_size);
     render_help_window();
     render_interface_hidden_hint_window();
 }
 
-void UI::render_main_window(App& app, SupervisorStatus& supervisor_status, const ImageSize& window_size)
+void UI::render_main_window(const Duration elapsed_time, SupervisorStatus& supervisor_status, const ImageSize& window_size)
 {
     static std::vector<float> fps(120);
     static std::size_t values_offset = 0;
@@ -59,8 +59,8 @@ void UI::render_main_window(App& app, SupervisorStatus& supervisor_status, const
     const bool calculation_running = supervisor_status.calculation_running();
     const Duration calculation_time = supervisor_status.calculation_time();
 
-    const float elapsed_time_in_seconds = app.elapsed_time().as_seconds();
-    const float current_fps = app.elapsed_time().fps();
+    const float elapsed_time_in_seconds = elapsed_time.as_seconds();
+    const float current_fps = elapsed_time.fps();
     const auto fps_label = fmt::format("{:.1f} FPS ({:.3f} ms/frame)", current_fps, 1000.0f * elapsed_time_in_seconds);
     fps[values_offset] = current_fps;
     values_offset = (values_offset + 1) % fps.size();

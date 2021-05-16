@@ -28,7 +28,7 @@ int main(int argc, char* argv[])
         event_handler.poll_events(window.window());
 
         if (window.is_open()) {
-            ui.render(app, supervisor.status(), window.size());
+            ui.render(app.elapsed_time(), supervisor.status(), window.size());
             window.render();
         }
     }

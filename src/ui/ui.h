@@ -6,13 +6,12 @@
 #include <imgui.h>
 
 #include "input_value.h"
-#include "clock/duration.h"
 #include "event_handler/event_handler.h"
 #include "interface_hidden_hint_window.h"
 #include "messages/messages.h"
 #include "supervisor/phase.h"
 
-class App;
+class Duration;
 class CommandLine;
 class SupervisorStatus;
 
@@ -47,7 +46,7 @@ class UI {
     bool input_int(const char* label, InputValue<int>& value, const int small_inc, const int big_inc, const int min, const int max);
     bool input_double(const char* label, InputValue<double>& value, const double small_inc, const double big_inc, const double min, const double max);
 
-    void render_main_window(App& app, SupervisorStatus& supervisor_status, const ImageSize& window_size);
+    void render_main_window(const Duration elapsed_time, SupervisorStatus& supervisor_status, const ImageSize& window_size);
     void render_help_window();
     void render_interface_hidden_hint_window();
 
@@ -61,7 +60,7 @@ class UI {
 public:
     UI(const CommandLine& cli);
 
-    void render(App& app, SupervisorStatus& supervisor_status, const ImageSize& window_size);
+    void render(const Duration elapsed_time, SupervisorStatus& supervisor_status, const ImageSize& window_size);
 
     void toggle_visibility();
     void toggle_help() { show_help_ = !show_help_; };
