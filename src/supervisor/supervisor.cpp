@@ -10,6 +10,7 @@
 Supervisor::Supervisor(Window& window)
     : running_{false}, window_{window}
 {
+    gradient_ = load_gradient("benchmark");
 }
 
 Supervisor::~Supervisor()
@@ -17,13 +18,11 @@ Supervisor::~Supervisor()
     join();
 }
 
-void Supervisor::run(const int num_threads, const Gradient& gradient)
+void Supervisor::run(const int num_threads)
 {
     status_.set_phase(Phase::Starting);
 
     num_threads_ = num_threads;
-    gradient_ = gradient;
-
     thread_ = std::thread(&Supervisor::main, this);
 }
 
@@ -57,7 +56,7 @@ void Supervisor::main()
 void Supervisor::restart(const int num_threads)
 {
     shutdown();
-    run(num_threads, gradient_);
+    run(num_threads);
 }
 
 void Supervisor::shutdown()

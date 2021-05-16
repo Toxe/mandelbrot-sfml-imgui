@@ -72,7 +72,7 @@ public:
     Supervisor(Window& window);
     ~Supervisor();
 
-    void run(const int num_threads, const Gradient& gradient);
+    void run(const int num_threads);
     void join();
 
     void restart(const int num_threads);

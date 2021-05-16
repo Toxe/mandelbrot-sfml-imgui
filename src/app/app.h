@@ -1,7 +1,6 @@
 #pragma once
 
 #include "clock/clock.h"
-#include "gradient/gradient.h"
 #include "mandelbrot/mandelbrot.h"
 #include "supervisor/supervisor.h"
 #include "window/window.h"
@@ -9,7 +8,6 @@
 class CommandLine;
 
 class App {
-    Gradient gradient_;
     Window window_;
     Supervisor supervisor_;
 
@@ -19,7 +17,6 @@ class App {
 public:
     App(const CommandLine& cli);
 
-    [[nodiscard]] Gradient& gradient() { return gradient_; }
     [[nodiscard]] Window& window() { return window_; };
     [[nodiscard]] Supervisor& supervisor() { return supervisor_; };
     [[nodiscard]] SupervisorStatus& supervisor_status() { return supervisor_.status(); };

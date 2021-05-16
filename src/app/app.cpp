@@ -7,8 +7,7 @@
 App::App(const CommandLine& cli)
     : window_{Window(cli)}, supervisor_{Supervisor(window_)}
 {
-    gradient_ = load_gradient("benchmark");
-    supervisor_.run(cli.num_threads(), gradient_);
+    supervisor_.run(cli.num_threads());
 }
 
 void App::next_frame()
