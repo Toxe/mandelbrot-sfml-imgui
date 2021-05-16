@@ -70,10 +70,10 @@ public:
 
     void set_needs_to_recalculate_image(bool f) { needs_to_recalculate_image_ = f; };
 
-    SupervisorImageRequest calculate_image(const ImageSize image_size);
-    SupervisorImageRequest scroll_image(const ImageSize image_size, const int delta_x, const int delta_y);
-    SupervisorImageRequest zoom_image(const ImageSize image_size, double factor);
-    SupervisorColorize colorize_image(const ImageSize image_size);
+    SupervisorImageRequest calculate_image_params(const ImageSize image_size);
+    SupervisorImageRequest scroll_image_params(const ImageSize image_size, const int delta_x, const int delta_y);
+    SupervisorImageRequest zoom_image_params(const ImageSize image_size, double factor);
+    SupervisorColorize colorize_image_params(const ImageSize image_size);
 
     void set_event_handler(EventHandler* event_handler) { event_handler_ = event_handler; };
 };

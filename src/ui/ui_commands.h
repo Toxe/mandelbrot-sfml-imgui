@@ -30,7 +30,7 @@ Command ScrollLeftCommand(Window& window, UI& ui, Supervisor& supervisor)
         spdlog::debug("ScrollLeftCommand");
 
         if (supervisor.status().phase() == Phase::Idle) {
-            SupervisorImageRequest image_request = ui.scroll_image(window.size(), -window.size().height / 8, 0);
+            SupervisorImageRequest image_request = ui.scroll_image_params(window.size(), -window.size().height / 8, 0);
             supervisor.calculate_image(image_request);
             ui.set_needs_to_recalculate_image(false);
         }
@@ -43,7 +43,7 @@ Command ScrollRightCommand(Window& window, UI& ui, Supervisor& supervisor)
         spdlog::debug("ScrollRightCommand");
 
         if (supervisor.status().phase() == Phase::Idle) {
-            SupervisorImageRequest image_request = ui.scroll_image(window.size(), window.size().height / 8, 0);
+            SupervisorImageRequest image_request = ui.scroll_image_params(window.size(), window.size().height / 8, 0);
             supervisor.calculate_image(image_request);
             ui.set_needs_to_recalculate_image(false);
         }
@@ -56,7 +56,7 @@ Command ScrollUpCommand(Window& window, UI& ui, Supervisor& supervisor)
         spdlog::debug("ScrollUpCommand");
 
         if (supervisor.status().phase() == Phase::Idle) {
-            SupervisorImageRequest image_request = ui.scroll_image(window.size(), 0, -window.size().height / 8);
+            SupervisorImageRequest image_request = ui.scroll_image_params(window.size(), 0, -window.size().height / 8);
             supervisor.calculate_image(image_request);
             ui.set_needs_to_recalculate_image(false);
         }
@@ -69,7 +69,7 @@ Command ScrollDownCommand(Window& window, UI& ui, Supervisor& supervisor)
         spdlog::debug("ScrollDownCommand");
 
         if (supervisor.status().phase() == Phase::Idle) {
-            SupervisorImageRequest image_request = ui.scroll_image(window.size(), 0, window.size().height / 8);
+            SupervisorImageRequest image_request = ui.scroll_image_params(window.size(), 0, window.size().height / 8);
             supervisor.calculate_image(image_request);
             ui.set_needs_to_recalculate_image(false);
         }
@@ -82,7 +82,7 @@ Command ZoomInCommand(Window& window, UI& ui, Supervisor& supervisor)
         spdlog::debug("ZoomInCommand");
 
         if (supervisor.status().phase() == Phase::Idle) {
-            SupervisorImageRequest image_request = ui.zoom_image(window.size(), 2.0);
+            SupervisorImageRequest image_request = ui.zoom_image_params(window.size(), 2.0);
             supervisor.calculate_image(image_request);
             ui.set_needs_to_recalculate_image(false);
         }
@@ -95,7 +95,7 @@ Command ZoomOutCommand(Window& window, UI& ui, Supervisor& supervisor)
         spdlog::debug("ZoomOutCommand");
 
         if (supervisor.status().phase() == Phase::Idle) {
-            SupervisorImageRequest image_request = ui.zoom_image(window.size(), 0.5);
+            SupervisorImageRequest image_request = ui.zoom_image_params(window.size(), 0.5);
             supervisor.calculate_image(image_request);
             ui.set_needs_to_recalculate_image(false);
         }
@@ -108,7 +108,7 @@ Command CalculateImageCommand(Window& window, UI& ui, Supervisor& supervisor)
         spdlog::debug("CalculateImageCommand");
 
         if (supervisor.status().phase() == Phase::Idle) {
-            SupervisorImageRequest image_request = ui.calculate_image(window.size());
+            SupervisorImageRequest image_request = ui.calculate_image_params(window.size());
             supervisor.calculate_image(image_request);
             ui.set_needs_to_recalculate_image(false);
         }
@@ -121,7 +121,7 @@ Command ColorizeImageCommand(Window& window, UI& ui, Supervisor& supervisor)
         spdlog::debug("ColorizeImageCommand");
 
         if (supervisor.status().phase() == Phase::Idle) {
-            SupervisorColorize colorize = ui.colorize_image(window.size());
+            SupervisorColorize colorize = ui.colorize_image_params(window.size());
             supervisor.colorize(colorize);
         }
     };

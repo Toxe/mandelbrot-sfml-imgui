@@ -262,7 +262,7 @@ bool UI::input_double(const char* label, InputValue<double>& value, const double
     return changed_now;
 }
 
-SupervisorImageRequest UI::calculate_image(const ImageSize image_size)
+SupervisorImageRequest UI::calculate_image_params(const ImageSize image_size)
 {
     const CalculationArea calculation_area{0, 0, image_size.width, image_size.height};
     const FractalSection fractal_section{center_x_.get(), center_y_.get(), fractal_height_.get()};
@@ -270,7 +270,7 @@ SupervisorImageRequest UI::calculate_image(const ImageSize image_size)
     return SupervisorImageRequest{max_iterations_.get(), tile_size_.get(), image_size, calculation_area, {0, 0}, fractal_section};
 }
 
-SupervisorImageRequest UI::scroll_image(const ImageSize image_size, const int delta_x, const int delta_y)
+SupervisorImageRequest UI::scroll_image_params(const ImageSize image_size, const int delta_x, const int delta_y)
 {
     assert((delta_x != 0 && delta_y == 0) || (delta_x == 0 && delta_y != 0));
 
@@ -320,7 +320,7 @@ SupervisorImageRequest UI::scroll_image(const ImageSize image_size, const int de
     return SupervisorImageRequest{max_iterations_.get(), tile_size_.get(), image_size, calculation_area, scroll, fractal_section};
 }
 
-SupervisorImageRequest UI::zoom_image(const ImageSize image_size, double factor)
+SupervisorImageRequest UI::zoom_image_params(const ImageSize image_size, double factor)
 {
     spdlog::debug("zoom {}", factor);
 
@@ -332,7 +332,7 @@ SupervisorImageRequest UI::zoom_image(const ImageSize image_size, double factor)
     return SupervisorImageRequest{max_iterations_.get(), tile_size_.get(), image_size, calculation_area, {0, 0}, fractal_section};
 }
 
-SupervisorColorize UI::colorize_image(const ImageSize image_size)
+SupervisorColorize UI::colorize_image_params(const ImageSize image_size)
 {
     return SupervisorColorize{max_iterations_.get(), image_size, available_gradients_[selected_gradient_]};
 }
