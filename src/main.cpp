@@ -13,9 +13,7 @@ int main(int argc, char* argv[])
     App app;
     UI ui(cli);
     Window window(cli);
-
-    Supervisor supervisor(window);
-    supervisor.run(cli.num_threads());
+    Supervisor supervisor(cli, window);
 
     EventHandler event_handler;
     register_events(event_handler, window, ui, supervisor);

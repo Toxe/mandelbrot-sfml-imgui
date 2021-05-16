@@ -5,12 +5,13 @@
 
 #include <spdlog/spdlog.h>
 
+#include "command_line/command_line.h"
 #include "mandelbrot/mandelbrot.h"
 
-Supervisor::Supervisor(Window& window)
-    : running_{false}, window_{window}
+Supervisor::Supervisor(const CommandLine& cli, Window& window)
+    : running_{false}, window_{window}, gradient_{load_gradient("benchmark")}
 {
-    gradient_ = load_gradient("benchmark");
+    run(cli.num_threads());
 }
 
 Supervisor::~Supervisor()

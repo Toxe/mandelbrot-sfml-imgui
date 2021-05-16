@@ -14,6 +14,7 @@
 #include "worker/worker.h"
 
 class App;
+class CommandLine;
 struct SupervisorImageRequest;
 
 class Supervisor {
@@ -69,7 +70,7 @@ class Supervisor {
     void copy_results_per_point_row(const int dx, const int dy, const int image_width, const int image_height, const int y);
 
 public:
-    Supervisor(Window& window);
+    Supervisor(const CommandLine& cli, Window& window);
     ~Supervisor();
 
     void run(const int num_threads);
