@@ -1,7 +1,6 @@
 #pragma once
 
 #include "clock/clock.h"
-#include "mandelbrot/mandelbrot.h"
 #include "window/window.h"
 
 class CommandLine;
