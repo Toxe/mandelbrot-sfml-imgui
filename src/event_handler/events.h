@@ -13,4 +13,7 @@ enum class Event {
     ZoomIn,
     ZoomOut,
     CalculateImage,
+    ColorizeImage,
+    ChangeNumberOfThreads,
+    CancelCalculation,
 };

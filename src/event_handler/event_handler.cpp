@@ -10,17 +10,21 @@ const Command no_command = [] { spdlog::debug("NoCommand"); };
 
 EventHandler::EventHandler()
 {
-    commands_[Event::CloseWindow]        = no_command;
-    commands_[Event::ResizedWindow]      = no_command;
-    commands_[Event::ToggleFullscreen]   = no_command;
-    commands_[Event::ToggleHelp]         = no_command;
-    commands_[Event::ToggleUIVisibility] = no_command;
-    commands_[Event::ScrollLeft]         = no_command;
-    commands_[Event::ScrollRight]        = no_command;
-    commands_[Event::ScrollUp]           = no_command;
-    commands_[Event::ScrollDown]         = no_command;
-    commands_[Event::ZoomIn]             = no_command;
-    commands_[Event::ZoomOut]            = no_command;
+    commands_[Event::CloseWindow]           = no_command;
+    commands_[Event::ResizedWindow]         = no_command;
+    commands_[Event::ToggleFullscreen]      = no_command;
+    commands_[Event::ToggleHelp]            = no_command;
+    commands_[Event::ToggleUIVisibility]    = no_command;
+    commands_[Event::ScrollLeft]            = no_command;
+    commands_[Event::ScrollRight]           = no_command;
+    commands_[Event::ScrollUp]              = no_command;
+    commands_[Event::ScrollDown]            = no_command;
+    commands_[Event::ZoomIn]                = no_command;
+    commands_[Event::ZoomOut]               = no_command;
+    commands_[Event::CalculateImage]        = no_command;
+    commands_[Event::ColorizeImage]         = no_command;
+    commands_[Event::ChangeNumberOfThreads] = no_command;
+    commands_[Event::CancelCalculation]     = no_command;
 }
 
 void EventHandler::set_command(const Event& event, Command command)

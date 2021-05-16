@@ -95,8 +95,7 @@ void UI::render_main_window(App& app)
     if (num_threads_.changed()) {
         if (phase == Phase::Idle) {
             if (ImGui::Button("change")) {
-                app.change_num_threads(num_threads_.get());
-                num_threads_.changed(false);
+                event_handler_->handle_event(Event::ChangeNumberOfThreads);
             }
         } else {
             ImGui::TextDisabled("waiting for calculation to finish...");
@@ -136,7 +135,7 @@ void UI::render_main_window(App& app)
     if (calculation_running) {
         if (phase == Phase::Calculating) {
             if (ImGui::Button("Cancel"))
-                app.cancel_calculation();
+                event_handler_->handle_event(Event::CancelCalculation);
         } else if (phase == Phase::Coloring) {
             ImGui::TextDisabled("waiting for colorization to finish...");
         } else if (phase == Phase::Canceled) {
@@ -339,6 +338,11 @@ SupervisorImageRequest UI::zoom_image(const ImageSize image_size, double factor)
     return SupervisorImageRequest{max_iterations_.get(), tile_size_.get(), image_size, calculation_area, {0, 0}, fractal_section};
 }
 
+SupervisorColorize UI::colorize_image(const ImageSize image_size)
+{
+    return SupervisorColorize{max_iterations_.get(), image_size, available_gradients_[selected_gradient_]};
+}
+
 void UI::show_status(const Phase phase)
 {
     static Clock clock;
@@ -391,7 +395,7 @@ void UI::show_gradient_selection(App& app)
 
         if (ImGui::Selectable(gradient.name_.c_str(), selected_gradient_ == i)) {
             selected_gradient_ = i;
-            app.colorize(SupervisorColorize{max_iterations_.get(), {0, 0}, gradient});
+            event_handler_->handle_event(Event::ColorizeImage);
         }
     }
 

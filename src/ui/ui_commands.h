@@ -5,6 +5,8 @@
 #include "ui.h"
 #include "event_handler/command.h"
 #include "supervisor/supervisor.h"
+#include "ui/ui.h"
+#include "window/window.h"
 
 Command ToggleHelpCommand(UI& ui)
 {
@@ -102,6 +104,32 @@ Command CalculateImageCommand(Window& window, UI& ui, Supervisor& supervisor)
         if (supervisor.status().phase() == Phase::Idle) {
             SupervisorImageRequest image_request = ui.calculate_image(window.size());
             supervisor.calculate_image(image_request);
+        }
+    };
+}
+
+Command ColorizeImageCommand(Window& window, UI& ui, Supervisor& supervisor)
+{
+    return [&] {
+        spdlog::debug("ColorizeImageCommand");
+
+        if (supervisor.status().phase() == Phase::Idle) {
+            SupervisorColorize colorize = ui.colorize_image(window.size());
+            supervisor.colorize(colorize);
+        }
+    };
+}
+
+Command ChangeNumberOfThreadsCommand(UI& ui, Supervisor& supervisor)
+{
+    return [&] {
+        spdlog::debug("ChangeNumberOfThreadsCommand");
+
+        if (supervisor.status().phase() == Phase::Idle) {
+            int num_threads = ui.num_threads_input_value();
+            ui.set_num_threads_input_value_changed(false);
+
+            supervisor.restart(num_threads);
         }
     };
 }

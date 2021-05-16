@@ -65,9 +65,13 @@ public:
     void toggle_visibility();
     void toggle_help() { show_help_ = !show_help_; };
 
+    int num_threads_input_value() { return num_threads_.get(); }
+    void set_num_threads_input_value_changed(bool changed) { num_threads_.changed(changed); };
+
     SupervisorImageRequest calculate_image(const ImageSize image_size);
     SupervisorImageRequest scroll_image(const ImageSize image_size, const int delta_x, const int delta_y);
     SupervisorImageRequest zoom_image(const ImageSize image_size, double factor);
+    SupervisorColorize colorize_image(const ImageSize image_size);
 
     void set_event_handler(EventHandler* event_handler) { event_handler_ = event_handler; };
 };

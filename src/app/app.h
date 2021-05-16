@@ -34,8 +34,4 @@ public:
     void render();
 
     void shutdown();
-
-    void colorize(SupervisorColorize colorize);
-    void cancel_calculation();
-    void change_num_threads(const int num_threads);
 };

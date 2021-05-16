@@ -13,6 +13,7 @@ add_executable(mandelbrot
     messages/message_queue.h
     messages/messages.h
     supervisor/phase.cpp supervisor/phase.h
+    supervisor/supervisor_commands.h
     supervisor/supervisor_status.cpp supervisor/supervisor_status.h
     supervisor/supervisor.cpp supervisor/supervisor.h
     ui/colors.h

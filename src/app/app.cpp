@@ -31,19 +31,3 @@ void App::shutdown()
 {
     supervisor_.shutdown();
 }
-
-void App::colorize(SupervisorColorize colorize)
-{
-    colorize.image_size = window_.size();
-    supervisor_.colorize(colorize);
-}
-
-void App::cancel_calculation()
-{
-    supervisor_.cancel_calculation();
-}
-
-void App::change_num_threads(const int num_threads)
-{
-    supervisor_.restart(num_threads);
-}
