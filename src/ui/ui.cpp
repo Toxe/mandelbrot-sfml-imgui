@@ -267,8 +267,6 @@ SupervisorImageRequest UI::calculate_image(const ImageSize image_size)
     const CalculationArea calculation_area{0, 0, image_size.width, image_size.height};
     const FractalSection fractal_section{center_x_.get(), center_y_.get(), fractal_height_.get()};
 
-    needs_to_recalculate_image_ = false;
-
     return SupervisorImageRequest{max_iterations_.get(), tile_size_.get(), image_size, calculation_area, {0, 0}, fractal_section};
 }
 
@@ -319,8 +317,6 @@ SupervisorImageRequest UI::scroll_image(const ImageSize image_size, const int de
     center_x_.set(fractal_section.center_x);
     center_y_.set(fractal_section.center_y);
 
-    needs_to_recalculate_image_ = false;
-
     return SupervisorImageRequest{max_iterations_.get(), tile_size_.get(), image_size, calculation_area, scroll, fractal_section};
 }
 
@@ -332,8 +328,6 @@ SupervisorImageRequest UI::zoom_image(const ImageSize image_size, double factor)
 
     const CalculationArea calculation_area{0, 0, image_size.width, image_size.height};
     const FractalSection fractal_section{center_x_.get(), center_y_.get(), fractal_height_.get()};
-
-    needs_to_recalculate_image_ = false;
 
     return SupervisorImageRequest{max_iterations_.get(), tile_size_.get(), image_size, calculation_area, {0, 0}, fractal_section};
 }

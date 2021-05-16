@@ -68,6 +68,8 @@ public:
     int num_threads_input_value() { return num_threads_.get(); }
     void set_num_threads_input_value_changed(bool changed) { num_threads_.changed(changed); };
 
+    void set_needs_to_recalculate_image(bool f) { needs_to_recalculate_image_ = f; };
+
     SupervisorImageRequest calculate_image(const ImageSize image_size);
     SupervisorImageRequest scroll_image(const ImageSize image_size, const int delta_x, const int delta_y);
     SupervisorImageRequest zoom_image(const ImageSize image_size, double factor);

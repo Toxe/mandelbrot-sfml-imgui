@@ -32,6 +32,7 @@ Command ScrollLeftCommand(Window& window, UI& ui, Supervisor& supervisor)
         if (supervisor.status().phase() == Phase::Idle) {
             SupervisorImageRequest image_request = ui.scroll_image(window.size(), -window.size().height / 8, 0);
             supervisor.calculate_image(image_request);
+            ui.set_needs_to_recalculate_image(false);
         }
     };
 }
@@ -44,6 +45,7 @@ Command ScrollRightCommand(Window& window, UI& ui, Supervisor& supervisor)
         if (supervisor.status().phase() == Phase::Idle) {
             SupervisorImageRequest image_request = ui.scroll_image(window.size(), window.size().height / 8, 0);
             supervisor.calculate_image(image_request);
+            ui.set_needs_to_recalculate_image(false);
         }
     };
 }
@@ -56,6 +58,7 @@ Command ScrollUpCommand(Window& window, UI& ui, Supervisor& supervisor)
         if (supervisor.status().phase() == Phase::Idle) {
             SupervisorImageRequest image_request = ui.scroll_image(window.size(), 0, -window.size().height / 8);
             supervisor.calculate_image(image_request);
+            ui.set_needs_to_recalculate_image(false);
         }
     };
 }
@@ -68,6 +71,7 @@ Command ScrollDownCommand(Window& window, UI& ui, Supervisor& supervisor)
         if (supervisor.status().phase() == Phase::Idle) {
             SupervisorImageRequest image_request = ui.scroll_image(window.size(), 0, window.size().height / 8);
             supervisor.calculate_image(image_request);
+            ui.set_needs_to_recalculate_image(false);
         }
     };
 }
@@ -80,6 +84,7 @@ Command ZoomInCommand(Window& window, UI& ui, Supervisor& supervisor)
         if (supervisor.status().phase() == Phase::Idle) {
             SupervisorImageRequest image_request = ui.zoom_image(window.size(), 2.0);
             supervisor.calculate_image(image_request);
+            ui.set_needs_to_recalculate_image(false);
         }
     };
 }
@@ -92,6 +97,7 @@ Command ZoomOutCommand(Window& window, UI& ui, Supervisor& supervisor)
         if (supervisor.status().phase() == Phase::Idle) {
             SupervisorImageRequest image_request = ui.zoom_image(window.size(), 0.5);
             supervisor.calculate_image(image_request);
+            ui.set_needs_to_recalculate_image(false);
         }
     };
 }
@@ -104,6 +110,7 @@ Command CalculateImageCommand(Window& window, UI& ui, Supervisor& supervisor)
         if (supervisor.status().phase() == Phase::Idle) {
             SupervisorImageRequest image_request = ui.calculate_image(window.size());
             supervisor.calculate_image(image_request);
+            ui.set_needs_to_recalculate_image(false);
         }
     };
 }
