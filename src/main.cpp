@@ -16,7 +16,11 @@ int main(int argc, char* argv[])
     while (app.running()) {
         app.next_frame();
         event_handler.poll_events(app.window().window());
-        app.render();
+
+        if (app.running()) {
+            app.ui().render(app);
+            app.window().render();
+        }
     }
 
     app.shutdown();

@@ -31,7 +31,5 @@ public:
 
     void next_frame();
 
-    void render();
-
     void shutdown();
 };

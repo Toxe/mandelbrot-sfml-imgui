@@ -19,14 +19,6 @@ void App::next_frame()
     window_.next_frame(elapsed_time_);
 }
 
-void App::render()
-{
-    if (running()) {
-        ui_.render(*this);
-        window_.render();
-    }
-}
-
 void App::shutdown()
 {
     supervisor_.shutdown();
