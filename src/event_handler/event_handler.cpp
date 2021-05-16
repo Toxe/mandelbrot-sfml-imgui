@@ -44,37 +44,36 @@ void EventHandler::poll_events(sf::RenderWindow& window)
     while (window.pollEvent(event)) {
         ImGui::SFML::ProcessEvent(event);
 
-        if (event.type == sf::Event::Closed) {
+        if (event.type == sf::Event::Closed)
             handle_event(Event::CloseWindow);
-        } else if (event.type == sf::Event::Resized) {
+        else if (event.type == sf::Event::Resized)
             handle_event(Event::ResizedWindow);
-        } else if (event.type == sf::Event::KeyPressed) {
+        else if (event.type == sf::Event::KeyPressed) {
             if (ImGui::GetIO().WantCaptureKeyboard)
                 continue;
 
-            if (event.key.code == sf::Keyboard::Escape) {
+            if (event.key.code == sf::Keyboard::Escape)
                 handle_event(Event::CloseWindow);
-            } else if (event.key.code == sf::Keyboard::F1) {
+            else if (event.key.code == sf::Keyboard::F1)
                 handle_event(Event::ToggleHelp);
-            } else if (event.key.code == sf::Keyboard::F11) {
+            else if (event.key.code == sf::Keyboard::F11)
                 handle_event(Event::ToggleFullscreen);
-            } else if (event.key.code == sf::Keyboard::Enter) {
+            else if (event.key.code == sf::Keyboard::Enter)
                 handle_event(Event::CalculateImage);
-            } else if (event.key.code == sf::Keyboard::Space) {
+            else if (event.key.code == sf::Keyboard::Space)
                 handle_event(Event::ToggleUIVisibility);
-            } else if (event.key.code == sf::Keyboard::Left) {
+            else if (event.key.code == sf::Keyboard::Left)
                 handle_event(Event::ScrollLeft);
-            } else if (event.key.code == sf::Keyboard::Right) {
+            else if (event.key.code == sf::Keyboard::Right)
                 handle_event(Event::ScrollRight);
-            } else if (event.key.code == sf::Keyboard::Up) {
+            else if (event.key.code == sf::Keyboard::Up)
                 handle_event(Event::ScrollUp);
-            } else if (event.key.code == sf::Keyboard::Down) {
+            else if (event.key.code == sf::Keyboard::Down)
                 handle_event(Event::ScrollDown);
-            } else if (event.key.code == sf::Keyboard::Add) {
+            else if (event.key.code == sf::Keyboard::Add)
                 handle_event(Event::ZoomIn);
-            } else if (event.key.code == sf::Keyboard::Subtract) {
+            else if (event.key.code == sf::Keyboard::Subtract)
                 handle_event(Event::ZoomOut);
-            }
         }
     }
 }
