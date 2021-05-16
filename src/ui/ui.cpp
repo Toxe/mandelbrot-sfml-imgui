@@ -43,14 +43,14 @@ void UI::reset_image_request_input_values_to_default()
     return max_iterations_.changed() || tile_size_.changed() || center_x_.changed() || center_y_.changed() || fractal_height_.changed();
 }
 
-void UI::render(App& app, Supervisor& supervisor)
+void UI::render(App& app, Supervisor& supervisor, const Window& window)
 {
-    render_main_window(app, supervisor);
+    render_main_window(app, supervisor, window);
     render_help_window();
     render_interface_hidden_hint_window();
 }
 
-void UI::render_main_window(App& app, Supervisor& supervisor)
+void UI::render_main_window(App& app, Supervisor& supervisor, const Window& window)
 {
     static std::vector<float> fps(120);
     static std::size_t values_offset = 0;
@@ -68,7 +68,7 @@ void UI::render_main_window(App& app, Supervisor& supervisor)
     if (!is_visible_)
         return;
 
-    const auto window_size = app.window().size();
+    const auto window_size = window.size();
 
     ImGui::SetNextWindowPos(ImVec2(20, 20), ImGuiCond_FirstUseEver);
     ImGui::Begin(main_window_title_, nullptr, ImGuiWindowFlags_AlwaysAutoResize);

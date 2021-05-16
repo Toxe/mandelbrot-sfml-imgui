@@ -4,27 +4,32 @@
 #include "event_handler/event_handler.h"
 #include "supervisor/supervisor.h"
 #include "ui/ui.h"
+#include "window/window.h"
 
 int main(int argc, char* argv[])
 {
     CommandLine cli(argc, argv);
-    App app(cli);
-    UI ui(cli);
 
-    Supervisor supervisor(app.window());
+    App app;
+    UI ui(cli);
+    Window window(cli);
+
+    Supervisor supervisor(window);
     supervisor.run(cli.num_threads());
 
     EventHandler event_handler;
-    register_events(event_handler, app.window(), ui, supervisor);
+    register_events(event_handler, window, ui, supervisor);
     ui.set_event_handler(&event_handler);
 
-    while (app.running()) {
+    while (window.is_open()) {
         app.next_frame();
-        event_handler.poll_events(app.window().window());
+        window.next_frame(app.elapsed_time());
 
-        if (app.running()) {
-            ui.render(app, supervisor);
-            app.window().render();
+        event_handler.poll_events(window.window());
+
+        if (window.is_open()) {
+            ui.render(app, supervisor, window);
+            window.render();
         }
     }
 
