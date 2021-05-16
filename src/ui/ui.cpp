@@ -121,14 +121,14 @@ void UI::render_main_window(App& app)
 
     if (phase == Phase::Idle) {
         if (ImGui::Button("Calculate"))
-            calculate_image(app);
+            event_handler_->handle_event(Event::CalculateImage);
 
         if (image_request_input_values_have_changed()) {
             ImGui::SameLine();
 
             if (ImGui::Button("Reset")) {
                 reset_image_request_input_values_to_default();
-                calculate_image(app);
+                event_handler_->handle_event(Event::CalculateImage);
             }
         }
     }
@@ -263,22 +263,22 @@ bool UI::input_double(const char* label, InputValue<double>& value, const double
     return changed_now;
 }
 
-void UI::calculate_image(App& app)
+SupervisorImageRequest UI::calculate_image(const ImageSize image_size)
 {
-    const auto image_size = app.window().size();
-    const auto calculation_area = CalculationArea{0, 0, image_size.width, image_size.height};
-    app.calculate_image(SupervisorImageRequest{max_iterations_.get(), tile_size_.get(), image_size, calculation_area, {0, 0}, {center_x_.get(), center_y_.get(), fractal_height_.get()}});
+    const CalculationArea calculation_area{0, 0, image_size.width, image_size.height};
+    const FractalSection fractal_section{center_x_.get(), center_y_.get(), fractal_height_.get()};
 
     needs_to_recalculate_image_ = false;
+
+    return SupervisorImageRequest{max_iterations_.get(), tile_size_.get(), image_size, calculation_area, {0, 0}, fractal_section};
 }
 
-void UI::scroll_image(App& app, int delta_x, int delta_y)
+SupervisorImageRequest UI::scroll_image(const ImageSize image_size, const int delta_x, const int delta_y)
 {
     assert((delta_x != 0 && delta_y == 0) || (delta_x == 0 && delta_y != 0));
 
     spdlog::debug("scroll {}/{}", delta_x, delta_y);
 
-    const ImageSize image_size = app.window().size();
     CalculationArea calculation_area;
     FractalSection fractal_section;
     Scroll scroll{delta_x, delta_y};
@@ -320,24 +320,23 @@ void UI::scroll_image(App& app, int delta_x, int delta_y)
     center_x_.set(fractal_section.center_x);
     center_y_.set(fractal_section.center_y);
 
-    app.calculate_image(SupervisorImageRequest{max_iterations_.get(), tile_size_.get(), image_size, calculation_area, scroll, fractal_section});
-
     needs_to_recalculate_image_ = false;
+
+    return SupervisorImageRequest{max_iterations_.get(), tile_size_.get(), image_size, calculation_area, scroll, fractal_section};
 }
 
-void UI::zoom_image(App& app, double factor)
+SupervisorImageRequest UI::zoom_image(const ImageSize image_size, double factor)
 {
     spdlog::debug("zoom {}", factor);
 
     fractal_height_.set(fractal_height_.get() / factor);
 
-    const ImageSize image_size = app.window().size();
     const CalculationArea calculation_area{0, 0, image_size.width, image_size.height};
     const FractalSection fractal_section{center_x_.get(), center_y_.get(), fractal_height_.get()};
 
-    app.calculate_image(SupervisorImageRequest{max_iterations_.get(), tile_size_.get(), image_size, calculation_area, {0, 0}, fractal_section});
-
     needs_to_recalculate_image_ = false;
+
+    return SupervisorImageRequest{max_iterations_.get(), tile_size_.get(), image_size, calculation_area, {0, 0}, fractal_section};
 }
 
 void UI::show_status(const Phase phase)

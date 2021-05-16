@@ -25,18 +25,15 @@ class Window {
 
     void adjust_view_to_window_size();
 
-    [[nodiscard]] bool handle_internal_event(const sf::Event& event);
-
 public:
     Window(const CommandLine& cli);
 
+    [[nodiscard]] sf::RenderWindow& window() const { return *window_; };
     [[nodiscard]] sf::Texture& texture() const { return *texture_; };
     [[nodiscard]] sf::Sprite& sprite() const { return *sprite_; };
     [[nodiscard]] bool is_open() const { return window_->isOpen(); };
 
     [[nodiscard]] ImageSize size() const;
-
-    [[nodiscard]] bool poll_event(sf::Event& event);
 
     void next_frame(const Duration elapsed_time);
     void render();

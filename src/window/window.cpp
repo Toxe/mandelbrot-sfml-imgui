@@ -36,44 +36,6 @@ Window::Window(const CommandLine& cli)
     ImGui::SFML::UpdateFontTexture();
 }
 
-[[nodiscard]] bool Window::handle_internal_event(const sf::Event& event)
-{
-    if (event.type == sf::Event::Closed) {
-        close();
-        return true;
-    } else if (event.type == sf::Event::Resized) {
-        resized_window();
-        return true;
-    } else if (event.type == sf::Event::KeyPressed) {
-        if (ImGui::GetIO().WantCaptureKeyboard)
-            return true;
-
-        if (event.key.code == sf::Keyboard::Escape) {
-            close();
-            return true;
-        } else if (event.key.code == sf::Keyboard::F11) {
-            toggle_fullscreen();
-            return true;
-        }
-    }
-
-    return false;
-}
-
-[[nodiscard]] bool Window::poll_event(sf::Event& event)
-{
-    while (window_->pollEvent(event)) {
-        ImGui::SFML::ProcessEvent(event);
-
-        if (handle_internal_event(event))
-            continue;
-
-        return true;
-    }
-
-    return false;
-}
-
 [[nodiscard]] ImageSize Window::size() const
 {
     const auto window_size = window_->getSize();

@@ -23,18 +23,18 @@ public:
 
     [[nodiscard]] Gradient& gradient() { return gradient_; }
     [[nodiscard]] Window& window() { return window_; };
+    [[nodiscard]] UI& ui() { return ui_; };
+    [[nodiscard]] Supervisor& supervisor() { return supervisor_; };
     [[nodiscard]] SupervisorStatus& supervisor_status() { return supervisor_.status(); };
     [[nodiscard]] Duration elapsed_time() const { return elapsed_time_; };
     [[nodiscard]] bool running() const { return window_.is_open(); };
 
     void next_frame();
-    void poll_events();
 
     void render();
 
     void shutdown();
 
-    void calculate_image(SupervisorImageRequest image_request);
     void colorize(SupervisorColorize colorize);
     void cancel_calculation();
     void change_num_threads(const int num_threads);

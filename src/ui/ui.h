@@ -7,6 +7,7 @@
 
 #include "input_value.h"
 #include "clock/duration.h"
+#include "event_handler/event_handler.h"
 #include "interface_hidden_hint_window.h"
 #include "supervisor/phase.h"
 #include "window/window.h"
@@ -17,6 +18,8 @@ class CommandLine;
 class UI {
     const char* main_window_title_ = "Mandelbrot";
     const char* help_window_title_ = "Help";
+
+    EventHandler* event_handler_ = nullptr;
 
     ImVec2 main_window_size_;
 
@@ -62,8 +65,9 @@ public:
     void toggle_visibility();
     void toggle_help() { show_help_ = !show_help_; };
 
-    void calculate_image(App& app);
+    SupervisorImageRequest calculate_image(const ImageSize image_size);
+    SupervisorImageRequest scroll_image(const ImageSize image_size, const int delta_x, const int delta_y);
+    SupervisorImageRequest zoom_image(const ImageSize image_size, double factor);
 
-    void scroll_image(App& app, int delta_x, int delta_y);
-    void zoom_image(App& app, double factor);
+    void set_event_handler(EventHandler* event_handler) { event_handler_ = event_handler; };
 };

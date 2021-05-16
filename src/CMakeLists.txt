@@ -1,10 +1,13 @@
 add_executable(mandelbrot
     main.cpp
+    register_events.cpp register_events.h
     app/app.cpp app/app.h
     clock/clock.h
     clock/duration.h
     clock/stopwatch.h
     command_line/command_line.cpp command_line/command_line.h
+    event_handler/event_handler.cpp event_handler/event_handler.h
+    event_handler/events.h
     gradient/gradient.cpp gradient/gradient.h
     mandelbrot/mandelbrot.cpp mandelbrot/mandelbrot.h
     messages/message_queue.h
@@ -15,7 +18,9 @@ add_executable(mandelbrot
     ui/colors.h
     ui/input_value.h
     ui/interface_hidden_hint_window.cpp ui/interface_hidden_hint_window.h
+    ui/ui_commands.h
     ui/ui.cpp ui/ui.h
+    window/window_commands
     window/window.cpp window/window.h
     worker/worker.cpp worker/worker.h
 )

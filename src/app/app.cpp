@@ -19,42 +19,6 @@ void App::next_frame()
     window_.next_frame(elapsed_time_);
 }
 
-void App::poll_events()
-{
-    sf::Event event;
-
-    while (window_.poll_event(event)) {
-        if (event.type == sf::Event::KeyPressed) {
-            if (event.key.code == sf::Keyboard::Enter) {
-                if (supervisor_.status().phase() == Phase::Idle)
-                    ui_.calculate_image(*this);
-            } else if (event.key.code == sf::Keyboard::Space) {
-                ui_.toggle_visibility();
-            } else if (event.key.code == sf::Keyboard::F1) {
-                ui_.toggle_help();
-            } else if (event.key.code == sf::Keyboard::Left) {
-                if (supervisor_.status().phase() == Phase::Idle)
-                    ui_.scroll_image(*this, -window_.size().height / 8, 0);
-            } else if (event.key.code == sf::Keyboard::Right) {
-                if (supervisor_.status().phase() == Phase::Idle)
-                    ui_.scroll_image(*this, window_.size().height / 8, 0);
-            } else if (event.key.code == sf::Keyboard::Up) {
-                if (supervisor_.status().phase() == Phase::Idle)
-                    ui_.scroll_image(*this, 0, -window_.size().height / 8);
-            } else if (event.key.code == sf::Keyboard::Down) {
-                if (supervisor_.status().phase() == Phase::Idle)
-                    ui_.scroll_image(*this, 0, window_.size().height / 8);
-            } else if (event.key.code == sf::Keyboard::Add) {
-                if (supervisor_.status().phase() == Phase::Idle)
-                    ui_.zoom_image(*this, 2.0);
-            } else if (event.key.code == sf::Keyboard::Subtract) {
-                if (supervisor_.status().phase() == Phase::Idle)
-                    ui_.zoom_image(*this, 0.5);
-            }
-        }
-    }
-}
-
 void App::render()
 {
     if (running()) {
@@ -66,12 +30,6 @@ void App::render()
 void App::shutdown()
 {
     supervisor_.shutdown();
-}
-
-void App::calculate_image(SupervisorImageRequest image_request)
-{
-    image_request.image_size = window_.size();
-    supervisor_.calculate_image(image_request);
 }
 
 void App::colorize(SupervisorColorize colorize)
