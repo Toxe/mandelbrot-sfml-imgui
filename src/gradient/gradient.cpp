@@ -12,6 +12,7 @@
 
 #include <fmt/ostream.h>
 #include <spdlog/spdlog.h>
+#include <SFML/Graphics/Color.hpp>
 
 const std::string gradients_directory = "assets/gradients";
 

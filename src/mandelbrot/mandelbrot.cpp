@@ -5,6 +5,8 @@
 #include <cmath>
 #include <numeric>
 
+#include <SFML/Graphics/Color.hpp>
+
 void mandelbrot_calc(const ImageSize& image, const FractalSection& section, const int max_iterations,
                      std::vector<CalculationResult>& results_per_point, const CalculationArea& area) noexcept
 {

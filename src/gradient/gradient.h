@@ -3,7 +3,9 @@
 #include <string>
 #include <vector>
 
-#include <SFML/Graphics/Color.hpp>
+namespace sf {
+    class Color;
+}
 
 bool equal_enough(float a, float b) noexcept;
 

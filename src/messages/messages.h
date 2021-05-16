@@ -4,6 +4,8 @@
 #include <variant>
 #include <vector>
 
+#include <SFML/Config.hpp>
+
 #include "gradient/gradient.h"
 
 struct CalculationResult {

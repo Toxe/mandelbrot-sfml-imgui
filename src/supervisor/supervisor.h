@@ -3,7 +3,8 @@
 #include <thread>
 #include <vector>
 
-#include <SFML/Graphics.hpp>
+#include <SFML/Graphics/Color.hpp>
+#include <SFML/Graphics/Image.hpp>
 
 #include "supervisor_status.h"
 #include "gradient/gradient.h"

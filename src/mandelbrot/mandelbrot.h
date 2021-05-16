@@ -2,8 +2,6 @@
 
 #include <vector>
 
-#include <SFML/Graphics/Image.hpp>
-
 #include "gradient/gradient.h"
 #include "messages/messages.h"
 
