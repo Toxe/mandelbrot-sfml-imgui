@@ -145,8 +145,14 @@ void Supervisor::handle_message(SupervisorColorize&& colorize)
 {
     spdlog::debug("supervisor: received message Colorize");
 
-    status_.start_calculation(Phase::Coloring);
     gradient_ = colorize.gradient;
+
+    if (results_per_point_.empty()) {
+        status_.set_phase(Phase::Idle);
+        return;  // we have not calculated an image yet
+    }
+
+    status_.start_calculation(Phase::Coloring);
     send_colorization_messages(colorize.max_iterations, colorize.image_size);
 }
 
